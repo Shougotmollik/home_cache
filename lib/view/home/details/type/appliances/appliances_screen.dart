@@ -3,10 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart' show AppColors;
+import 'package:home_cache/controller/appliance_controller.dart';
 import 'package:home_cache/view/home/details/type/appliances/dialog_appliance.dart';
-import 'package:home_cache/view/widget/appbar_back_widget.dart';
-
 import '../../../../../config/route/route_names.dart';
+import 'package:home_cache/model/appliance.dart';
 
 class AppliancesScreen extends StatefulWidget {
   const AppliancesScreen({super.key});
@@ -16,107 +16,46 @@ class AppliancesScreen extends StatefulWidget {
 }
 
 class _AppliancesScreenState extends State<AppliancesScreen> {
-  final List<String> categories = [
-    "Refrigerator",
-    "Oven",
-    "Washer",
-    "Stove",
-    "Dryer",
-    "Ice Maker",
-    "Dish Washer",
-    "Garbage Disposal",
-    "Micro Wave",
-  ];
+  final ApplianceController controller = Get.put(ApplianceController());
 
   int selectedCategoryIndex = 0;
+  late String applianceTypeId;
 
-  void selectCategory(int index) {
-    setState(() {
-      selectedCategoryIndex = index;
+  @override
+  void initState() {
+    super.initState();
+
+    // Receive the applianceTypeId argument safely
+    applianceTypeId = Get.arguments['id'] ?? '';
+    print('Received Appliance Type ID:=====>>> $applianceTypeId');
+
+    // Fetch categories and types after the widget is built
+    Future.microtask(() async {
+      await controller.getApplianceCategories();
+      await controller.getApplianceTypes(applianceTypeId);
+
+      // Fetch appliances for the first category if available
+      if (controller.applianceCategoryList.isNotEmpty) {
+        final firstCategoryId = controller.applianceCategoryList[0].id;
+        await controller.getAppliancesByCategory(firstCategoryId);
+      }
     });
   }
 
-  final List<Map<String, dynamic>> documentTiles = [
-    {
-      'title': 'LG Fridge Warranty',
-      'subtitle': 'Model LGX1200',
-      'date': '10 Jun 25',
-      'category': 'Refrigerator',
-    },
-    {
-      'title': 'Samsung Oven Manual',
-      'subtitle': 'Convection Oven',
-      'date': '22 Aug 25',
-      'category': 'Oven',
-    },
-    {
-      'title': 'Washer Insurance',
-      'subtitle': 'Bosch Washer',
-      'date': '15 May 25',
-      'category': 'Washer',
-    },
-    {
-      'title': 'Gas Stove Receipt',
-      'subtitle': 'GE Brand',
-      'date': '20 Jul 25',
-      'category': 'Stove',
-    },
-    {
-      'title': 'Dryer User Manual',
-      'subtitle': 'Whirlpool',
-      'date': '12 Jun 25',
-      'category': 'Dryer',
-    },
-    {
-      'title': 'Ice Maker Quote',
-      'subtitle': 'Installation',
-      'date': '01 Jul 25',
-      'category': 'Ice Maker',
-    },
-    {
-      'title': 'Dishwasher Invoice',
-      'subtitle': 'LG Smart Dish Washer',
-      'date': '15 Jul 25',
-      'category': 'Dish Washer',
-    },
-    {
-      'title': 'Garbage Disposal Warranty',
-      'subtitle': 'Model GD300',
-      'date': '12 Apr 25',
-      'category': 'Garbage Disposal',
-    },
-    {
-      'title': 'Microwave Manual',
-      'subtitle': 'Panasonic Inverter',
-      'date': '30 May 25',
-      'category': 'Micro Wave',
-    },
-  ];
+  void selectCategory(int index) {
+    setState(() => selectedCategoryIndex = index);
+
+    final categoryId = controller.applianceCategoryList[index].id;
+    controller.getAppliancesByCategory(categoryId);
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Normalize categories for comparison (lowercase, no spaces)
-    String normalize(String s) => s.toLowerCase().replaceAll(' ', '');
-
-    final normalizedSelectedCategory = normalize(
-      categories[selectedCategoryIndex],
-    );
-
-    final filteredDocuments = documentTiles.where((doc) {
-      final normalizedDocCategory = normalize(doc['category'].toString());
-      return normalizedDocCategory == normalizedSelectedCategory;
-    }).toList();
-
-    // Debug prints to check filtering
-    // ignore: avoid_print
-    print('Selected category: ${categories[selectedCategoryIndex]}');
-    // ignore: avoid_print
-    print('Filtered docs count: ${filteredDocuments.length}');
-
     return Scaffold(
-      appBar: AppBarBack(
-        title: 'Appliances',
-        titleColor: AppColors.secondary,
+      appBar: AppBar(
+        title: Text('Appliances', style: AppTypoGraphy.medium),
+        backgroundColor: AppColors.surface,
+        elevation: 0,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
@@ -124,15 +63,14 @@ class _AppliancesScreenState extends State<AppliancesScreen> {
               onPressed: () {
                 showDialog(
                   context: context,
-                  builder: (context) => const DialogAppliance(),
+                  builder: (_) => DialogAppliance(
+                    applianceTypeId: applianceTypeId,
+                  ),
                 );
               },
               style: TextButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                padding: EdgeInsets.symmetric(
-                  horizontal: 12.w,
-                  vertical: 6.h,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12.r),
                 ),
@@ -146,98 +84,141 @@ class _AppliancesScreenState extends State<AppliancesScreen> {
         ],
       ),
       backgroundColor: AppColors.surface,
-      body: Padding(
-        padding: EdgeInsets.all(24.sp),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 6.w,
-              runSpacing: 8.h,
-              children: List.generate(categories.length, (index) {
-                final isSelected = selectedCategoryIndex == index;
-                return ElevatedButton(
-                  onPressed: () => selectCategory(index),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        isSelected ? AppColors.primary : AppColors.lightgrey,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 10.w),
-                  ),
-                  child: Text(
-                    categories[index],
-                    style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.black,
-                      fontSize: 12.sp,
-                    ),
-                  ),
-                );
-              }),
-            ),
-            SizedBox(height: 20.h),
-            Text(
-              'View All',
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (controller.applianceCategoryList.isEmpty) {
+          return Center(
+            child: Text(
+              'No appliance categories found',
               style: AppTypoGraphy.medium.copyWith(color: AppColors.black),
-              textAlign: TextAlign.start,
             ),
-            SizedBox(height: 20.h),
-            // List View
-            Expanded(
-              child: filteredDocuments.isEmpty
-                  ? Center(
-                      child: Text(
-                        'No appliances in this category.',
-                        style: AppTypoGraphy.medium.copyWith(
-                          color: AppColors.black,
+          );
+        }
+
+        // Ensure selected index is valid
+        if (selectedCategoryIndex >= controller.applianceCategoryList.length) {
+          selectedCategoryIndex = 0;
+        }
+
+        return Padding(
+          padding: EdgeInsets.all(24.sp),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // CATEGORY BUTTONS
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 6.w,
+                runSpacing: 8.h,
+                children: List.generate(
+                  controller.applianceCategoryList.length,
+                  (index) {
+                    final isSelected = selectedCategoryIndex == index;
+                    final categoryName =
+                        controller.applianceCategoryList[index].appliance;
+
+                    return ElevatedButton(
+                      onPressed: () => selectCategory(index),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isSelected
+                            ? AppColors.primary
+                            : AppColors.lightgrey,
+                        padding: EdgeInsets.symmetric(horizontal: 12.w),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.r),
                         ),
                       ),
-                    )
-                  : ListView.separated(
-                      itemCount: filteredDocuments.length,
-                      separatorBuilder: (context, index) =>
-                          SizedBox(height: 12.h),
-                      itemBuilder: (context, index) {
-                        final doc = filteredDocuments[index];
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.lightgrey,
-                            borderRadius: BorderRadius.circular(12.r),
-                            border: Border.all(
+                      child: Text(
+                        categoryName,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : Colors.black,
+                          fontSize: 12.sp,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              SizedBox(height: 20.h),
+              Text(
+                'View All',
+                style: AppTypoGraphy.medium.copyWith(color: AppColors.black),
+              ),
+              SizedBox(height: 20.h),
+
+              // LIST OF APPLIANCES
+              Expanded(
+                child: controller.appliancesByCategoryList.isEmpty
+                    ? Center(
+                        child: Text(
+                          'No appliances in this category.',
+                          style: AppTypoGraphy.medium
+                              .copyWith(color: AppColors.black),
+                        ),
+                      )
+                    : ListView.separated(
+                        itemCount: controller.appliancesByCategoryList.length,
+                        separatorBuilder: (_, __) => SizedBox(height: 12.h),
+                        itemBuilder: (context, index) {
+                          final Appliance appliance =
+                              controller.appliancesByCategoryList[index];
+
+                          return Container(
+                            padding: EdgeInsets.all(12.sp),
+                            decoration: BoxDecoration(
                               color: AppColors.lightgrey,
-                              width: 1,
+                              borderRadius: BorderRadius.circular(12.r),
                             ),
-                          ),
-                          child: ListTile(
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 24.w,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        appliance.details.brand ??
+                                            'Unknown Brand',
+                                        style: AppTypoGraphy.medium
+                                            .copyWith(fontSize: 20.sp),
+                                      ),
+                                      SizedBox(height: 4.h),
+                                      Text(
+                                        '${appliance.details.model} • ${appliance.details.warrantyYears} yr warranty',
+                                        style: AppTypoGraphy.regular
+                                            .copyWith(fontSize: 14.sp),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                // EDIT BUTTON
+                                IconButton(
+                                  icon:
+                                      Icon(Icons.edit, color: AppColors.black),
+                                  onPressed: () {
+                                    Get.toNamed(RouteNames.editAppliances,
+                                        arguments: {
+                                          'applianceId': appliance.id
+                                        });
+                                  },
+                                ),
+                              ],
                             ),
-                            title: Text(
-                              doc['title'],
-                              style: AppTypoGraphy.medium.copyWith(
-                                fontSize: 20.sp,
-                              ),
-                            ),
-                            subtitle: Text(
-                              doc['subtitle'],
-                              style: TextStyle(fontSize: 12.sp),
-                            ),
-                            trailing: IconButton(
-                              icon: Icon(Icons.edit, color: AppColors.black),
-                              onPressed: () {
-                                Get.toNamed(RouteNames.editAppliances);
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
-      ),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+        );
+      }),
     );
   }
 }

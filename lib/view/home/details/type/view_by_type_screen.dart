@@ -1,50 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/route_manager.dart';
+import 'package:get/get.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
+import 'package:home_cache/controller/view_by_type_controller.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
-
 import '../../../../config/route/route_names.dart';
 
 class ViewByTypeScreen extends StatefulWidget {
   const ViewByTypeScreen({super.key});
 
   @override
-  State<ViewByTypeScreen> createState() => _DetailsScreenState();
+  State<ViewByTypeScreen> createState() => _ViewByTypeScreenState();
 }
 
-class _DetailsScreenState extends State<ViewByTypeScreen> {
+class _ViewByTypeScreenState extends State<ViewByTypeScreen> {
   int selectedIndex = -1;
 
-  // List of tile data
-  final List<Map<String, dynamic>> tiles = [
-    {
-      'title': 'Appliances',
-      'iconPath': 'assets/images/appliances.png',
-      'index': 0,
-    },
-    {'title': 'Utility', 'iconPath': 'assets/images/utility.png', 'index': 1},
-    {'title': 'Paint', 'iconPath': 'assets/images/paint.png', 'index': 2},
-    {
-      'title': 'Materials',
-      'iconPath': 'assets/images/materials.png',
-      'index': 3,
-    },
-  ];
+  final ViewByTypeController controller = Get.put(ViewByTypeController());
 
+  @override
+  void initState() {
+    super.initState();
+    controller.getViewByType();
+  }
+
+  /// Handle tile taps with navigation
+  void onTileTap(int index) {
+    switch (index) {
+      case 0:
+        Get.toNamed(RouteNames.appliances, arguments: {
+          "id": controller.typeList[index].id,
+          "type": controller.typeList[index].type,
+        });
+        break;
+      case 1:
+        Get.toNamed(RouteNames.utility, arguments: {
+          "id": controller.typeList[index].id,
+          "type": controller.typeList[index].type,
+        });
+        break;
+      case 2:
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Coming Soon")),
+        );
+        break;
+      case 3:
+      default:
+        Get.toNamed(RouteNames.material, arguments: {
+          "id": controller.typeList[index].id,
+          "type": controller.typeList[index].type,
+        });
+    }
+  }
+
+  /// Build grid tile
   Widget _buildTile(
     BuildContext context,
     String title,
-    String iconPath,
+    String imageUrl,
     int index,
     VoidCallback onTap,
   ) {
     return GestureDetector(
       onTap: () {
-        setState(() {
-          selectedIndex = index;
-        });
+        setState(() => selectedIndex = index);
         onTap();
       },
       child: Container(
@@ -54,7 +74,7 @@ class _DetailsScreenState extends State<ViewByTypeScreen> {
           color: AppColors.lightgrey,
           border: Border.all(
             color: selectedIndex == index
-                ? AppColors.lightgrey
+                ? AppColors.primaryLight
                 : AppColors.lightgrey,
             width: selectedIndex == index ? 2.w : 1.w,
           ),
@@ -69,10 +89,15 @@ class _DetailsScreenState extends State<ViewByTypeScreen> {
           ],
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(iconPath, height: 52.h, width: 52.w),
+            Image.network(
+              imageUrl,
+              height: 52.h,
+              width: 52.w,
+              errorBuilder: (_, __, ___) =>
+                  Icon(Icons.broken_image, size: 40, color: Colors.grey),
+            ),
             SizedBox(height: 12.h),
             Text(
               title,
@@ -99,60 +124,50 @@ class _DetailsScreenState extends State<ViewByTypeScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(height: 40.h),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 8.h,
-                  crossAxisSpacing: 8.w,
-                  childAspectRatio: 1,
+          child: Obx(() {
+            if (controller.isLoading.value) {
+              return Padding(
+                padding: EdgeInsets.only(top: 100.h),
+                child: const Center(child: CircularProgressIndicator()),
+              );
+            }
+
+            if (controller.typeList.isEmpty) {
+              return Padding(
+                padding: EdgeInsets.only(top: 100.h),
+                child: const Center(child: Text("No data found")),
+              );
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(height: 40.h),
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 8.h,
+                    crossAxisSpacing: 8.w,
+                    childAspectRatio: 1,
+                  ),
+                  itemCount: controller.typeList.length,
+                  itemBuilder: (context, index) {
+                    final item = controller.typeList[index];
+
+                    return _buildTile(
+                      context,
+                      item.type,
+                      item.image,
+                      index,
+                      () => onTileTap(index),
+                    );
+                  },
                 ),
-                itemCount: tiles.length,
-                itemBuilder: (context, index) {
-                  VoidCallback onTap;
-
-                  switch (index) {
-                    case 0:
-                      onTap = () {
-                        Get.toNamed(RouteNames.appliances);
-                      };
-                      break;
-                    case 1:
-                      onTap = () {
-                        Get.toNamed(RouteNames.utility);
-                      };
-                      break;
-                    case 2:
-                      onTap = () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Coming Soon")),
-                        );
-                      };
-                      break;
-                    case 3:
-                    default:
-                      onTap = () {
-                        Get.toNamed(RouteNames.material);
-                      };
-                      break;
-                  }
-
-                  return _buildTile(
-                    context,
-                    tiles[index]['title'],
-                    tiles[index]['iconPath'],
-                    tiles[index]['index'],
-                    onTap,
-                  );
-                },
-              ),
-            ],
-          ),
+              ],
+            );
+          }),
         ),
       ),
     );

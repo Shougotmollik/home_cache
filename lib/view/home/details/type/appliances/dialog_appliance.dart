@@ -1,22 +1,40 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get/get.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
+import 'package:home_cache/controller/appliance_controller.dart';
+import 'package:home_cache/controller/room_controller.dart';
 import 'package:home_cache/view/widget/text_button_widget.dart';
-
 import '../../../../../config/route/route_names.dart';
 
 class DialogAppliance extends StatelessWidget {
-  const DialogAppliance({super.key});
+  DialogAppliance({super.key, required this.applianceTypeId});
+
+  final String applianceTypeId;
+
+  // Controllers
+  final ApplianceController applianceController =
+      Get.put(ApplianceController());
+  final RoomController roomController = Get.put(RoomController());
+
+  // Reactive selected IDs
+  final RxString selectedTypeId = ''.obs;
+  final RxString selectedRoomId = ''.obs;
+
+  // Delay fetching after first frame to avoid build issues
+  void fetchAppliances() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      print('Appliance Type ID in Dialog: $applianceTypeId');
+      applianceController.getApplianceTypes(applianceTypeId);
+      roomController.fetchAllRoom();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    String selectedType = 'Refrigerator';
-    String selectedBrand = 'Kitchen';
-
+    fetchAppliances();
     return AlertDialog(
       backgroundColor: AppColors.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -25,157 +43,133 @@ class DialogAppliance extends StatelessWidget {
         style: AppTypoGraphy.bold.copyWith(color: AppColors.black),
         textAlign: TextAlign.center,
       ),
-      content: SizedBox(
-        height: 300.h,
-        child: StatefulBuilder(
-          builder: (context, setState) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                SizedBox(height: 18.h),
-                Text(
-                  'Title',
-                  style: AppTypoGraphy.regular.copyWith(color: AppColors.black),
-                  textAlign: TextAlign.start,
-                ),
-                Container(
+      content: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.3,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(height: 18.h),
+              Text(
+                'Type',
+                style: AppTypoGraphy.regular.copyWith(color: AppColors.black),
+              ),
+              SizedBox(height: 6.h),
+              Obx(() {
+                if (applianceController.applianceTypeList.isEmpty) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                // Set default value if empty
+                selectedTypeId.value = selectedTypeId.value.isEmpty
+                    ? applianceController.applianceTypeList.first.id
+                    : selectedTypeId.value;
+
+                return Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
                     border: Border.all(color: AppColors.lightgrey),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: DropdownButton<String>(
-                    value: selectedType,
+                    value: selectedTypeId.value,
                     isExpanded: true,
-                    underline: SizedBox(),
+                    underline: const SizedBox(),
                     icon: Icon(
                       CupertinoIcons.chevron_down,
                       color: AppColors.secondary,
                       size: 18.sp,
                     ),
-                    items: [
-                      'Thermostat',
-                      'Ceiling Fan',
-                      'Humidifier / Dehumidifier',
-                      'Air Purifier',
-                      'Space Heater',
-                      'Portable Air Conditioner',
-                      'Central Vacuum System',
-                      'Radon Mitigation',
-                      'Refrigerator',
-                      'Freezer',
-                      'Stove / Range',
-                      'Wall Oven',
-                      'Cooktop',
-                      'Microwave',
-                      'Dishwasher',
-                      'Range Hood / Vent',
-                      'Garbage Disposal',
-                      'Trash Compactor',
-                      'Warming Drawer',
-                      'Sink',
-                      'Washing Machine',
-                      'Dryer',
-                      'Shower',
-                      'Bathtub',
-                      'Toilet',
-                      'Steam Shower',
-                      'Sauna',
-                      'Garage Doors',
-                      'Electric Vehicle Charger',
-                      'Ice Maker',
-                    ].map((value) {
-                      return DropdownMenuItem(
-                        value: value,
-                        child: Text(
-                          value,
-                          style: TextStyle(color: AppColors.black),
-                        ),
+                    items: applianceController.applianceTypeList.map((value) {
+                      return DropdownMenuItem<String>(
+                        value: value.id, // Use ID
+                        child: Text(value.name,
+                            style: const TextStyle(color: AppColors.black)),
                       );
                     }).toList(),
                     onChanged: (newValue) {
-                      setState(() {
-                        selectedType = newValue!;
-                      });
+                      if (newValue != null) selectedTypeId.value = newValue;
                     },
                   ),
-                ),
-                SizedBox(height: 16),
-                SizedBox(height: 6.h),
-                Text(
-                  'Location',
-                  style: AppTypoGraphy.regular.copyWith(color: AppColors.black),
-                  textAlign: TextAlign.start,
-                ),
-                Container(
+                );
+              }),
+              SizedBox(height: 16.h),
+              Text(
+                'Location',
+                style: AppTypoGraphy.regular.copyWith(color: AppColors.black),
+              ),
+              SizedBox(height: 6.h),
+              Obx(() {
+                if (roomController.allRooms.isEmpty) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                // Set default value if empty
+                selectedRoomId.value = selectedRoomId.value.isEmpty
+                    ? roomController.allRooms.first.id
+                    : selectedRoomId.value;
+
+                return Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
                     border: Border.all(color: AppColors.lightgrey),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: DropdownButton<String>(
-                    value: selectedBrand,
+                    value: selectedRoomId.value,
                     isExpanded: true,
-                    underline: SizedBox(),
+                    underline: const SizedBox(),
                     icon: Icon(
                       CupertinoIcons.chevron_down,
                       color: AppColors.secondary,
                       size: 18.sp,
                     ),
-                    items: [
-                      'Kitchen',
-                      'Dining',
-                      'Living Room',
-                      'Bedroom',
-                      'Bathroom',
-                      'Laundry',
-                      'Office',
-                      'Basement',
-                      'Garage',
-                      'Gym',
-                      'Mudroom',
-                      'Mediaroom',
-                      'Playroom',
-                      'Sunroom',
-                    ].map((value) {
-                      return DropdownMenuItem(
-                        value: value,
-                        child: Text(
-                          value,
-                          style: TextStyle(color: AppColors.black),
-                        ),
+                    items: roomController.allRooms.map((value) {
+                      return DropdownMenuItem<String>(
+                        value: value.id, // Use ID
+                        child: Text(value.name,
+                            style: const TextStyle(color: AppColors.black)),
                       );
                     }).toList(),
                     onChanged: (newValue) {
-                      setState(() {
-                        selectedBrand = newValue!;
-                      });
+                      if (newValue != null) selectedRoomId.value = newValue;
                     },
                   ),
+                );
+              }),
+              // const Spacer(),
+              SizedBox(height: 24.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 40.w),
+                child: TextWidgetButton(
+                  text: '→  Next',
+                  onPressed: () {
+                    if (selectedTypeId.value.isEmpty ||
+                        selectedRoomId.value.isEmpty) {
+                      Get.snackbar('Error', 'Please select type and location');
+                      return;
+                    }
+
+                    Get.toNamed(
+                      RouteNames.addAppliances,
+                      arguments: {
+                        'appliance_id': selectedTypeId.value,
+                        'view_type_id': applianceTypeId,
+                        'room_id': selectedRoomId.value,
+                        'type_name': applianceController
+                            .applianceTypeList
+                            .firstWhere(
+                                (type) => type.id == selectedTypeId.value)
+                            .name,
+                      },
+                    );
+                  },
                 ),
-                SizedBox(height: 70.h),
-                Padding(
-                  padding: EdgeInsets.only(left: 60.w),
-                  child: Column(
-                    children: [
-                      TextWidgetButton(
-                        text: '→  Next',
-                        onPressed: () {
-                          Get.toNamed(
-                            RouteNames.addAppliances,
-                            arguments: {
-                              'type': selectedType,
-                              'location': selectedBrand,
-                            },
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
+              ),
+            ],
+          ),
         ),
       ),
     );

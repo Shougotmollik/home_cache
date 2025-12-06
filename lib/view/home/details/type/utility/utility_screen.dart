@@ -101,10 +101,12 @@ class _UtilityScreenState extends State<UtilityScreen> {
             padding: const EdgeInsets.only(right: 8.0),
             child: TextButton(
               onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => const DialogAppliance(),
-                );
+                // showDialog(
+                //   context: context,
+                //   builder: (context) => const DialogAppliance(
+
+                //   ),
+                // );
               },
               style: TextButton.styleFrom(
                 backgroundColor: AppColors.primary,

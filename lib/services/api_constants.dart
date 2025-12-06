@@ -33,6 +33,10 @@ class ApiConstants {
   static String deleteUserRoomItem =
       "/view-by-room/delete-user-room-item-details/";
 
+  static String viewByType = "/view-by-type/";
+  static String applianceTypes = "/view-by-type/appliance/";
+  static String addNewAppliance = "/view-by-type/add-new-user-appliance";
+
   static String fetchUserRoomItems =
       "/view-by-room/user-room-single-item-data/";
 
