@@ -36,6 +36,8 @@ class ApiConstants {
   static String viewByType = "/view-by-type/";
   static String applianceTypes = "/view-by-type/appliance/";
   static String addNewAppliance = "/view-by-type/add-new-user-appliance";
+  static String updateAppliance =
+      "/view-by-type/update-user-appliance-details/";
 
   static String fetchUserRoomItems =
       "/view-by-room/user-room-single-item-data/";

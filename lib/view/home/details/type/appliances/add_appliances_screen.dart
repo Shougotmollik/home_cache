@@ -127,7 +127,6 @@ class _AddAppliancesScreenState extends State<AddAppliancesScreen> {
             Center(
               child: GestureDetector(
                 onTap: () async {
-                  // Pick new image from camera
                   await pickFromCamera();
                 },
                 child: Obx(() {
@@ -247,11 +246,11 @@ class _AddAppliancesScreenState extends State<AddAppliancesScreen> {
                 controller: _notesController),
             SizedBox(height: 16.h),
 
-            // ----- Past Appointments -----
-            if (isPastExpanded) ...[
-              PastAppointmentsTile(date: "June 18, 2025", status: "AC Check"),
-              PastAppointmentsTile(date: "May 05, 2025", status: "AC Check"),
-            ],
+            // // ----- Past Appointments -----
+            // if (isPastExpanded) ...[
+            //   PastAppointmentsTile(date: "June 18, 2025", status: "AC Check"),
+            //   PastAppointmentsTile(date: "May 05, 2025", status: "AC Check"),
+            // ],
             SizedBox(height: 20.h),
 
             // ----- Documents Section -----

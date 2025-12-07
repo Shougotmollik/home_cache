@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:home_cache/config/route/route_names.dart';
 import 'package:home_cache/model/appliance.dart';
 import 'package:home_cache/model/appliance_category.dart';
+import 'package:home_cache/model/appliance_details_model.dart';
 import 'package:home_cache/model/appliance_type.dart';
 import 'package:home_cache/services/api_checker.dart';
 import 'package:home_cache/services/api_clients.dart';
@@ -17,7 +19,29 @@ class ApplianceController extends GetxController {
 
   var applianceTypeList = <ApplianceType>[].obs;
   var applianceCategoryList = <ApplianceCategory>[].obs;
-  var appliancesByCategoryList = <Appliance>[].obs;
+  var appliancesByCategoryList = <ApplianceModel>[].obs;
+  var applianceDetails = Rx<ApplianceDetailsModel?>(null);
+
+  // Controllers for editing
+  late TextEditingController typeController;
+  late TextEditingController locationController;
+  late TextEditingController notesController;
+
+  @override
+  void onInit() {
+    super.onInit();
+    typeController = TextEditingController();
+    locationController = TextEditingController();
+    notesController = TextEditingController();
+  }
+
+  @override
+  void onClose() {
+    typeController.dispose();
+    locationController.dispose();
+    notesController.dispose();
+    super.onClose();
+  }
 
   /// Safely extract file extension
   String? _extension() {
@@ -116,11 +140,15 @@ class ApplianceController extends GetxController {
 
       if (responseData['data'] != null) {
         appliancesByCategoryList.clear();
-        for (var item in responseData['data']) {
+
+        final dataMap = responseData['data'] as Map<String, dynamic>;
+
+        // iterate through map values
+        for (var item in dataMap.values) {
           try {
-            appliancesByCategoryList.add(Appliance.fromJson(item));
+            appliancesByCategoryList.add(ApplianceModel.fromJson(item));
           } catch (e) {
-            print("Skipping invalid appliance: $e");
+            debugPrint("Skipping invalid appliance: $e");
           }
         }
       }
@@ -134,21 +162,15 @@ class ApplianceController extends GetxController {
   // ! add new appliance
   Future<void> addNewAppliance(var data) async {
     isLoading(true);
-
-    // Encode nested details JSON
     if (data['details'] != null) {
       data['details'] = jsonEncode(data['details']);
     }
-
-    // Safe Map<String, String> conversion
     Map<String, String> newData = {};
     data.forEach((key, value) {
       if (value != null) {
         newData[key] = value.toString();
       }
     });
-
-    // Build multipart list (send both)
     List<MultipartBody> multiParts = [];
 
     if (selectedImageFile.value != null) {
@@ -168,6 +190,74 @@ class ApplianceController extends GetxController {
     if (response.statusCode == 200) {
       await Future.delayed(const Duration(seconds: 1));
       Get.offAllNamed(RouteNames.viewByType);
+    } else {
+      ApiChecker.checkApi(response);
+    }
+
+    isLoading(false);
+  }
+
+  // ! get appliance details
+  Future<void> getApplianceDetails(String id) async {
+    try {
+      isLoading(true);
+
+      final response = await ApiClient.getData("/view-by-type/details/$id");
+
+      if (response.statusCode == 200) {
+        final responseData = response.body;
+        if (responseData['data'] != null) {
+          final details = ApplianceDetailsModel.fromJson(responseData['data']);
+          typeController.text = details.userAppliance?.appliance?.name ?? '';
+          locationController.text = details.room?.name ?? '';
+          notesController.text = details.details?.notes?.toString() ?? '';
+          applianceDetails.value = details;
+        }
+      } else {
+        ApiChecker.checkApi(response);
+      }
+    } catch (e) {
+      debugPrint("Error fetching appliance details: $e");
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  // ! update appliance details
+  Future<void> updateApplianceDetails(String id, var data) async {
+    isLoading(true);
+
+    if (data['details'] != null) {
+      data['details'] = jsonEncode(data['details']);
+    }
+
+    Map<String, String> newData = {};
+    data.forEach((key, value) {
+      if (value != null) {
+        newData[key] = value.toString();
+      }
+    });
+
+    List<MultipartBody> multiParts = [];
+
+    if (selectedImageFile.value != null) {
+      multiParts.add(MultipartBody('image', selectedImageFile.value!));
+    }
+
+    if (selectedFile.value != null) {
+      multiParts.add(MultipartBody('files', selectedFile.value!));
+    }
+
+    // API call
+    Response response = await ApiClient.patchMultipartData(
+      "${ApiConstants.updateAppliance}$id",
+      newData,
+      multipartBody: multiParts,
+    );
+
+    if (response.statusCode == 200) {
+      await Future.delayed(const Duration(seconds: 1));
+      Get.back();
     } else {
       ApiChecker.checkApi(response);
     }

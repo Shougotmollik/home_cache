@@ -111,7 +111,7 @@ class _AppliancesScreenState extends State<AppliancesScreen> {
               // CATEGORY BUTTONS
               Wrap(
                 alignment: WrapAlignment.center,
-                spacing: 6.w,
+                spacing: 10.w,
                 runSpacing: 8.h,
                 children: List.generate(
                   controller.applianceCategoryList.length,
@@ -124,7 +124,7 @@ class _AppliancesScreenState extends State<AppliancesScreen> {
                       onPressed: () => selectCategory(index),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: isSelected
-                            ? AppColors.primary
+                            ? AppColors.primary.withValues(alpha: 0.7)
                             : AppColors.lightgrey,
                         padding: EdgeInsets.symmetric(horizontal: 12.w),
                         shape: RoundedRectangleBorder(
@@ -164,52 +164,61 @@ class _AppliancesScreenState extends State<AppliancesScreen> {
                         itemCount: controller.appliancesByCategoryList.length,
                         separatorBuilder: (_, __) => SizedBox(height: 12.h),
                         itemBuilder: (context, index) {
-                          final Appliance appliance =
+                          final ApplianceModel appliance =
                               controller.appliancesByCategoryList[index];
 
-                          return Container(
-                            padding: EdgeInsets.all(12.sp),
-                            decoration: BoxDecoration(
-                              color: AppColors.lightgrey,
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        appliance.details.brand ??
-                                            'Unknown Brand',
-                                        style: AppTypoGraphy.medium
-                                            .copyWith(fontSize: 20.sp),
-                                      ),
-                                      SizedBox(height: 4.h),
-                                      Text(
-                                        '${appliance.details.model} • ${appliance.details.warrantyYears} yr warranty',
-                                        style: AppTypoGraphy.regular
-                                            .copyWith(fontSize: 14.sp),
-                                      ),
-                                    ],
+                          return GestureDetector(
+                            onTap: () {
+                              Get.toNamed(RouteNames.editAppliances,
+                                  arguments: {
+                                    'id': appliance.id,
+                                  });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(12.sp),
+                              decoration: BoxDecoration(
+                                color: AppColors.lightgrey,
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          appliance
+                                              .userAppliance.appliance.name,
+                                          style: AppTypoGraphy.medium
+                                              .copyWith(fontSize: 20.sp),
+                                        ),
+                                        SizedBox(height: 4.h),
+                                        Text(
+                                          appliance.room.name,
+                                          style: AppTypoGraphy.regular
+                                              .copyWith(fontSize: 14.sp),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
 
-                                // EDIT BUTTON
-                                IconButton(
-                                  icon:
-                                      Icon(Icons.edit, color: AppColors.black),
-                                  onPressed: () {
-                                    Get.toNamed(RouteNames.editAppliances,
-                                        arguments: {
-                                          'applianceId': appliance.id
-                                        });
-                                  },
-                                ),
-                              ],
+                                  // EDIT BUTTON
+                                  IconButton(
+                                    icon: Icon(Icons.edit,
+                                        color: AppColors.black),
+                                    onPressed: () {
+                                      Get.toNamed(RouteNames.editAppliances,
+                                          arguments: {
+                                            'id': appliance.id,
+                                          });
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           );
                         },
