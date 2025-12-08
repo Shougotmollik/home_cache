@@ -124,7 +124,7 @@ class _SelectResponsibleTypeScreenState
                       authController.updateResponsibleFor(selectedValues);
 
                       // Navigate
-                      Get.toNamed(RouteNames.finishUtility);
+                      Get.toNamed(RouteNames.selectHouseRole);
                     },
                   )
                 ],

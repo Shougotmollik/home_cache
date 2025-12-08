@@ -10,8 +10,6 @@ class DialongController extends GetxController {
     'Fire Alarm / Smoke Detector',
     'Laundry Room',
     'Landscaping',
-    'Laundry Room',
-    'Landscaping',
   ];
 
   final selectedTags = <String>[].obs;

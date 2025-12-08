@@ -321,7 +321,7 @@ class _EditAppliancesScreenState extends State<EditAppliancesScreen> {
                       'file':
                           controller.selectedFile.value!.path.split('/').last,
                       'fileId': '',
-                      'updatedAt': DateTime.now().toString(),
+                      'uploadedAt': DateTime.now().toString(),
                     });
                   }
 
@@ -330,7 +330,7 @@ class _EditAppliancesScreenState extends State<EditAppliancesScreen> {
                         .map((e) => {
                               'file': e.file?.split('/').last ?? '',
                               'fileId': e.fileId ?? '',
-                              'updatedAt': e.updatedAt ?? '',
+                              'uploadedAt': e.uploadedAt??'',
                             })
                         .toList());
                   }

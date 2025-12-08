@@ -67,6 +67,7 @@ class AuthController extends GetxController {
     homeWaterSupplyType: [],
     homeHeatingType: [],
     homeHeatingPower: null,
+    houseRole: null,
     homeCoolingType: [],
     responsibleFor: [],
     wantToTrack: [],
@@ -112,6 +113,10 @@ class AuthController extends GetxController {
 
   void updateWantToTrack(List<String> value) {
     collectedData.update((data) => data?.wantToTrack = value);
+  }
+
+  void updateHouseRole(String value) {
+    collectedData.update((data) => data?.houseRole = value);
   }
 
   void updateLastServiceData({

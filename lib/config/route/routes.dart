@@ -10,6 +10,7 @@ import 'package:home_cache/view/auth/signup/onboardingSignup/screens/select_heat
 import 'package:home_cache/view/auth/signup/onboardingSignup/screens/select_heating_type.dart';
 import 'package:home_cache/view/auth/signup/onboardingSignup/screens/select_power_type.dart';
 import 'package:home_cache/view/auth/signup/onboardingSignup/screens/select_reponsible_type_screen.dart';
+import 'package:home_cache/view/auth/signup/onboardingSignup/screens/select_role_screen.dart';
 import 'package:home_cache/view/auth/signup/onboardingSignup/screens/select_type_of_house_screen.dart';
 import 'package:home_cache/view/auth/signup/onboardingSignup/screens/select_water_supply_type_screen.dart';
 import 'package:home_cache/view/auth/signup/screens/add_details_iteam_screen.dart';
@@ -98,6 +99,10 @@ class AppRoutes {
     GetPage(
         name: RouteNames.selectResponsibleType,
         page: () => const SelectResponsibleTypeScreen(),
+        binding: ControllerBinder()),
+    GetPage(
+        name: RouteNames.selectHouseRole,
+        page: () => const SelectHouseRoleScreen(),
         binding: ControllerBinder()),
     GetPage(
         name: RouteNames.finishUtility,

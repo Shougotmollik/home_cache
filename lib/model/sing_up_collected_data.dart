@@ -6,6 +6,7 @@ class SingUpCollectedData {
   List<String>? homeWaterSupplyType;
   List<String>? homeHeatingType;
   String? homeHeatingPower;
+  String? houseRole;
   List<String>? homeCoolingType;
   List<String>? responsibleFor;
   List<String>? wantToTrack;
@@ -23,6 +24,7 @@ class SingUpCollectedData {
     this.responsibleFor,
     this.wantToTrack,
     this.lastServiceData,
+    this.houseRole,
   });
 
   Map<String, dynamic> toJson() => {
@@ -33,6 +35,7 @@ class SingUpCollectedData {
         "home_water_supply_type": homeWaterSupplyType,
         "home_heating_type": homeHeatingType,
         "home_heating_power": homeHeatingPower,
+        "home_role": houseRole,
         "home_cooling_type": homeCoolingType,
         "responsible_for": responsibleFor,
         "want_to_track": wantToTrack,

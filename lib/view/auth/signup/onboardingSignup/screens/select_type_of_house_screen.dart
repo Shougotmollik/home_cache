@@ -75,7 +75,7 @@ class _SelectTypeOfHouseScreenState extends State<SelectTypeOfHouseScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Jess,',
+                'Hey,',
                 style: AppTypoGraphy.bold.copyWith(
                   color: AppColors.primary,
                   fontSize: 32.sp,

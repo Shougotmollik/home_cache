@@ -11,6 +11,7 @@ class RouteNames {
   static const selectCoolingType = '/select-cooling-type';
   static const selectHeatingType = '/select-heating-type';
   static const selectResponsibleType = '/select-responsible-type';
+  static const selectHouseRole = '/select-house-role';
   static const finishUtility = '/finish-utility';
   static const trackList = '/track-list';
   static const selectIteam = '/select-iteam';

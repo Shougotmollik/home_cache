@@ -64,15 +64,15 @@ class Details {
 class ApplianceFile {
   final String? file;
   final String? fileId;
-  final String? updatedAt;
+  final String? uploadedAt;
 
-  ApplianceFile({this.file, this.fileId, this.updatedAt});
+  ApplianceFile({this.file, this.fileId, this.uploadedAt});
 
   factory ApplianceFile.fromJson(Map<String, dynamic> json) {
     return ApplianceFile(
       file: json['file'],
       fileId: json['file_id'],
-      updatedAt: json['updated_at'],
+      uploadedAt: json['upload_at'],
     );
   }
 }
