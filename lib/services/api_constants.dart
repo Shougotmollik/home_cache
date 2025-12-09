@@ -6,6 +6,8 @@ class ApiConstants {
   static String signup = "/auth/create-user";
   static String login = "/auth/login";
 
+  static String fetchUserData = "/user/me";
+
   static String updateHomeData = "/user/update_home_data";
   static String homeTaskData = "/task/home-task-data";
   static String homeHealthData = "/task/home-health";

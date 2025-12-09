@@ -6,6 +6,7 @@ import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/controller/appliance_controller.dart';
 import 'package:home_cache/controller/room_controller.dart';
+import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import 'package:home_cache/view/widget/text_button_widget.dart';
 import '../../../../../config/route/route_names.dart';
 
@@ -103,7 +104,7 @@ class DialogAppliance extends StatelessWidget {
               SizedBox(height: 6.h),
               Obx(() {
                 if (roomController.allRooms.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: CustomProgressIndicator());
                 }
 
                 // Set default value if empty

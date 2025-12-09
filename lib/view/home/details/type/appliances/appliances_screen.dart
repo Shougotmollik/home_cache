@@ -5,6 +5,7 @@ import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart' show AppColors;
 import 'package:home_cache/controller/appliance_controller.dart';
 import 'package:home_cache/view/home/details/type/appliances/dialog_appliance.dart';
+import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import '../../../../../config/route/route_names.dart';
 import 'package:home_cache/model/appliance.dart';
 
@@ -86,7 +87,7 @@ class _AppliancesScreenState extends State<AppliancesScreen> {
       backgroundColor: AppColors.surface,
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CustomProgressIndicator());
         }
 
         if (controller.applianceCategoryList.isEmpty) {

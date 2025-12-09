@@ -1,7 +1,5 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:get/get.dart';
-import 'package:home_cache/config/route/route_names.dart';
 import 'package:home_cache/model/room.dart';
 import 'package:home_cache/model/room_data.dart';
 import 'package:home_cache/model/room_item.dart';

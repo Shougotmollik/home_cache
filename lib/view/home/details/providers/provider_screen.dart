@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
@@ -100,7 +101,11 @@ class ProviderScreen extends StatelessWidget {
               Expanded(
                 child: Obx(() {
                   if (controller.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                        child: SpinKitPouringHourGlassRefined(
+                      color: AppColors.primary,
+                      duration: Duration(seconds: 2),
+                    ));
                   }
                   if (controller.errorMessage.isNotEmpty) {
                     return Center(child: Text(controller.errorMessage.value));

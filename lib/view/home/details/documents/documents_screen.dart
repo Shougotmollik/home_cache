@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:home_cache/controller/documents_controller.dart';
 import 'package:home_cache/view/home/details/widgets/document_tile.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
+import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import '../../../../config/route/route_names.dart';
 import '../../../../constants/colors.dart';
 import '../../../../constants/app_typo_graphy.dart';
@@ -126,7 +127,7 @@ class DocumentsScreen extends StatelessWidget {
             Expanded(
               child: Obx(() {
                 if (controller.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: CustomProgressIndicator());
                 }
 
                 final filteredDocs = controller

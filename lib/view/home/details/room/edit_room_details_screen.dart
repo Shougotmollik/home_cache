@@ -10,6 +10,7 @@ import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/controller/room_controller.dart';
 import 'package:home_cache/utils.dart' as utils;
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
+import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditRoomDetailsScreen extends StatefulWidget {
@@ -114,7 +115,7 @@ class _EditRoomDetailsScreenState extends State<EditRoomDetailsScreen> {
         padding: EdgeInsets.all(24.sp),
         child: Obx(() {
           if (roomController.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CustomProgressIndicator());
           }
 
           final room = roomController.roomDetails.value;

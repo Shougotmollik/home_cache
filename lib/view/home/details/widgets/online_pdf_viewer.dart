@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 
@@ -37,7 +38,7 @@ class _OnlinePdfViewerState extends State<OnlinePdfViewer> {
   @override
   Widget build(BuildContext context) {
     return isLoading
-        ? const Center(child: CircularProgressIndicator())
+        ? const Center(child: CustomProgressIndicator())
         : PDFView(
             filePath: localPath!,
             enableSwipe: true,

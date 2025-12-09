@@ -6,6 +6,7 @@ import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/controller/room_controller.dart';
 import 'package:home_cache/view/home/details/room/add_room_dialog.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
+import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import '../../../../config/route/route_names.dart';
 
 class RoomScreen extends StatefulWidget {
@@ -123,7 +124,7 @@ class _RoomScreenState extends State<RoomScreen> {
         child: Obx(
           () {
             if (roomController.isLoading.value) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: CustomProgressIndicator());
             }
 
             if (roomController.allRooms.isEmpty) {

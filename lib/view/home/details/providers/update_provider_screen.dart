@@ -12,6 +12,7 @@ import 'package:home_cache/view/auth/signup/widgets/custom_elevated_button.dart'
 import 'package:home_cache/view/home/details/widgets/tile_button.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
 import 'package:home_cache/view/home/account/productsupport/widgets/text_field_widget.dart';
+import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 
 class UpdateProviderScreen extends StatefulWidget {
   const UpdateProviderScreen({super.key});
@@ -77,7 +78,7 @@ class _UpdateProviderScreenState extends State<UpdateProviderScreen> {
       appBar: AppBarBack(title: 'Update Provider'),
       body: Obx(() {
         if (providerController.isLoading.value || !isFormInitialized) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CustomProgressIndicator());
         }
 
         return SingleChildScrollView(

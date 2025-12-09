@@ -5,6 +5,7 @@ import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/controller/view_by_type_controller.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
+import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import '../../../../config/route/route_names.dart';
 
 class ViewByTypeScreen extends StatefulWidget {
@@ -128,7 +129,7 @@ class _ViewByTypeScreenState extends State<ViewByTypeScreen> {
             if (controller.isLoading.value) {
               return Padding(
                 padding: EdgeInsets.only(top: 100.h),
-                child: const Center(child: CircularProgressIndicator()),
+                child: const Center(child: CustomProgressIndicator()),
               );
             }
 
