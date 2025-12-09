@@ -68,10 +68,11 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
 
   Future<void> _pickDate() async {
     final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     final picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate ?? now,
-      firstDate: DateTime(now.year - 5),
+      firstDate: today,
       lastDate: DateTime(now.year + 5),
       builder: (BuildContext context, Widget? child) {
         return Theme(

@@ -7,6 +7,7 @@ import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/controller/home_controller.dart';
 import 'package:home_cache/controller/task_controller.dart';
 import 'package:home_cache/view/home/home/widgets/home_health_pie_chart.dart';
+import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import 'package:home_cache/view/widget/task_list_tile.dart';
 import 'package:intl/intl.dart';
 
@@ -147,8 +148,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     Obx(
                       () {
                         if (_taskController.isLoading.value) {
-                          return const Center(
-                              child: CircularProgressIndicator());
+                          return Center(
+                              child: SizedBox(
+                                  height: 25.h,
+                                  width: 18.w,
+                                  child: CustomProgressIndicator()));
                         }
                         if (_taskController.tasks.isEmpty) {
                           return const Center(child: Text("No tasks found"));

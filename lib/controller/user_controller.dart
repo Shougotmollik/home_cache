@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:home_cache/model/user_model.dart';
+import 'package:home_cache/services/api_checker.dart';
 import 'package:home_cache/services/api_clients.dart';
 import 'package:home_cache/services/api_constants.dart';
 
@@ -15,37 +16,29 @@ class UserController extends GetxController {
 
   // ! Fetch user data from API
   Future<void> getUserData() async {
-    try {
-      isLoading(true);
+    isLoading(true);
+    final response = await ApiClient.getData(ApiConstants.fetchUserData);
 
-      // API call
-      final response = await ApiClient.getData(ApiConstants.fetchUserData);
+    if (response.statusCode == 200) {
+      final body = response.body;
+      if (body is List) {
+        userDataList.value =
+            body.map((json) => UserData.fromJson(json)).toList();
+      } else if (body is Map<String, dynamic>) {
+        final jsonData = body.containsKey('data') ? body['data'] : body;
 
-      if (response.statusCode == 200) {
-        final body = response.body;
-
-        // Check if API returns a list or single object
-        if (body is List) {
-          // API returns a list of users
+        if (jsonData is List) {
           userDataList.value =
-              body.map((json) => UserData.fromJson(json)).toList();
-        } else if (body is Map<String, dynamic>) {
-          // API returns a single user object or nested 'data' field
-          final jsonData = body.containsKey('data') ? body['data'] : body;
-
-          if (jsonData is List) {
-            userDataList.value =
-                jsonData.map((json) => UserData.fromJson(json)).toList();
-          } else if (jsonData is Map<String, dynamic>) {
-            userDataList.value = [UserData.fromJson(jsonData)];
-          }
+              jsonData.map((json) => UserData.fromJson(json)).toList();
+        } else if (jsonData is Map<String, dynamic>) {
+          userDataList.value = [UserData.fromJson(jsonData)];
         }
-      } else {
-        print("❌ Failed to fetch user data: ${response.statusCode}");
       }
-    } finally {
-      isLoading(false);
+    } else {
+      ApiChecker.checkApi(response);
     }
+
+    isLoading(false);
   }
 
   // Optional: refresh user data

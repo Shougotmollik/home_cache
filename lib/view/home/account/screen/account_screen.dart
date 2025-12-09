@@ -6,8 +6,6 @@ import 'package:home_cache/constants/colors.dart' show AppColors;
 import 'package:home_cache/controller/auth_controller.dart';
 import 'package:home_cache/controller/user_controller.dart';
 import 'package:home_cache/view/home/account/widgets/setting_tile.dart';
-import 'package:home_cache/view/widget/custom_loading_indicator.dart';
-import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import 'package:home_cache/view/widget/text_button_widget.dart';
 import '../../../../config/route/route_names.dart';
 
@@ -38,7 +36,7 @@ class AccountScreen extends StatelessWidget {
               // User Info Card
               Obx(() {
                 if (userController.isLoading.value) {
-                  return Center(child: CustomLoadingIndicator());
+                  return Center(child: CircularProgressIndicator());
                 }
 
                 if (userController.userDataList.isEmpty) {
