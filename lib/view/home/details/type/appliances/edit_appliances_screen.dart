@@ -108,10 +108,16 @@ class _EditAppliancesScreenState extends State<EditAppliancesScreen> {
                       GestureDetector(
                         onTap: () {
                           if (!isEditable) {
+                            final applianceId = controller.applianceDetails
+                                .value?.userAppliance?.appliance?.id;
+                            final roomId =
+                                controller.applianceDetails.value?.roomId;
+
+                            print("Appliance ID:========> $applianceId");
+                            print("Room ID: ============>$roomId");
                             var data = {
-                              "appliance_id":
-                                  "6f77742d-628f-4d10-abb3-6aff9cf1329b",
-                              "room_id": "bf6c26e4-7a20-47a5-ad7c-cde12862567c",
+                              "appliance_id": applianceId,
+                              "room_id": roomId,
                               "details": {
                                 "notes": controller.notesController.text,
                               },
@@ -330,7 +336,7 @@ class _EditAppliancesScreenState extends State<EditAppliancesScreen> {
                         .map((e) => {
                               'file': e.file?.split('/').last ?? '',
                               'fileId': e.fileId ?? '',
-                              'uploadedAt': e.uploadedAt??'',
+                              'uploadedAt': e.uploadedAt ?? '',
                             })
                         .toList());
                   }

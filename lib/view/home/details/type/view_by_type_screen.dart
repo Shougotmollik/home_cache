@@ -82,7 +82,7 @@ class _ViewByTypeScreenState extends State<ViewByTypeScreen> {
           borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(
-              color: AppColors.black.withOpacity(0.3),
+              color: AppColors.black.withValues(alpha: 0.3),
               spreadRadius: 2,
               blurRadius: 8,
               offset: const Offset(0, 4),

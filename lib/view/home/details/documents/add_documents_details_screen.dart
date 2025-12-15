@@ -36,30 +36,53 @@ class _AddDocumentsDetailsScreenState extends State<AddDocumentsDetailsScreen> {
     print("add doctype shown here ====> $docType");
   }
 
+  Widget field(String label) {
+    final controller = TextEditingController();
+    controllers[label] = controller;
+
+    bool isDateField = label.toLowerCase().contains('date');
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: 16.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: AppTypoGraphy.semiBold.copyWith(color: AppColors.black),
+          ),
+          SizedBox(height: 6.h),
+          GestureDetector(
+            onTap: isDateField
+                ? () async {
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime(2100),
+                    );
+
+                    if (picked != null) {
+                      controller.text =
+                          "${picked.year}-${picked.month}-${picked.day}";
+                      setState(() {});
+                    }
+                  }
+                : null,
+            child: AbsorbPointer(
+              absorbing: isDateField,
+              child: TextFieldWidget(
+                hintText: isDateField ? "Select $label" : "Enter $label",
+                controller: controller,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   List<Widget> _buildFields(String type) {
-    Widget field(String label) {
-      final controller = TextEditingController();
-      controllers[label] = controller;
-
-      return Padding(
-        padding: EdgeInsets.only(bottom: 16.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: AppTypoGraphy.semiBold.copyWith(color: AppColors.black),
-            ),
-            SizedBox(height: 6.h),
-            TextFieldWidget(
-              hintText: 'Enter $label',
-              controller: controller,
-            ),
-          ],
-        ),
-      );
-    }
-
     switch (type) {
       case 'warranty':
         return [
@@ -106,7 +129,6 @@ class _AddDocumentsDetailsScreenState extends State<AddDocumentsDetailsScreen> {
           field('Manual Type'),
           field('Publication Date'),
         ];
-      case 'other':
       default:
         return [
           field('Title'),
@@ -136,6 +158,7 @@ class _AddDocumentsDetailsScreenState extends State<AddDocumentsDetailsScreen> {
           "service_contact_info": fieldData['Service Contact Info'] ?? '',
         });
         break;
+
       case 'insurance':
         data.addAll({
           "type": "insurance",
@@ -147,6 +170,7 @@ class _AddDocumentsDetailsScreenState extends State<AddDocumentsDetailsScreen> {
           "claim_contact_info": fieldData['Claim Contact Info'] ?? '',
         });
         break;
+
       case 'receipt':
         data.addAll({
           "type": "receipt",
@@ -157,6 +181,7 @@ class _AddDocumentsDetailsScreenState extends State<AddDocumentsDetailsScreen> {
           "order_number": fieldData['Order Number'] ?? '',
         });
         break;
+
       case 'quote':
         data.addAll({
           "type": "quote",
@@ -169,6 +194,7 @@ class _AddDocumentsDetailsScreenState extends State<AddDocumentsDetailsScreen> {
           "quote_reference_number": fieldData['Quote Reference Number'] ?? '',
         });
         break;
+
       case 'manual':
         data.addAll({
           "type": "manual",
@@ -180,7 +206,7 @@ class _AddDocumentsDetailsScreenState extends State<AddDocumentsDetailsScreen> {
           "publication_date": fieldData['Publication Date'] ?? '',
         });
         break;
-      case 'other':
+
       default:
         data.addAll({
           "type": "other",
@@ -191,8 +217,10 @@ class _AddDocumentsDetailsScreenState extends State<AddDocumentsDetailsScreen> {
         });
         break;
     }
+
     final Map<String, String> finalData =
         data.map((key, value) => MapEntry(key, value.toString()));
+
     debugPrint('FINAL JSON TO SEND ====> $finalData');
 
     if (filePath != null) {
@@ -232,15 +260,6 @@ class _AddDocumentsDetailsScreenState extends State<AddDocumentsDetailsScreen> {
                           swipeHorizontal: false,
                           autoSpacing: true,
                           pageFling: true,
-                          onRender: (_pages) {
-                            debugPrint('PDF rendered with $_pages pages');
-                          },
-                          onError: (error) {
-                            debugPrint(error.toString());
-                          },
-                          onPageError: (page, error) {
-                            debugPrint('$page: ${error.toString()}');
-                          },
                         )
                       : ClipRRect(
                           borderRadius: BorderRadius.circular(12),
