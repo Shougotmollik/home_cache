@@ -120,6 +120,8 @@ class _AppliancesScreenState extends State<AppliancesScreen> {
                     final isSelected = selectedCategoryIndex == index;
                     final categoryName =
                         controller.applianceCategoryList[index].appliance;
+                    final categoryAmount =
+                        controller.applianceCategoryList[index].amount;
 
                     return ElevatedButton(
                       onPressed: () => selectCategory(index),
@@ -133,7 +135,7 @@ class _AppliancesScreenState extends State<AppliancesScreen> {
                         ),
                       ),
                       child: Text(
-                        categoryName,
+                        "$categoryName ($categoryAmount)",
                         style: TextStyle(
                           color: isSelected ? Colors.white : Colors.black,
                           fontSize: 12.sp,

@@ -51,6 +51,10 @@ class RouteNames {
   static const notifications = '/notifications';
   static const notificationDetails = '/notification-details';
   static const utility = '/utility';
+
   static const material = '/material';
+  static const addMaterial = '/add-material';
+  static const editMaterial = '/edit-material';
+
   static const calendar = '/calendar';
 }

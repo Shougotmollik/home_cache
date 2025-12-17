@@ -48,4 +48,6 @@ class ApiConstants {
   static String postAiResponse = "/ai/get-response";
 
   static String fetchHomeMember = "/home-share/my-home-member";
+
+  static String addMaterial = "/view-by-type/add-new-user-material";
 }

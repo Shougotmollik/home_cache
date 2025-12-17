@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:home_cache/config/route/route_names.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/controller/material_controller.dart';
@@ -127,7 +128,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
                         ),
                       ),
                       child: Text(
-                        categoryName,
+                        "$categoryName(${controller.materialCategoryList[index].amount})",
                         style: TextStyle(
                           color: isSelected ? Colors.white : Colors.black,
                           fontSize: 12.sp,
@@ -162,38 +163,47 @@ class _MaterialScreenState extends State<MaterialScreen> {
                           final MaterialModel material =
                               controller.materialsByCategoryList[index];
 
-                          return Container(
-                            padding: EdgeInsets.all(12.sp),
-                            decoration: BoxDecoration(
-                              color: AppColors.lightgrey,
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        material.userMaterial.material.name,
-                                        style: AppTypoGraphy.medium
-                                            .copyWith(fontSize: 18.sp),
-                                      ),
-                                      SizedBox(height: 4.h),
-                                      Text(
-                                        material.room.name,
-                                        style: AppTypoGraphy.regular
-                                            .copyWith(fontSize: 14.sp),
-                                      ),
-                                    ],
+                          return GestureDetector(
+                            onTap: () {
+                              Get.toNamed(RouteNames.editMaterial,
+                                  arguments: {'id': material.id});
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(12.sp),
+                              decoration: BoxDecoration(
+                                color: AppColors.lightgrey,
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          material.userMaterial.material.name,
+                                          style: AppTypoGraphy.medium
+                                              .copyWith(fontSize: 18.sp),
+                                        ),
+                                        SizedBox(height: 4.h),
+                                        Text(
+                                          material.room.name,
+                                          style: AppTypoGraphy.regular
+                                              .copyWith(fontSize: 14.sp),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  onPressed: () {},
-                                ),
-                              ],
+                                  IconButton(
+                                    icon: const Icon(Icons.edit),
+                                    onPressed: () {
+                                      Get.toNamed(RouteNames.editMaterial,
+                                          arguments: {'id': material.id});
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           );
                         },

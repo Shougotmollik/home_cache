@@ -39,7 +39,7 @@ class DialogMaterial extends StatelessWidget {
       backgroundColor: AppColors.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       title: Text(
-        'Add An Appliance',
+        'Add A Material',
         style: AppTypoGraphy.bold.copyWith(color: AppColors.black),
         textAlign: TextAlign.center,
       ),
@@ -53,7 +53,7 @@ class DialogMaterial extends StatelessWidget {
             children: [
               SizedBox(height: 18.h),
               Text(
-                'Type',
+                'Name',
                 style: AppTypoGraphy.regular.copyWith(color: AppColors.black),
               ),
               SizedBox(height: 6.h),
@@ -150,22 +150,26 @@ class DialogMaterial extends StatelessWidget {
                 child: TextWidgetButton(
                   text: '→  Next',
                   onPressed: () {
-                    if (selectedTypeId.value.isEmpty ||
-                        selectedRoomId.value.isEmpty) {
-                      Get.snackbar('Error', 'Please select type and location');
-                      return;
-                    }
+                    // if (selectedTypeId.value.isEmpty ||
+                    //     selectedRoomId.value.isEmpty) {
+                    //   Get.snackbar('Error', 'Please select type and location');
+                    //   return;
+                    // }
 
                     Get.toNamed(
-                      RouteNames.addAppliances,
+                      RouteNames.addMaterial,
                       arguments: {
-                        'appliance_id': selectedTypeId.value,
+                        'material_id': selectedTypeId.value,
                         'view_type_id': materialTypeId,
                         'room_id': selectedRoomId.value,
                         'type_name': materialController.materialTypeList
                             .firstWhere(
                                 (type) => type.id == selectedTypeId.value)
                             .name,
+                        'room_name': roomController.allRooms
+                            .firstWhere(
+                                (room) => room.id == selectedRoomId.value)
+                            .name
                       },
                     );
                   },

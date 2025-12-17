@@ -49,6 +49,8 @@ import 'package:home_cache/view/home/details/room/update_room_item_screen.dart';
 import 'package:home_cache/view/home/details/type/appliances/add_appliances_screen.dart';
 import 'package:home_cache/view/home/details/type/appliances/appliances_screen.dart';
 import 'package:home_cache/view/home/details/type/appliances/edit_appliances_screen.dart';
+import 'package:home_cache/view/home/details/type/materials/add_material_screen.dart';
+import 'package:home_cache/view/home/details/type/materials/edit_material_screen.dart';
 import 'package:home_cache/view/home/details/type/materials/material_screen.dart';
 import 'package:home_cache/view/home/details/type/utility/utility_screen.dart';
 import 'package:home_cache/view/home/details/type/view_by_type_screen.dart';
@@ -211,6 +213,10 @@ class AppRoutes {
       name: RouteNames.material,
       page: () => const MaterialScreen(),
     ),
+    GetPage(
+        name: RouteNames.addMaterial, page: () => const AddMaterialScreen()),
+    GetPage(
+        name: RouteNames.editMaterial, page: () => const EditMaterialScreen()),
     GetPage(name: RouteNames.calendar, page: () => const CalendarScreen()),
   ];
 }
