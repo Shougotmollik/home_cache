@@ -165,8 +165,12 @@ class _MaterialScreenState extends State<MaterialScreen> {
 
                           return GestureDetector(
                             onTap: () {
-                              Get.toNamed(RouteNames.editMaterial,
-                                  arguments: {'id': material.id});
+                              Get.toNamed(RouteNames.editMaterial, arguments: {
+                                'id': material.id,
+                                'type_name':
+                                    material.userMaterial.material.name,
+                                'room_name': material.room.name
+                              });
                             },
                             child: Container(
                               padding: EdgeInsets.all(12.sp),
@@ -199,7 +203,12 @@ class _MaterialScreenState extends State<MaterialScreen> {
                                     icon: const Icon(Icons.edit),
                                     onPressed: () {
                                       Get.toNamed(RouteNames.editMaterial,
-                                          arguments: {'id': material.id});
+                                          arguments: {
+                                            'id': material.id,
+                                            'type_name': material
+                                                .userMaterial.material.name,
+                                            'room_name': material.room.name
+                                          });
                                     },
                                   ),
                                 ],

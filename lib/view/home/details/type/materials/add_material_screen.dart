@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/controller/material_controller.dart';
-import 'package:home_cache/utils.dart' as utils;
 import 'package:home_cache/view/home/account/productsupport/widgets/text_field_widget.dart';
 import 'package:home_cache/view/home/details/widgets/doccument_slider.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
@@ -25,23 +24,49 @@ class _AddMaterialScreenState extends State<AddMaterialScreen> {
   final MaterialController controller = Get.put(MaterialController());
 
   final TextEditingController _notesController = TextEditingController();
+  final TextEditingController _brandController = TextEditingController();
+  final TextEditingController _shutoffController = TextEditingController();
 
-  File? _imageFile;
   File? _documentFile;
+  File? _imageFile;
+
   String? selectedType;
   String? selectedMaterial;
+  DateTime? lastServiceDate;
+  DateTime? lastFilledDate;
 
-  // IDs passed from previous screen
   late String materialId;
   late String viewTypeId;
   late String roomId;
   late String typeName;
   late String roomName;
 
+  final ImagePicker _picker = ImagePicker();
+
+  final Map<String, List<String>> componentFields = {
+    "Foundation": ["type", "material", "date", "notes"],
+    "Framing": ["type", "material", "date", "notes"],
+    "Roofing": ["type", "material", "date", "notes"],
+    "Siding": ["type", "material", "date", "notes"],
+    "Windows": ["type", "material", "date", "notes"],
+    "Doors": ["type", "material", "date", "notes"],
+    "Garage Door": ["type", "material", "date", "notes"],
+    "Insulation": ["type", "material", "date", "notes"],
+    "Drywall": ["type", "material", "date", "notes"],
+    "Flooring": ["type", "material", "date", "notes"],
+    "Trim": ["type", "material", "date", "notes"],
+    "Decking": ["type", "material", "date", "notes"],
+    "Fencing": ["material", "date", "notes"],
+    "Driveway": ["material", "date", "notes"],
+    "Patio": ["type", "material", "date", "notes"],
+    "Water Softener": ["type", "brand", "last_filled_date", "notes"],
+    "Plumbing": ["pipe_material", "shutoff_location", "date", "notes"],
+  };
+
   @override
   void initState() {
     super.initState();
-    // Receive IDs using Get.arguments
+
     final args = Get.arguments as Map<String, String>?;
 
     materialId = args?['material_id'] ?? '';
@@ -51,44 +76,194 @@ class _AddMaterialScreenState extends State<AddMaterialScreen> {
     roomName = args?['room_name'] ?? '';
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (materialId.isNotEmpty) {
-        controller.getTypeMaterialOption(materialId);
+      controller.getTypeMaterialOption(materialId);
+    });
+  }
+
+  InputDecoration _dec(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      filled: true,
+      fillColor: AppColors.lightgrey,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12.r),
+        borderSide: BorderSide(color: AppColors.grey),
+      ),
+    );
+  }
+
+  Future<void> pickImage() async {
+    final picked = await _picker.pickImage(source: ImageSource.camera);
+    if (picked != null) {
+      setState(() => _imageFile = File(picked.path));
+    }
+  }
+
+  void onSave() {
+    controller.addNewMaterial({
+      "material_id": materialId,
+      "view_type_id": viewTypeId,
+      "room_id": roomId,
+      "details": {
+        "name": typeName,
+        "location": roomName,
+        "type": selectedType,
+        "material": selectedMaterial,
+        "brand": _brandController.text.trim(),
+        "shutoff_location": _shutoffController.text.trim(),
+        "last_service_date": lastServiceDate?.toIso8601String(),
+        "last_filled_date": lastFilledDate?.toIso8601String(),
+        "notes": _notesController.text.trim(),
       }
     });
+  }
 
-    print('material ID: ++++>>$materialId');
-    print('View Type ID: ++++>>$viewTypeId');
-    print('Room ID: ++++>>$roomId');
-    print('Type Name: ++++>>$typeName');
-    print('Room Name: ++++>>$roomName');
+  Widget buildDynamicFields() {
+    final fields = componentFields[typeName] ?? [];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: fields.map((f) {
+        switch (f) {
+          case "type":
+            return Obx(() {
+              final list = controller.typeMaterialOption.value?.type ?? [];
+              if (list.isEmpty) return const SizedBox();
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Type', style: AppTypoGraphy.semiBold),
+                  SizedBox(height: 6.h),
+                  DropdownButtonFormField<String>(
+                    value: selectedType,
+                    items: list
+                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                        .toList(),
+                    onChanged: (v) => setState(() => selectedType = v),
+                    decoration: _dec('Select type'),
+                  ),
+                  SizedBox(height: 16.h),
+                ],
+              );
+            });
+
+          case "material":
+            return Obx(() {
+              final list = controller.typeMaterialOption.value?.material ?? [];
+              if (list.isEmpty) return const SizedBox();
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Material', style: AppTypoGraphy.semiBold),
+                  SizedBox(height: 6.h),
+                  DropdownButtonFormField<String>(
+                    value: selectedMaterial,
+                    items: list
+                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                        .toList(),
+                    onChanged: (v) => setState(() => selectedMaterial = v),
+                    decoration: _dec('Select material'),
+                  ),
+                  SizedBox(height: 16.h),
+                ],
+              );
+            });
+
+          case "brand":
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Brand', style: AppTypoGraphy.semiBold),
+                SizedBox(height: 6.h),
+                TextFieldWidget(
+                  controller: _brandController,
+                  hintText: 'Brand',
+                ),
+                SizedBox(height: 16.h),
+              ],
+            );
+
+          case "pipe_material":
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Pipe Material', style: AppTypoGraphy.semiBold),
+                SizedBox(height: 6.h),
+                TextFieldWidget(
+                  controller: _brandController,
+                  hintText: 'PEX, PVC, Copper',
+                ),
+                SizedBox(height: 16.h),
+              ],
+            );
+
+          case "shutoff_location":
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Shutoff Location', style: AppTypoGraphy.semiBold),
+                SizedBox(height: 6.h),
+                TextFieldWidget(
+                  controller: _shutoffController,
+                  hintText: 'Under sink, basement',
+                ),
+              ],
+            );
+
+          case "date":
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Last Service Date', style: AppTypoGraphy.semiBold),
+                SizedBox(height: 6.h),
+                TimeTextField(
+                  onDateSelected: (d) => lastServiceDate = d,
+                ),
+                SizedBox(height: 16.h),
+              ],
+            );
+
+          case "last_filled_date":
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Last Filled Date', style: AppTypoGraphy.semiBold),
+                SizedBox(height: 6.h),
+                TimeTextField(
+                  onDateSelected: (d) => lastFilledDate = d,
+                ),
+                SizedBox(height: 16.h),
+              ],
+            );
+
+          case "notes":
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Notes', style: AppTypoGraphy.semiBold),
+                SizedBox(height: 6.h),
+                TextFieldWidget(
+                  controller: _notesController,
+                  hintText: 'Additional details',
+                ),
+                SizedBox(height: 16.h),
+              ],
+            );
+
+          default:
+            return const SizedBox();
+        }
+      }).toList(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    //! Pick image from camera
-    Future<void> pickFromCamera() async {
-      final file = await utils.pickSingleImage(
-        context: context,
-        source: ImageSource.camera,
-      );
-
-      if (file != null) {
-        setState(() => _imageFile = file);
-        controller.selectedImageFile.value = file;
-      }
-    }
-
-    //! Pick file from storage
     Future<void> pickFile() async {
-      final result = await FilePicker.platform.pickFiles(type: FileType.any);
-
+      final result = await FilePicker.platform.pickFiles();
       if (result != null) {
-        final file = File(result.files.single.path!);
-
-        setState(() => _documentFile = file);
-        controller.selectedFile.value = file;
-
-        debugPrint("Picked File: ${file.path}");
+        _documentFile = File(result.files.single.path!);
+        setState(() {});
       }
     }
 
@@ -98,359 +273,144 @@ class _AddMaterialScreenState extends State<AddMaterialScreen> {
       body: SingleChildScrollView(
         padding: EdgeInsets.all(20.sp),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Align(
-              alignment: Alignment.center,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Add $typeName',
-                      style: AppTypoGraphy.medium
-                          .copyWith(color: AppColors.black)),
-                  SizedBox(width: 6.w),
-                  IconButton(
-                      onPressed: () {
-                        var data = {
-                          "material_id": materialId,
-                          "view_type_id": viewTypeId,
-                          "room_id": roomId,
-                          "details": {
-                            "Name": typeName,
-                            "location": roomName,
-                            "notes": _notesController.text.trim(),
-                            "type": selectedType,
-                            "material": selectedMaterial
-                          }
-                        };
-
-                        print('Add Appliance Data: ++++>>$data');
-                        controller.addNewMaterial(data);
-                      },
-                      icon: Image.asset("assets/icons/save_ic.png")),
-                ],
-              ),
+            // Title
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Add $typeName', style: AppTypoGraphy.medium),
+                IconButton(
+                  onPressed: onSave,
+                  icon: Image.asset("assets/icons/save_ic.png"),
+                )
+              ],
             ),
 
             SizedBox(height: 16.h),
 
-            // ----- Image Upload Box -----
-            Center(
-              child: GestureDetector(
-                onTap: () async {
-                  await pickFromCamera();
-                },
-                child: Obx(() {
-                  if (controller.selectedImageFile.value != null) {
-                    return Stack(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(16.r),
-                          child: Image.file(
-                            controller.selectedImageFile.value!,
-                            height: 120.h,
-                            width: 120.w,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        Positioned(
-                          top: 8.h,
-                          right: 8.w,
-                          child: GestureDetector(
-                            onTap: () {
-                              controller.selectedImageFile.value = null;
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.6),
-                                shape: BoxShape.circle,
-                              ),
-                              padding: EdgeInsets.all(4.w),
-                              child: Icon(
-                                Icons.close,
-                                color: Colors.white,
-                                size: 16.sp,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  } else {
-                    return Container(
+            // Image Upload
+            GestureDetector(
+              onTap: pickImage,
+              child: _imageFile != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(16.r),
+                      child: Image.file(
+                        _imageFile!,
+                        height: 120.h,
+                        width: 120.w,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : Container(
                       height: 120.h,
                       width: 120.w,
-                      padding: EdgeInsets.all(12.w),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16.r),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            spreadRadius: 2,
+                            color: Colors.black12,
                             blurRadius: 10,
-                            offset: Offset(0, 4),
-                          ),
+                          )
                         ],
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset(
-                            'assets/images/camera.png',
-                            height: 32.h,
-                            width: 32.w,
-                            color: AppColors.black,
-                          ),
-                          SizedBox(height: 8.h),
-                          Text(
-                            'Take A Photo To Upload Image',
-                            textAlign: TextAlign.center,
-                            style: AppTypoGraphy.regular.copyWith(
-                              color: AppColors.black,
-                              fontSize: 12.sp,
+                          Image.asset('assets/images/camera.png', height: 40.h),
+                          SizedBox(height: 6.h),
+                          Padding(
+                            padding:  EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              'Take A Photo To Upload Image',
+                              textAlign: TextAlign.center,
+                              style: AppTypoGraphy.regular.copyWith(
+                                fontSize: 14.sp
+                              ),
                             ),
-                          ),
+                          )
                         ],
                       ),
-                    );
-                  }
-                }),
-              ),
-            ),
-
-            SizedBox(height: 16.h),
-
-            // ----- Name Field -----
-            Text(
-              'Name',
-              style: AppTypoGraphy.semiBold.copyWith(color: AppColors.black),
-            ),
-            SizedBox(height: 6.h),
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(
-                color: AppColors.lightgrey,
-                borderRadius: BorderRadius.circular(16.r),
-                border: Border.all(
-                  color: AppColors.grey,
-                  width: 1.5.w,
-                ),
-              ),
-              child: Text(
-                typeName,
-                style: AppTypoGraphy.regular.copyWith(
-                  color: AppColors.black,
-                ),
-              ),
-            ),
-
-            SizedBox(height: 16.h),
-
-            // ----- Location Field -----
-            Text(
-              'Location',
-              style: AppTypoGraphy.semiBold.copyWith(color: AppColors.black),
-            ),
-            SizedBox(height: 6.h),
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(
-                color: AppColors.lightgrey,
-                borderRadius: BorderRadius.circular(16.r),
-                border: Border.all(
-                  color: AppColors.grey,
-                  width: 1.5.w,
-                ),
-              ),
-              child: Text(
-                roomName,
-                style: AppTypoGraphy.regular.copyWith(
-                  color: AppColors.black,
-                ),
-              ),
-            ),
-
-            SizedBox(height: 16.h),
-
-            // ----- Type Dropdown -----
-            Obx(() {
-              final types = controller.typeMaterialOption.value?.type ?? [];
-              if (types.isEmpty) return SizedBox.shrink();
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Type',
-                    style:
-                        AppTypoGraphy.semiBold.copyWith(color: AppColors.black),
-                  ),
-                  SizedBox(height: 6.h),
-                  DropdownButtonFormField<String>(
-                    value: selectedType,
-                    items: types
-                        .map(
-                          (e) => DropdownMenuItem(
-                            value: e,
-                            child: Text(e),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() => selectedType = value);
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Select type',
-                      filled: true,
-                      fillColor: AppColors.lightgrey,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                          borderSide:
-                              BorderSide(color: AppColors.grey, width: 1.w)),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                        borderSide: BorderSide(
-                          color: AppColors.grey,
-                          width: 1,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                        borderSide: BorderSide(
-                          color: AppColors.grey,
-                          width: 1.5,
-                        ),
-                      ),
                     ),
-                  ),
-                  SizedBox(height: 16.h),
-                ],
-              );
-            }),
-
-            // ----- Material Dropdown -----
-            Obx(() {
-              final materials =
-                  controller.typeMaterialOption.value?.material ?? [];
-              if (materials.isEmpty) return SizedBox.shrink();
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Material',
-                    style:
-                        AppTypoGraphy.semiBold.copyWith(color: AppColors.black),
-                  ),
-                  SizedBox(height: 6.h),
-                  DropdownButtonFormField<String>(
-                    value: selectedMaterial,
-                    items: materials
-                        .map(
-                          (e) => DropdownMenuItem(
-                            value: e,
-                            child: Text(e),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() => selectedMaterial = value);
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Select material',
-                      filled: true,
-                      fillColor: AppColors.lightgrey,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                          borderSide:
-                              BorderSide(color: AppColors.grey, width: 1.w)),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                        borderSide: BorderSide(
-                          color: AppColors.grey,
-                          width: 1,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                        borderSide: BorderSide(
-                          color: AppColors.grey,
-                          width: 1.5,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                ],
-              );
-            }),
-
-            Text(
-              'Last Service Date',
-              style: AppTypoGraphy.semiBold.copyWith(color: AppColors.black),
             ),
-            SizedBox(height: 6.h),
 
-            TimeTextField(),
-            SizedBox(height: 16.h),
+            SizedBox(height: 20.h),
 
-            // ----- Notes Field -----
-            Text(
-              'Notes',
-              style: AppTypoGraphy.semiBold.copyWith(color: AppColors.black),
-            ),
-            TextFieldWidget(
-                hintText: 'Additional details about the appliance',
-                controller: _notesController),
-            SizedBox(height: 16.h),
-
-            // ----- Documents Section -----
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Documents',
-                  style:
-                      AppTypoGraphy.semiBold.copyWith(color: AppColors.black),
-                ),
-                SizedBox(width: 6.w),
+                Text("Name", style: AppTypoGraphy.semiBold),
+                SizedBox(height: 6.h),
                 Container(
-                  height: 24.h,
-                  width: 24.h,
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                  width: double.infinity,
                   decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
+                    color: AppColors.lightgrey,
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(color: AppColors.grey, width: 1.5.w),
                   ),
-                  child: IconButton(
-                    icon: Icon(Icons.add, color: Colors.white, size: 18.sp),
-                    onPressed: () {
-                      pickFile();
-                    },
-                    padding: EdgeInsets.zero,
-                    splashRadius: 20.r,
-                  ),
+                  child: Text(typeName, style: AppTypoGraphy.regular),
                 ),
+                SizedBox(height: 16.h),
+                Text("Location", style: AppTypoGraphy.semiBold),
+                SizedBox(height: 6.h),
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: AppColors.lightgrey,
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(color: AppColors.grey, width: 1.5.w),
+                  ),
+                  child: Text(roomName, style: AppTypoGraphy.regular),
+                ),
+                SizedBox(height: 16.h),
               ],
             ),
+
+            //!Dynamic Fields
+            buildDynamicFields(),
+
             SizedBox(height: 12.h),
 
-            // ----- Document Slider -----
-            DocumentSlider(
-              documents: [
-                if (_documentFile != null)
-                  {
-                    'title': _documentFile!.path.split('/').last,
-                    'path': _documentFile!.path,
-                    'iconPath': 'assets/images/document.png',
-                    'date': '',
-                  },
+            // Documents
+            Row(
+              spacing: 8.w,
+              children: [
+                Text('Documents', style: AppTypoGraphy.semiBold),
+                GestureDetector(
+                  onTap: pickFile,
+                  child: Container(
+                      padding: EdgeInsets.all(4.w),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.primary,
+                      ),
+                      child: Icon(
+                        Icons.add,
+                        color: Colors.white,
+                        size: 16.sp,
+                      )),
+                )
               ],
             ),
 
-            SizedBox(height: 32.h),
+            DocumentSlider(
+              documents: _documentFile == null
+                  ? []
+                  : [
+                      {
+                        'title': _documentFile!.path.split('/').last,
+                        'path': _documentFile!.path,
+                        'iconPath': 'assets/images/document.png',
+                        'date': '',
+                      }
+                    ],
+            ),
+
+            SizedBox(height: 40.h),
           ],
         ),
       ),

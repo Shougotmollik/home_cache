@@ -28,6 +28,13 @@ class MaterialController extends GetxController {
   late TextEditingController typeController;
   late TextEditingController locationController;
   late TextEditingController notesController;
+  late TextEditingController brandController;
+  late TextEditingController shutoffLocationController;
+  late TextEditingController lastServiceDateController;
+  late TextEditingController lastFieldDateController;
+  late TextEditingController pipeMaterialController;
+  final selectedMaterial = RxnString();
+  final selectedType = RxnString();
 
   @override
   void onInit() {
@@ -35,6 +42,11 @@ class MaterialController extends GetxController {
     typeController = TextEditingController();
     locationController = TextEditingController();
     notesController = TextEditingController();
+    brandController = TextEditingController();
+    shutoffLocationController = TextEditingController();
+    lastServiceDateController = TextEditingController();
+    lastFieldDateController = TextEditingController();
+    pipeMaterialController = TextEditingController();
   }
 
   /// Safely extract file extension
@@ -220,7 +232,7 @@ class MaterialController extends GetxController {
   }
 
   // ! get material details
-  Future<void> getMaterialDetails(String id) async {
+  Future<MaterialDetailsModel?> getMaterialDetails(String id) async {
     try {
       isLoading(true);
 
@@ -230,27 +242,75 @@ class MaterialController extends GetxController {
       if (response.statusCode == 200) {
         final responseData = response.body['data'];
 
- 
         if (responseData != null && responseData is Map<String, dynamic>) {
           final details = MaterialDetailsModel.fromJson(responseData);
 
-      
-          typeController.text = details.userMaterial.material.name ?? '';
-          locationController.text = details.room.name ?? '';
-          notesController.text = details.details.notes ?? '';
+          typeController.text = details.userMaterial.material.name;
+          locationController.text = details.room.name;
+
+          notesController.text = details.details.note;
+          brandController.text = details.details.brand ?? '';
+          shutoffLocationController.text =
+              details.details.shutoffLocation ?? '';
+
+          selectedType.value = details.details.type;
+          selectedMaterial.value = details.details.material;
 
           materialDetails.value = details;
-        } else {
-          materialDetails.value = null;
+
+          return details;
         }
       } else {
         ApiChecker.checkApi(response);
       }
-    } catch (e, s) {
-      debugPrint("❌ getMaterialDetails error: $e");
-      debugPrint("STACKTRACE: $s");
+    } catch (e) {
+      print("Error fetching material details: $e");
     } finally {
       isLoading(false);
     }
+
+    return null;
+  }
+
+  // ! update material details
+  Future<void> updateMaterialDetails(String id, var data) async {
+    isLoading(true);
+
+    if (data['details'] != null) {
+      data['details'] = jsonEncode(data['details']);
+    }
+
+    Map<String, String> newData = {};
+    data.forEach((key, value) {
+      if (value != null) {
+        newData[key] = value.toString();
+      }
+    });
+
+    List<MultipartBody> multiParts = [];
+
+    if (selectedImageFile.value != null) {
+      multiParts.add(MultipartBody('image', selectedImageFile.value!));
+    }
+
+    if (selectedFile.value != null) {
+      multiParts.add(MultipartBody('files', selectedFile.value!));
+    }
+
+    // API call
+    Response response = await ApiClient.patchMultipartData(
+      "${ApiConstants.updateAppliance}$id",
+      newData,
+      multipartBody: multiParts,
+    );
+
+    if (response.statusCode == 200) {
+      await Future.delayed(const Duration(seconds: 1));
+      Get.back();
+    } else {
+      ApiChecker.checkApi(response);
+    }
+
+    isLoading(false);
   }
 }

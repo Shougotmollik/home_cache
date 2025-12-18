@@ -26,11 +26,12 @@ class MaterialDetailsModel {
       id: json['id'],
       userMaterialId: json['user_material_id'],
       roomId: json['room_id'],
-      details: MaterialDetails.fromJson(json['details']),
-      image: json['image'],
-      imageId: json['image_id'],
-      files:
-          (json['files'] as List).map((e) => MaterialFile.fromJson(e)).toList(),
+      details: MaterialDetails.fromJson(json['details'] ?? {}),
+      image: json['image'] ?? '',
+      imageId: json['image_id'] ?? '',
+      files: (json['files'] as List? ?? [])
+          .map((e) => MaterialFile.fromJson(e))
+          .toList(),
       userMaterial: UserMaterial.fromJson(json['user_material']),
       room: Room.fromJson(json['room']),
     );
@@ -38,13 +39,42 @@ class MaterialDetailsModel {
 }
 
 class MaterialDetails {
-  final String notes;
+  final String note;
+  final String? type;
+  final String? brand;
+  final String? material;
+  final String? shutoffLocation;
+  final DateTime? lastServiceDate;
+  final DateTime? lastFieldDate;
 
-  MaterialDetails({required this.notes});
+  MaterialDetails({
+    required this.note,
+    this.type,
+    this.brand,
+    this.material,
+    this.shutoffLocation,
+    this.lastServiceDate,
+    this.lastFieldDate,
+  });
 
   factory MaterialDetails.fromJson(Map<String, dynamic> json) {
+    DateTime? parseDate(String? value) {
+      if (value == null || value.isEmpty) return null;
+      try {
+        return DateTime.parse(value);
+      } catch (_) {
+        return null; // ignore invalid date formats
+      }
+    }
+
     return MaterialDetails(
-      notes: json['notes'] ?? '',
+      note: json['note'] ?? '',
+      type: json['type'],
+      brand: json['brand'],
+      material: json['material'],
+      shutoffLocation: json['shutoff_locaton'], // backend typo
+      lastServiceDate: parseDate(json['last_date_service']),
+      lastFieldDate: parseDate(json['last_field_date:']), // backend typo
     );
   }
 }
@@ -85,10 +115,7 @@ class MaterialInfo {
   final String id;
   final String name;
 
-  MaterialInfo({
-    required this.id,
-    required this.name,
-  });
+  MaterialInfo({required this.id, required this.name});
 
   factory MaterialInfo.fromJson(Map<String, dynamic> json) {
     return MaterialInfo(
@@ -102,10 +129,7 @@ class Room {
   final String id;
   final String name;
 
-  Room({
-    required this.id,
-    required this.name,
-  });
+  Room({required this.id, required this.name});
 
   factory Room.fromJson(Map<String, dynamic> json) {
     return Room(
