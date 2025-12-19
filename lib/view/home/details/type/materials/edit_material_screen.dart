@@ -7,10 +7,10 @@ import 'package:get/get.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/controller/material_controller.dart';
+import 'package:home_cache/utils/custom_snakbar.dart';
 import 'package:home_cache/view/home/account/productsupport/widgets/text_field_widget.dart';
 import 'package:home_cache/view/home/details/widgets/doccument_slider.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
-import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import 'package:home_cache/view/widget/time_text_field.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -33,6 +33,7 @@ class _EditMaterialScreenState extends State<EditMaterialScreen> {
   DateTime? lastFilledDate;
 
   late String materialId;
+  late String viewTypeId;
   late String roomId;
   late String typeName;
   late String roomName;
@@ -142,38 +143,13 @@ class _EditMaterialScreenState extends State<EditMaterialScreen> {
     }
   }
 
-  void toggleEditMode() {
-    setState(() {
-      isEditMode = !isEditMode;
-    });
-  }
+  void toggleEditModeAndSave() async {
+    if (isEditMode) {
+      final materialTypeId =
+          controller.materialDetails.value?.userMaterial.material.id;
+      final roomIdValue = controller.materialDetails.value?.roomId;
 
-  // void onSave() {
-  //   if (!isEditMode) return;
-
-  //   controller.addNewMaterial({
-  //     "material_id": materialId,
-  //     "view_type_id": viewTypeId,
-  //     "room_id": roomId,
-  //     "details": {
-  //       "name": typeName,
-  //       "location": roomName,
-  //       "type": selectedType,
-  //       "material": selectedMaterial,
-  //       "brand": controller.brandController.text.trim(),
-  //       "shutoff_location": controller.shutoffLocationController.text.trim(),
-  //       "last_service_date": lastServiceDate?.toIso8601String(),
-  //       "last_filled_date": lastFilledDate?.toIso8601String(),
-  //       "notes": controller.notesController.text.trim(),
-  //     }
-  //   });
-  // }
-
-  void toggleEditModeAndSave() {
-    if (!isEditMode) {
-      final materialId = controller.materialDetails.value?.id;
-      print("Material ID: ============> $materialId");
-      var data = {
+      final data = {
         "details": {
           "name": typeName,
           "location": roomName,
@@ -187,8 +163,16 @@ class _EditMaterialScreenState extends State<EditMaterialScreen> {
         }
       };
 
-      controller.updateMaterialDetails(materialId!, data);
+      debugPrint("✅ UPDATE API TRIGGERED");
+
+      final materialDetailsId = controller.materialDetails.value?.id;
+      print("Material Details ID: ==========>$materialDetailsId");
+      await controller.updateMaterialDetails(materialDetailsId!, data);
     }
+
+    setState(() {
+      isEditMode = !isEditMode;
+    });
   }
 
   Widget buildDynamicFields() {
@@ -200,6 +184,7 @@ class _EditMaterialScreenState extends State<EditMaterialScreen> {
         switch (f) {
           case "type":
             return Obx(() {
+              // Try to get from API first, fallback to hardcoded options
               var list = controller.typeMaterialOption.value?.type ?? [];
               if (list.isEmpty) {
                 list = fallbackTypeOptions[typeName] ?? [];
@@ -367,9 +352,10 @@ class _EditMaterialScreenState extends State<EditMaterialScreen> {
       backgroundColor: AppColors.surface,
       appBar: AppBarBack(),
       body: Obx(() {
+        // Show loading indicator
         if (controller.isLoading.value && !isDataFetched) {
           return Center(
-            child: CustomProgressIndicator(),
+            child: CircularProgressIndicator(),
           );
         }
 
@@ -377,45 +363,26 @@ class _EditMaterialScreenState extends State<EditMaterialScreen> {
           padding: EdgeInsets.all(20.sp),
           child: Column(
             children: [
-              // Title with Edit and Save buttons
+              // Title with Edit/Save button
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text('$typeName Details', style: AppTypoGraphy.medium),
 
+                  // Edit/Save Button
                   GestureDetector(
                     onTap: toggleEditModeAndSave,
                     child: Padding(
                       padding: EdgeInsets.only(left: 8.w),
                       child: Image.asset(
-                        isEditMode
-                            ? 'assets/icons/save_ic.png'
-                            : 'assets/images/pen.png',
+                        !isEditMode
+                            ? 'assets/images/pen.png'
+                            : 'assets/icons/save_ic.png',
                         height: 24.h,
                         color: AppColors.black,
                       ),
                     ),
                   ),
-
-                  // // Edit Button
-                  // IconButton(
-                  //   onPressed: toggleEditMode,
-                  //   icon: Icon(
-                  //     isEditMode ? Icons.cancel : Icons.edit,
-                  //     color: isEditMode ? Colors.red : AppColors.primary,
-                  //   ),
-                  //   tooltip: isEditMode ? 'Cancel' : 'Edit',
-                  // ),
-
-                  // // Save Button
-                  // IconButton(
-                  //   onPressed: isEditMode ? onSave : null,
-                  //   icon: Image.asset(
-                  //     "assets/icons/save_ic.png",
-                  //     color: isEditMode ? AppColors.primary : Colors.grey,
-                  //   ),
-                  //   tooltip: 'Save',
-                  // ),
                 ],
               ),
 

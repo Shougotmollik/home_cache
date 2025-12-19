@@ -12,6 +12,7 @@ import 'package:home_cache/model/type_material_option.dart';
 import 'package:home_cache/services/api_checker.dart';
 import 'package:home_cache/services/api_clients.dart';
 import 'package:home_cache/services/api_constants.dart';
+import 'package:home_cache/utils/custom_snakbar.dart';
 
 class MaterialController extends GetxController {
   var isLoading = false.obs;
@@ -272,41 +273,50 @@ class MaterialController extends GetxController {
     return null;
   }
 
-  // ! update material details
-  Future<void> updateMaterialDetails(String id, var data) async {
+// ! update material details
+  Future<void> updateMaterialDetails(
+      String id, Map<String, dynamic> data) async {
     isLoading(true);
 
-    if (data['details'] != null) {
-      data['details'] = jsonEncode(data['details']);
-    }
+    final Map<String, String> newData = {};
 
-    Map<String, String> newData = {};
     data.forEach((key, value) {
-      if (value != null) {
+      if (value == null) return;
+
+      if (key == 'details' && value is Map) {
+        newData[key] = jsonEncode(value);
+      } else {
         newData[key] = value.toString();
       }
     });
 
-    List<MultipartBody> multiParts = [];
+    final List<MultipartBody> multiParts = [];
 
     if (selectedImageFile.value != null) {
-      multiParts.add(MultipartBody('image', selectedImageFile.value!));
+      multiParts.add(
+        MultipartBody('image', selectedImageFile.value!),
+      );
     }
 
     if (selectedFile.value != null) {
-      multiParts.add(MultipartBody('files', selectedFile.value!));
+      multiParts.add(
+        MultipartBody('files', selectedFile.value!),
+      );
     }
 
-    // API call
-    Response response = await ApiClient.patchMultipartData(
-      "${ApiConstants.updateAppliance}$id",
+    final Response response = await ApiClient.patchMultipartData(
+      "/view-by-type/update-user-material-details/$id",
       newData,
       multipartBody: multiParts,
     );
 
     if (response.statusCode == 200) {
-      await Future.delayed(const Duration(seconds: 1));
-      Get.back();
+      Get.snackbar(
+        "Success",
+        "Material details updated successfully",
+      );
+
+      await getMaterialDetails(id);
     } else {
       ApiChecker.checkApi(response);
     }
