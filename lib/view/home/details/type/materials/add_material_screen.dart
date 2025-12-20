@@ -92,10 +92,22 @@ class _AddMaterialScreenState extends State<AddMaterialScreen> {
     );
   }
 
+// Image picker
   Future<void> pickImage() async {
     final picked = await _picker.pickImage(source: ImageSource.camera);
     if (picked != null) {
       setState(() => _imageFile = File(picked.path));
+      controller.selectedImageFile.value = File(picked.path);
+    }
+  }
+
+// file picker
+  Future<void> pickFile() async {
+    final result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      _documentFile = File(result.files.single.path!);
+      controller.selectedFile.value = File(result.files.single.path!);
+      setState(() {});
     }
   }
 
@@ -259,14 +271,6 @@ class _AddMaterialScreenState extends State<AddMaterialScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Future<void> pickFile() async {
-      final result = await FilePicker.platform.pickFiles();
-      if (result != null) {
-        _documentFile = File(result.files.single.path!);
-        setState(() {});
-      }
-    }
-
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: AppBarBack(),
@@ -320,13 +324,12 @@ class _AddMaterialScreenState extends State<AddMaterialScreen> {
                           Image.asset('assets/images/camera.png', height: 40.h),
                           SizedBox(height: 6.h),
                           Padding(
-                            padding:  EdgeInsets.symmetric(horizontal: 8.0),
+                            padding: EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text(
                               'Take A Photo To Upload Image',
                               textAlign: TextAlign.center,
-                              style: AppTypoGraphy.regular.copyWith(
-                                fontSize: 14.sp
-                              ),
+                              style: AppTypoGraphy.regular
+                                  .copyWith(fontSize: 14.sp),
                             ),
                           )
                         ],
