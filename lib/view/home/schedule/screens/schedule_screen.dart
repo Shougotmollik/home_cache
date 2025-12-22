@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
+import 'package:home_cache/controller/schedule_controller.dart';
 import 'package:home_cache/controller/task_controller.dart';
 import 'package:intl/intl.dart';
 
@@ -18,7 +19,8 @@ class ScheduleScreen extends StatefulWidget {
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
   final List<Task> _tasks = [];
-  final TaskController _taskController = Get.put(TaskController());
+  // final TaskController _taskController = Get.put(TaskController());
+  final ScheduleController _scheduleController = Get.put(ScheduleController());
 
   @override
   Widget build(BuildContext context) {
@@ -59,14 +61,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   return ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: _taskController.tasks.length,
+                    itemCount: _scheduleController.schedule.length,
                     itemBuilder: (context, index) {
-                      final task = _taskController.tasks[index];
+                      final task = _scheduleController.schedule[index];
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            DateFormat('MMMM d, yyyy').format(task.initialDate),
+                            DateFormat('MMMM d, yyyy')
+                                .format(task.initialDate!),
                             style: TextStyle(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.w600,
@@ -89,7 +92,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                               GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    task.isLinked = !task.isLinked;
+                                    // task.isLinked = !task.isLinked;
                                   });
                                 },
                                 child: SvgPicture.asset(

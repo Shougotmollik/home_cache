@@ -12,6 +12,8 @@ class ApiConstants {
   static String homeTaskData = "/task/home-task-data";
   static String homeHealthData = "/task/home-health";
 
+  static String fetchScheduleData = "/task/get-users-added-task";
+
   static String createTask = "/task/add_task";
   static String fetchTask = "/task/get_users_task";
   static String fetchTaskDetails = "/task/task_details/";
