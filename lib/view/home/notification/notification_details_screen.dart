@@ -4,7 +4,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
+import 'package:home_cache/controller/provider_controller.dart';
 import 'package:home_cache/controller/task_controller.dart';
+import 'package:home_cache/model/provider_model.dart';
 import 'package:home_cache/view/home/details/widgets/provider_list_tile.dart';
 import 'package:home_cache/view/home/notification/screens/home_member_screen.dart';
 import 'package:home_cache/view/home/schedule/widgets/assigned_person_tile.dart';
@@ -27,6 +29,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
   Person? _selectedPerson;
 
   final TaskController taskController = Get.put(TaskController());
+  final ProviderController providerController = Get.find<ProviderController>();
 
   @override
   void initState() {
@@ -195,13 +198,16 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
         Text(data["lastServiceDate"], style: AppTypoGraphy.semiBold),
         SizedBox(height: 20.h),
         Text('Last Service By', style: AppTypoGraphy.regular),
-        ProviderListTile(
-          providerName: data["providerName"],
-          lastUsedDate: data["providerLastUsed"],
-          rating: data["providerRating"],
-          isFavorite: false,
-          onTap: () => Get.toNamed(RouteNames.providerDetails),
-        ),
+        // Obx(
+        //   () {
+        //     final provider=providerController.selectedProvider.value;
+        //     return ProviderListTile(
+        //        provider:provider ,
+           
+        //     onTap: () => Get.toNamed(RouteNames.providerDetails),
+        //   );
+        //   },
+        // ),
       ],
     );
   }

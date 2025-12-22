@@ -11,7 +11,7 @@ class Provider {
   final String? deletedAt;
   final String rating;
   final String? lastServiceDate;
-  final bool isFollowed;
+  bool isFollowed;
 
   Provider({
     required this.id,
@@ -67,5 +67,10 @@ class Provider {
       "last_service_date": lastServiceDate,
       "is_followed": isFollowed,
     };
+  }
+
+  @override
+  String toString() {
+    return 'Provider(id: $id, name: $name, isFollowed: $isFollowed, rating: $rating, lastServiceDate: $lastServiceDate)';
   }
 }

@@ -119,10 +119,7 @@ class ProviderScreen extends StatelessWidget {
                       final provider = controller.filteredAllProviders[index];
                       debugPrint("=============> Provider $provider");
                       return ProviderListTile(
-                        providerName: provider.name,
-                        lastUsedDate: provider.lastServiceDate,
-                        rating: provider.rating,
-                        isFavorite: provider.isFollowed,
+                        provider: provider,
                         onTap: () => Get.toNamed(RouteNames.providerDetails,
                             arguments: provider.id),
                       );

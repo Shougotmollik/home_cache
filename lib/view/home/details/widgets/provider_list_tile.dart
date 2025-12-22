@@ -1,38 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:home_cache/constants/colors.dart';
+import 'package:home_cache/controller/provider_controller.dart';
+import 'package:home_cache/model/provider_model.dart';
 import 'package:home_cache/view/widget/heart_beat_animation.dart';
 
-class ProviderListTile extends StatefulWidget {
-  final String? providerName;
-  final String? lastUsedDate;
-  final String rating;
-  final bool isFavorite;
+class ProviderListTile extends StatelessWidget {
+  final Provider provider;
   final VoidCallback? onTap;
 
   const ProviderListTile({
     super.key,
-    required this.providerName,
-    required this.lastUsedDate,
-    this.rating = "0.0",
-    this.isFavorite = false,
+    required this.provider,
     this.onTap,
   });
 
   @override
-  State<ProviderListTile> createState() => _ProviderListTileState();
-}
-
-class _ProviderListTileState extends State<ProviderListTile> {
-  late bool _favorite = widget.isFavorite;
-
-  @override
   Widget build(BuildContext context) {
-    // Convert rating string to int for star display
-    final int ratingValue = int.tryParse(widget.rating.split(".").first) ?? 0;
+    final int ratingValue = int.tryParse(provider.rating.split(".").first) ?? 0;
 
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: onTap,
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 0.w, vertical: 8.h),
         padding: EdgeInsets.all(2.w),
@@ -44,7 +33,7 @@ class _ProviderListTileState extends State<ProviderListTile> {
               color: Colors.black.withOpacity(0.2),
               spreadRadius: 1,
               blurRadius: 2,
-              offset: Offset(0, 2),
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -52,25 +41,20 @@ class _ProviderListTileState extends State<ProviderListTile> {
           children: [
             SizedBox(width: 12.w),
 
-            // LEFT SIDE TEXT
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// Provider Name
                   Text(
-                    widget.providerName ?? "Unknown Provider",
+                    provider.name,
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-
                   SizedBox(height: 4.h),
-
-                  /// Last Used Date
                   Text(
-                    widget.lastUsedDate ?? "N/A",
+                    provider.lastServiceDate ?? "N/A",
                     style: TextStyle(
                       fontSize: 14.sp,
                       color: Colors.black54,
@@ -80,11 +64,10 @@ class _ProviderListTileState extends State<ProviderListTile> {
               ),
             ),
 
-            // STARS + FAVORITE
+            // STARS + HEART
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// Rating stars
                 Row(
                   children: List.generate(
                     5,
@@ -97,36 +80,14 @@ class _ProviderListTileState extends State<ProviderListTile> {
                     ),
                   ),
                 ),
-
                 SizedBox(height: 4.h),
-
-                /// Heart animation
-                HeartBeatAnimation(
-                  selected: _favorite,
-                  selectedChild: Icon(
-                    Icons.favorite,
-                    color: Colors.red,
-                    size: 20.sp,
-                  ),
-                  unselectedChild: Icon(
-                    Icons.favorite_border,
-                    color: Colors.grey,
-                    size: 20.sp,
-                  ),
-                  duration: Duration(milliseconds: 220),
-                  scale: 1.3,
-                  onChange: () {
-                    setState(() {
-                      _favorite = !_favorite;
-                    });
-                  },
-                ),
+                FollowHeartButton(provider: provider),
               ],
             ),
 
             SizedBox(width: 6.w),
 
-            // RIGHT SIDE INFO BOX
+            // RIGHT INFO BOX
             Container(
               padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
               decoration: BoxDecoration(
@@ -158,5 +119,87 @@ class _ProviderListTileState extends State<ProviderListTile> {
         ),
       ),
     );
+  }
+}
+
+class FollowHeartButton extends StatefulWidget {
+  final Provider provider;
+
+  const FollowHeartButton({
+    super.key,
+    required this.provider,
+  });
+
+  @override
+  State<FollowHeartButton> createState() => _FollowHeartButtonState();
+}
+
+class _FollowHeartButtonState extends State<FollowHeartButton> {
+  late bool _favorite;
+  bool _isProcessing = false;
+
+  final ProviderController _providerController = Get.find<ProviderController>();
+
+  @override
+  void initState() {
+    super.initState();
+    _favorite = widget.provider.isFollowed;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return HeartBeatAnimation(
+      selected: _favorite,
+      selectedChild: Icon(
+        Icons.favorite,
+        color: Colors.red,
+        size: 20.sp,
+      ),
+      unselectedChild: Icon(
+        Icons.favorite_border,
+        color: Colors.grey,
+        size: 20.sp,
+      ),
+      duration: const Duration(milliseconds: 220),
+      scale: 1.3,
+      onChange: _handleFollowToggle,
+    );
+  }
+
+  Future<void> _handleFollowToggle() async {
+    if (_isProcessing) return;
+    _isProcessing = true;
+
+    final originalState = _favorite;
+
+    // Optimistic UI update
+    if (mounted) {
+      setState(() {
+        _favorite = !_favorite;
+        widget.provider.isFollowed = _favorite;
+      });
+    }
+
+    try {
+      bool serverFollowState = await _providerController.toggleFollowProvider(
+        widget.provider.id,
+      );
+
+      if (mounted) {
+        setState(() {
+          _favorite = serverFollowState;
+          widget.provider.isFollowed = serverFollowState;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _favorite = originalState;
+          widget.provider.isFollowed = originalState;
+        });
+      }
+    } finally {
+      _isProcessing = false;
+    }
   }
 }

@@ -19,6 +19,7 @@ class ApiConstants {
   static String addProvider = "/provider/";
   static String fetchProviders = "/provider/";
   static String updateProvider = "/provider/";
+  static String followProvider = "/provider/toogle-follow";
 
   static String addDocument = "/document";
   static String fetchDocument = "/document/all?type=";

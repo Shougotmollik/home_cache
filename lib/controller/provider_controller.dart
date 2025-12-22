@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:home_cache/model/provider_model.dart';
 import 'package:home_cache/services/api_checker.dart';
 import 'package:home_cache/services/api_clients.dart';
 import 'package:home_cache/services/api_constants.dart';
+import 'package:http/http.dart' as http;
 
 class ProviderController extends GetxController {
   var isLoading = false.obs;
@@ -115,6 +118,67 @@ class ProviderController extends GetxController {
       }
     } catch (e) {
       errorMessage.value = e.toString();
+    } finally {
+      isLoading(false);
+    }
+  }
+
+// // ! toggle follow provider
+//   Future<bool> toggleFollowProvider(String providerId) async {
+//     try {
+
+//       final response = await http.post(
+//         Uri.parse(
+//             'https://k10swf0g-6000.inc1.devtunnels.ms/api/v1/provider/toogle-follow'),
+
+//         headers: {
+//           'Content-Type': 'application/json',
+//           'Authorization':
+//               'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2VtYWlsIjoic2hvdWdvdG1vbGxpa0BnbWFpbC5jb20iLCJ1c2VyX2lkIjoiNWQ0NDVhZTItOWRmNy00ZWIyLTkzY2MtMGQ4NjAxOGM5NTVlIiwidXNlcl9yb2xlIjoidXNlciIsImlhdCI6MTc2NjM4NDIwMSwiZXhwIjoxNzY4OTc2MjAxfQ.GNmYDs1ELsenpC-2tiFjMcZ0MQwR8GFJnrV89q6YIHk',
+//         },
+//         body: json.encode({
+//           "provider_id": providerId,
+//         }),
+//       );
+
+//       print('Status: ${response.statusCode}');
+//       print('Body: ${response.body}');
+
+//       if (response.statusCode == 200) {
+//         final data = json.decode(response.body);
+//         return data['data']['is_followed'];
+//       }
+//       throw Exception('Failed');
+//     } catch (e) {
+//       print('Error: $e');
+//       rethrow;
+//     }
+//   }
+
+  Future<bool> toggleFollowProvider(String providerId) async {
+    isLoading(true);
+    try {
+      var body = json.encode({
+        "provider_id": providerId,
+      });
+
+      Response response = await ApiClient.postData(
+        ApiConstants.followProvider,
+        body,
+      );
+
+      if (response.statusCode == 200) {
+        var responseData = response.body;
+
+        bool isFollowed = responseData['data']['is_followed'] ?? false;
+
+        return isFollowed;
+      } else {
+        throw Exception('Failed to toggle follow status');
+      }
+    } catch (e) {
+      print("❌ Error in toggleFollowProvider: $e");
+      rethrow;
     } finally {
       isLoading(false);
     }
