@@ -1,19 +1,21 @@
-class HomeTaskData {
+
+
+class HomeTaskHealth {
   final Tasks tasks;
   final HomeHealth homeHealth;
   final MyData myData;
 
-  HomeTaskData({
+  HomeTaskHealth({
     required this.tasks,
     required this.homeHealth,
     required this.myData,
   });
 
-  factory HomeTaskData.fromJson(Map<String, dynamic> json) {
-    return HomeTaskData(
-      tasks: Tasks.fromJson(json['tasks']),
-      homeHealth: HomeHealth.fromJson(json['home_health']),
-      myData: MyData.fromJson(json['my_data']),
+  factory HomeTaskHealth.fromJson(Map<String, dynamic> json) {
+    return HomeTaskHealth(
+      tasks: Tasks.fromJson(json['tasks'] ?? {}),
+      homeHealth: HomeHealth.fromJson(json['home_health'] ?? {}),
+      myData: MyData.fromJson(json['my_data'] ?? {}),
     );
   }
 
@@ -39,7 +41,7 @@ class Tasks {
 
   factory Tasks.fromJson(Map<String, dynamic> json) {
     return Tasks(
-      season: Season.fromJson(json['season']),
+      season: Season.fromJson(json['season'] ?? {}),
       overdue: json['overdue'] ?? [],
       upcoming: json['upcoming'] ?? [],
       completed: json['completed'] ?? [],
@@ -65,8 +67,8 @@ class Season {
 
   factory Season.fromJson(Map<String, dynamic> json) {
     return Season(
-      start: DateTime.parse(json['start']),
-      end: DateTime.parse(json['end']),
+      start: DateTime.parse(json['start'] ?? DateTime.now().toIso8601String()),
+      end: DateTime.parse(json['end'] ?? DateTime.now().toIso8601String()),
     );
   }
 
@@ -89,9 +91,9 @@ class HomeHealth {
 
   factory HomeHealth.fromJson(Map<String, dynamic> json) {
     return HomeHealth(
-      health: json['health'],
-      totalTasks: json['totalTasks'],
-      completedTasks: json['completedTasks'],
+      health: json['health'] ?? 0,
+      totalTasks: json['totalTasks'] ?? 0,
+      completedTasks: json['completedTasks'] ?? 0,
     );
   }
 
@@ -113,8 +115,8 @@ class MyData {
 
   factory MyData.fromJson(Map<String, dynamic> json) {
     return MyData(
-      completed: json['completed'],
-      pending: json['pending'],
+      completed: json['completed'] ?? 0,
+      pending: json['pending'] ?? 0,
     );
   }
 

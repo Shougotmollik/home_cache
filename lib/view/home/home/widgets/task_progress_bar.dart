@@ -48,7 +48,6 @@ class TaskProgressBar extends StatelessWidget {
               builder: (context, constraints) {
                 final totalWidth = constraints.maxWidth;
                 final filledWidth = totalWidth * progress;
-
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: List.generate(total, (index) {

@@ -136,7 +136,7 @@ class FollowHeartButton extends StatefulWidget {
 
 class _FollowHeartButtonState extends State<FollowHeartButton> {
   late bool _favorite;
-  bool _isProcessing = false;
+  // bool _isProcessing = false;
 
   final ProviderController _providerController = Get.find<ProviderController>();
 
@@ -167,10 +167,10 @@ class _FollowHeartButtonState extends State<FollowHeartButton> {
   }
 
   Future<void> _handleFollowToggle() async {
-    if (_isProcessing) return;
-    _isProcessing = true;
+    // if (_isProcessing) return;
+    // _isProcessing = true;
 
-    final originalState = _favorite;
+    // final originalState = _favorite;
 
     // Optimistic UI update
     if (mounted) {
@@ -192,14 +192,14 @@ class _FollowHeartButtonState extends State<FollowHeartButton> {
         });
       }
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _favorite = originalState;
-          widget.provider.isFollowed = originalState;
-        });
-      }
+      // if (mounted) {
+      //   setState(() {
+      //     _favorite = originalState;
+      //     widget.provider.isFollowed = originalState;
+      //   });
+      // }
     } finally {
-      _isProcessing = false;
+      // _isProcessing = false;
     }
   }
 }

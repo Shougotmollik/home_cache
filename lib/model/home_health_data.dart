@@ -1,7 +1,7 @@
 class HomeHealthModel {
-  final double health;
-  final double totalTasks;
-  final double completedTasks;
+  final int health;
+  final int totalTasks;
+  final int completedTasks;
 
   HomeHealthModel({
     required this.health,
@@ -11,24 +11,16 @@ class HomeHealthModel {
 
   factory HomeHealthModel.fromJson(Map<String, dynamic> json) {
     return HomeHealthModel(
-      health: (json['health'] as num).toDouble(),
-      totalTasks: (json['totalTasks'] as num).toDouble(),
-      completedTasks: (json['completedTasks'] as num).toDouble(),
+      health: json['health'] ?? 0,
+      totalTasks: json['totalTasks'] ?? 0,
+      completedTasks: json['completedTasks'] ?? 0,
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'health': health,
-      'totalTasks': totalTasks,
-      'completedTasks': completedTasks,
-    };
   }
 }
 
 class MyData {
-  final int completed;
-  final int pending;
+  final double completed;
+  final double pending;
 
   MyData({
     required this.completed,
@@ -37,15 +29,8 @@ class MyData {
 
   factory MyData.fromJson(Map<String, dynamic> json) {
     return MyData(
-      completed: json['completed'],
-      pending: json['pending'],
+      completed: json['completed'] ?? 0,
+      pending: json['pending'] ?? 0,
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'completed': completed,
-      'pending': pending,
-    };
   }
 }

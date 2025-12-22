@@ -23,6 +23,12 @@ class _HomeHealthScreenState extends State<HomeHealthScreen> {
   final HomeController homeController = Get.put(HomeController());
 
   @override
+  void initState() {
+    super.initState();
+    homeController.getHomeHealth();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarBack(
@@ -56,7 +62,7 @@ class _HomeHealthScreenState extends State<HomeHealthScreen> {
                 children: [
                   SizedBox(height: 20.h),
                   Text(
-                    'Great Work, (Jess)', // Replace with dynamic username if available
+                    'Great Work,',
                     style:
                         AppTypoGraphy.medium.copyWith(color: AppColors.black),
                   ),
@@ -71,8 +77,8 @@ class _HomeHealthScreenState extends State<HomeHealthScreen> {
                   SizedBox(height: 24.h),
 
                   TaskProgressBar(
-                    totalTasks: totalTasks,
-                    completedTasks: completedTasks,
+                    totalTasks: 100,
+                    completedTasks: 6,
                   ),
 
                   SizedBox(height: 32.h),
@@ -163,7 +169,6 @@ class _HomeHealthScreenState extends State<HomeHealthScreen> {
         Divider(color: AppColors.lightgrey, thickness: 1.h, height: 6.h),
         if (isExpanded)
           ...tasks.map((task) {
-            // Replace 'title' and 'date' with your API's task keys
             final taskTitle = task['title'] ?? "No title";
             final taskDate = task['date'] ?? defaultDate;
             return TaskListTile(

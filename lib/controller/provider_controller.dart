@@ -156,7 +156,6 @@ class ProviderController extends GetxController {
 //   }
 
   Future<bool> toggleFollowProvider(String providerId) async {
-    isLoading(true);
     try {
       var body = json.encode({
         "provider_id": providerId,
@@ -179,9 +178,7 @@ class ProviderController extends GetxController {
     } catch (e) {
       print("❌ Error in toggleFollowProvider: $e");
       rethrow;
-    } finally {
-      isLoading(false);
-    }
+    } finally {}
   }
 }
 

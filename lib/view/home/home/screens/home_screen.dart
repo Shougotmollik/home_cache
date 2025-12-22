@@ -51,22 +51,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   GestureDetector(
                       onTap: () => Get.toNamed(RouteNames.homeHealth),
                       child: Obx(() {
+                        final progressHealth =
+                            homeController.homeHealth.value.health;
+
                         return HomeHealthPieChart(
-                          completedValue: homeController
-                                  .homeHealthData.value?.completedTasks ??
-                              0,
-                          remainingValue: 100 -
-                              (homeController
-                                      .homeHealthData.value?.completedTasks ??
-                                  0),
+                          progress: progressHealth,
                         );
                       })),
                   _buildHealthTitleSection(
-                    completedTasks:
-                        homeController.homeHealthData.value?.completedTasks ??
-                            0,
+                    completedTasks: homeController
+                        .homeHealth.value.completedTasks
+                        .toDouble(),
                     totalTasks:
-                        homeController.homeHealthData.value?.totalTasks ?? 0,
+                        homeController.homeHealth.value.totalTasks.toDouble(),
                   ),
                   SizedBox(height: 10.h),
                 ],
