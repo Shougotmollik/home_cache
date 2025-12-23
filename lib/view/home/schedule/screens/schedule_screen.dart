@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/controller/schedule_controller.dart';
-import 'package:home_cache/controller/task_controller.dart';
 import 'package:intl/intl.dart';
 
 import '../dialog/add_task_dialog.dart';
@@ -19,7 +18,6 @@ class ScheduleScreen extends StatefulWidget {
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
   final List<Task> _tasks = [];
-  // final TaskController _taskController = Get.put(TaskController());
   final ScheduleController _scheduleController = Get.put(ScheduleController());
 
   @override

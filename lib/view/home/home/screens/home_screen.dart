@@ -6,6 +6,7 @@ import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/controller/home_controller.dart';
 import 'package:home_cache/controller/task_controller.dart';
+import 'package:home_cache/controller/user_controller.dart';
 import 'package:home_cache/view/home/home/widgets/home_health_pie_chart.dart';
 import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import 'package:home_cache/view/widget/task_list_tile.dart';
@@ -23,6 +24,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final TaskController _taskController = Get.find<TaskController>();
   final HomeController homeController = Get.put(HomeController());
+  final UserController userController = Get.put(UserController());
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             homeController.homeHealth.value.health;
 
                         return HomeHealthPieChart(
-                          progress: progressHealth,
+                          progress: progressHealth.round(),
                         );
                       })),
                   _buildHealthTitleSection(
@@ -213,36 +215,46 @@ class _HomeScreenState extends State<HomeScreen> {
       automaticallyImplyLeading: false,
       title: Padding(
         padding: const EdgeInsets.only(left: 8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Hi Jess,',
-              style: AppTypoGraphy.medium.copyWith(
+        child: Obx(() {
+          if (userController.userDataList.isEmpty) {
+            return const SizedBox();
+          }
+
+          final user = userController.userDataList.first;
+          final firstName = user.profile?.firstName;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (firstName == null) SizedBox(height: 10.h),
+              Text(
+                'Hi ${firstName ?? ''},',
+                style: AppTypoGraphy.medium.copyWith(
                   color: AppColors.black,
                   fontSize: 24.sp,
-                  fontWeight: FontWeight.w600),
-            ),
-            Text(
-              'Welcome Back',
-              style: AppTypoGraphy.regular.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                'Welcome Back',
+                style: AppTypoGraphy.regular.copyWith(
                   color: AppColors.black.withAlpha(200),
                   fontSize: 18.sp,
-                  fontWeight: FontWeight.w300),
-            ),
-          ],
-        ),
+                  fontWeight: FontWeight.w300,
+                ),
+              ),
+            ],
+          );
+        }),
       ),
       actions: [
         GestureDetector(
-          onTap: () {
-            Get.toNamed(RouteNames.notifications);
-          },
+          onTap: () => Get.toNamed(RouteNames.notifications),
           child: Container(
             height: 32.h,
             width: 48.w,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.primary,
               shape: BoxShape.circle,
             ),

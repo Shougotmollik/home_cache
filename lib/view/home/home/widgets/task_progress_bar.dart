@@ -22,6 +22,10 @@ class TaskProgressBar extends StatelessWidget {
 
       final progress = total > 0 ? (completed / total).clamp(0.0, 1.0) : 0.0;
 
+      final percentage = (progress * 100).round();
+
+      final numberOfDots = ((percentage / 10).ceil()).clamp(1, 10);
+
       return Container(
         height: 14.h,
         width: double.infinity,
@@ -31,6 +35,7 @@ class TaskProgressBar extends StatelessWidget {
         ),
         child: Stack(
           children: [
+            // Animated progress fill
             AnimatedFractionallySizedBox(
               duration: const Duration(milliseconds: 500),
               curve: Curves.easeInOut,
@@ -44,15 +49,21 @@ class TaskProgressBar extends StatelessWidget {
                 ),
               ),
             ),
+            // Dots overlay
             LayoutBuilder(
               builder: (context, constraints) {
                 final totalWidth = constraints.maxWidth;
                 final filledWidth = totalWidth * progress;
+
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: List.generate(total, (index) {
-                    final dotPosition = (index / (total - 1)) * totalWidth;
+                  children: List.generate(numberOfDots, (index) {
+                    // Calculate dot position (evenly spaced)
+                    final dotPosition = numberOfDots > 1
+                        ? (index / (numberOfDots - 1)) * totalWidth
+                        : totalWidth / 2; // Center the dot if only one
 
+                    // Check if this dot should be filled (covered by progress)
                     final isInsideFilled = dotPosition + 4.w <= filledWidth;
 
                     return Padding(

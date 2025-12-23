@@ -77,8 +77,8 @@ class _HomeHealthScreenState extends State<HomeHealthScreen> {
                   SizedBox(height: 24.h),
 
                   TaskProgressBar(
-                    totalTasks: 100,
-                    completedTasks: 6,
+                    totalTasks: totalTasks,
+                    completedTasks: completedTasks,
                   ),
 
                   SizedBox(height: 32.h),

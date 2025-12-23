@@ -219,42 +219,42 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
               controller: TextEditingController(text: _dateText),
             ),
 
-            SizedBox(height: 20.h),
+            // SizedBox(height: 20.h),
 
-            // Assignee Selection
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Assignee',
-                  style: AppTypoGraphy.regular.copyWith(fontSize: 16.sp),
-                ),
-                SizedBox(height: 8.h),
-                DropdownButtonFormField<String>(
-                  initialValue: _selectedAssignee,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: AppColors.lightgrey,
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(2.r),
-                      borderSide: BorderSide(color: AppColors.primary),
-                    ),
-                  ),
-                  dropdownColor: Color(0xffA7B8BB),
-                  items: _assignees.map((assignee) {
-                    return DropdownMenuItem(
-                      value: assignee['name'],
-                      child: Text('${assignee['name']} (${assignee['role']})'),
-                    );
-                  }).toList(),
-                  onChanged: (value) =>
-                      setState(() => _selectedAssignee = value),
-                  hint: Text('Select assignee'),
-                ),
-              ],
-            ),
+            // // Assignee Selection
+            // Column(
+            //   crossAxisAlignment: CrossAxisAlignment.start,
+            //   children: [
+            //     Text(
+            //       'Assignee',
+            //       style: AppTypoGraphy.regular.copyWith(fontSize: 16.sp),
+            //     ),
+            //     SizedBox(height: 8.h),
+            //     DropdownButtonFormField<String>(
+            //       initialValue: _selectedAssignee,
+            //       decoration: InputDecoration(
+            //         filled: true,
+            //         fillColor: AppColors.lightgrey,
+            //         contentPadding:
+            //             EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+            //         border: OutlineInputBorder(
+            //           borderRadius: BorderRadius.circular(2.r),
+            //           borderSide: BorderSide(color: AppColors.primary),
+            //         ),
+            //       ),
+            //       dropdownColor: Color(0xffA7B8BB),
+            //       items: _assignees.map((assignee) {
+            //         return DropdownMenuItem(
+            //           value: assignee['name'],
+            //           child: Text('${assignee['name']} (${assignee['role']})'),
+            //         );
+            //       }).toList(),
+            //       onChanged: (value) =>
+            //           setState(() => _selectedAssignee = value),
+            //       hint: Text('Select assignee'),
+            //     ),
+            //   ],
+            // ),
 
             SizedBox(height: 20.h),
 
@@ -309,37 +309,38 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
             SizedBox(height: 40.h),
 
             // Action Buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text(
-                    'CANCEL',
-                    style: AppTypoGraphy.regular
-                        .copyWith(color: AppColors.primary),
+            SafeArea(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text(
+                      'CANCEL',
+                      style: AppTypoGraphy.regular
+                          .copyWith(color: AppColors.primary),
+                    ),
                   ),
-                ),
-                SizedBox(width: 16.w),
-                Obx(
-                  () => ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4.r),
+                  SizedBox(width: 16.w),
+                  Obx(
+                    () => ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                      ),
+                      onPressed: _saveTask,
+                      child: Text(
+                        _taskController.isLoading.value ? 'Saving...' : 'SAVE',
+                        style:
+                            AppTypoGraphy.regular.copyWith(color: Colors.white),
                       ),
                     ),
-                    onPressed: _saveTask,
-                    child: Text(
-                      _taskController.isLoading.value ? 'Saving...' : 'SAVE',
-                      style:
-                          AppTypoGraphy.regular.copyWith(color: Colors.white),
-                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-            SizedBox(height: 20.h),
           ],
         ),
       ),

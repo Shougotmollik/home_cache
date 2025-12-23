@@ -1,5 +1,5 @@
 class HomeHealthModel {
-  final int health;
+  final double health;
   final int totalTasks;
   final int completedTasks;
 
