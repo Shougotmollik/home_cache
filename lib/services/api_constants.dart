@@ -17,6 +17,8 @@ class ApiConstants {
   static String createTask = "/task/add_task";
   static String fetchTask = "/task/get_users_task";
   static String fetchTaskDetails = "/task/task_details/";
+  static String markTaskComplete = "/task/mark_as_done_or_ignore";
+  static String changeScheduleDate = "/task/change-task-time/";
 
   static String addProvider = "/provider/";
   static String fetchProviders = "/provider/";

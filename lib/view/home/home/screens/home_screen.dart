@@ -10,7 +10,6 @@ import 'package:home_cache/controller/user_controller.dart';
 import 'package:home_cache/view/home/home/widgets/home_health_pie_chart.dart';
 import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import 'package:home_cache/view/widget/task_list_tile.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../config/route/route_names.dart';
 
@@ -159,13 +158,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           return Column(
                             children: _taskController.tasks
                                 .map((task) => TaskListTile(
-                                      title: task.title,
-                                      date: DateFormat('MMMM d, yyyy')
-                                          .format(task.initialDate),
-                                      onTap: () => Get.toNamed(
-                                        RouteNames.notificationDetails,
-                                        arguments: task.id,
-                                      ),
+                                      task: task,
+                                      // title: task.title,
+                                      // date: DateFormat('MMMM d, yyyy')
+                                      //     .format(task.initialDate),
+                                      // onTap: () => Get.toNamed(
+                                      //   RouteNames.notificationDetails,
+                                      //   arguments: task.id,
+                                      // ),
                                     ))
                                 .toList(),
                           );

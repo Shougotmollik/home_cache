@@ -172,9 +172,8 @@ class _HomeHealthScreenState extends State<HomeHealthScreen> {
             final taskTitle = task['title'] ?? "No title";
             final taskDate = task['date'] ?? defaultDate;
             return TaskListTile(
-              title: taskTitle,
-              date: taskDate,
-              onTap: () {},
+              task: task,
+              // onTap: () {},
             );
           }).toList(),
       ],

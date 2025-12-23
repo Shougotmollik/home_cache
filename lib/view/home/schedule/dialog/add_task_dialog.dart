@@ -28,15 +28,20 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
   bool _isEditingTaskName = false;
 
   final List<String> _frequencies = [
-    'Weekly',
-    'Biweekly',
-    'Monthly',
-    'Every Spring',
-    'Every Summer',
-    'Every Fall',
-    'Every Winter',
-    'Annually',
-    'Biannually',
+    "none",
+    "weekly",
+    "biweekly",
+    "monthly",
+    "annually",
+    "biannually",
+    "spring",
+    "summer",
+    "fall",
+    "winter",
+    "every_spring",
+    "every_summer",
+    "every_fall",
+    "every_winter"
   ];
 
   final TextEditingController _taskNameController = TextEditingController();

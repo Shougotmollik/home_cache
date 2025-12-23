@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/controller/provider_controller.dart';
 import 'package:home_cache/controller/task_controller.dart';
-import 'package:home_cache/model/provider_model.dart';
 import 'package:home_cache/view/home/details/widgets/provider_list_tile.dart';
 import 'package:home_cache/view/home/notification/screens/home_member_screen.dart';
 import 'package:home_cache/view/home/schedule/widgets/assigned_person_tile.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
-
-import '../../../../config/route/route_names.dart';
 
 class NotificationDetailsScreen extends StatefulWidget {
   const NotificationDetailsScreen({super.key});
@@ -65,7 +61,8 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
               children: [
                 /// Title
                 Text(
-                  data.title,
+                  // data.title,
+                  "Notification",
                   style: AppTypoGraphy.bold.copyWith(color: AppColors.black),
                   textAlign: TextAlign.center,
                 ),
@@ -198,16 +195,6 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
         Text(data["lastServiceDate"], style: AppTypoGraphy.semiBold),
         SizedBox(height: 20.h),
         Text('Last Service By', style: AppTypoGraphy.regular),
-        // Obx(
-        //   () {
-        //     final provider=providerController.selectedProvider.value;
-        //     return ProviderListTile(
-        //        provider:provider ,
-           
-        //     onTap: () => Get.toNamed(RouteNames.providerDetails),
-        //   );
-        //   },
-        // ),
       ],
     );
   }

@@ -57,4 +57,6 @@ class RouteNames {
   static const editMaterial = '/edit-material';
 
   static const calendar = '/calendar';
+
+  static const taskDetails = '/task-details';
 }

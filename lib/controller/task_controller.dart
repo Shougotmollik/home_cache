@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
-import 'package:home_cache/model/task_model.dart';
+import 'package:home_cache/model/task_details_model.dart';
 import 'package:home_cache/services/api_checker.dart';
 import 'package:home_cache/services/api_clients.dart';
 import 'package:home_cache/services/api_constants.dart';
@@ -12,7 +12,7 @@ class TaskController extends GetxController {
   var tasks = <Task>[].obs;
   var isLoading = false.obs;
   var selectedIndex = 0.obs;
-  Rx<TaskModel?> taskDetails = Rx<TaskModel?>(null);
+  Rx<TaskDetailsModel?> taskDetails = Rx<TaskDetailsModel?>(null);
 
   RxInt totalTasks = 10.obs;
   RxInt completedTasks = 3.obs;
@@ -93,12 +93,47 @@ class TaskController extends GetxController {
     if (response.statusCode == 200) {
       var responseData = response.body;
       if (responseData['data'] != null) {
-        taskDetails.value = TaskModel.fromJson(responseData['data']);
+        taskDetails.value = TaskDetailsModel.fromJson(responseData['data']);
       }
     } else {
       ApiChecker.checkApi(response);
     }
 
     isLoading(false);
+  }
+
+  // ! task mark complete
+  Future<void> markTaskComplete(var data) async {
+    isLoading(true);
+    Response response =
+        await ApiClient.patchData(ApiConstants.markTaskComplete, data);
+    if (response.statusCode == 200) {
+      Get.back();
+      fetchAllTask(
+        "upcoming",
+      );
+    } else {
+      ApiChecker.checkApi(response);
+    }
+  }
+
+  Future<void> changeScheduleDate(String id, var selectedDate) async {
+    isLoading(true);
+
+    Map<String, dynamic> body = {
+      "date": selectedDate,
+    };
+
+    Response response = await ApiClient.patchData(
+      "${ApiConstants.changeScheduleDate}$id",
+      body,
+    );
+
+    isLoading(false);
+
+    if (response.statusCode == 200) {
+    } else {
+      ApiChecker.checkApi(response);
+    }
   }
 }
