@@ -8,6 +8,8 @@ class ApiConstants {
 
   static String fetchUserData = "/user/me";
 
+  static String fetchHomeMember = "/home-share/my-home-member";
+
   static String updateHomeData = "/user/update_home_data";
   static String homeTaskData = "/task/home-task-data";
   static String homeHealthData = "/task/home-health";
@@ -52,7 +54,7 @@ class ApiConstants {
   static String getAiResponse = "/ai/get-message";
   static String postAiResponse = "/ai/get-response";
 
-  static String fetchHomeMember = "/home-share/my-home-member";
+  // static String fetchHomeMember = "/home-share/my-home-member";
 
   static String addMaterial = "/view-by-type/add-new-user-material";
 }

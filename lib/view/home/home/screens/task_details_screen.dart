@@ -30,8 +30,6 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     final arg = Get.arguments as Map<String, dynamic>;
     taskId = arg['task_id'];
     taskTitle = arg['task_title'];
-    print("Task ID:=========>>>> $taskId");
-    print("Task Title:=========>>>> $taskTitle");
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       taskController.fetchTaskDetails(taskId);
@@ -184,10 +182,16 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                         ),
                       ],
                     ),
-                    taskController.taskDetails.value?.taskData.createdBy ==
-                            userController.userDataList.first.id
+                    (taskController.taskDetails.value?.taskData.createdBy !=
+                                null &&
+                            userController.userDataList.isNotEmpty &&
+                            taskController
+                                    .taskDetails.value!.taskData.createdBy ==
+                                userController.userDataList.first.id)
                         ? IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Get.toNamed(RouteNames.homeMember);
+                            },
                             icon: Icon(
                               Icons.mode_edit_outlined,
                               color: AppColors.primary,
@@ -372,8 +376,6 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
               lastDate: DateTime(DateTime.now().year + 5),
             );
             if (pickedDate != null) {
-              print("Picked Date: =======>${pickedDate.toIso8601String()}");
-
               await taskController.changeScheduleDate(
                   taskDetails.taskData.id, pickedDate.toIso8601String());
 

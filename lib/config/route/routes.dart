@@ -55,6 +55,7 @@ import 'package:home_cache/view/home/details/type/materials/material_screen.dart
 import 'package:home_cache/view/home/details/type/utility/utility_screen.dart';
 import 'package:home_cache/view/home/details/type/view_by_type_screen.dart';
 import 'package:home_cache/view/home/home/screens/home_health_screen.dart';
+import 'package:home_cache/view/home/home/screens/home_member_screen.dart';
 import 'package:home_cache/view/home/home/screens/task_details_screen.dart';
 import 'package:home_cache/view/home/notification/notification_details_screen.dart';
 import 'package:home_cache/view/home/notification/screens/notification_screen.dart';
@@ -223,5 +224,6 @@ class AppRoutes {
       name: RouteNames.taskDetails,
       page: () => const TaskDetailsScreen(),
     ),
+    GetPage(name: RouteNames.homeMember, page: () => const HomeMemberScreen()),
   ];
 }

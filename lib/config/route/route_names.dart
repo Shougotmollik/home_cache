@@ -59,4 +59,5 @@ class RouteNames {
   static const calendar = '/calendar';
 
   static const taskDetails = '/task-details';
+  static const homeMember = '/home-member';
 }

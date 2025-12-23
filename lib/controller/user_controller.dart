@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:home_cache/model/home_member_model.dart';
 import 'package:home_cache/model/user_model.dart';
 import 'package:home_cache/services/api_checker.dart';
 import 'package:home_cache/services/api_clients.dart';
@@ -7,6 +8,7 @@ import 'package:home_cache/services/api_constants.dart';
 class UserController extends GetxController {
   var isLoading = false.obs;
   var userDataList = <UserData>[].obs;
+  var homeMemberList = <HomeMemberModel>[].obs;
 
   @override
   void onInit() {
@@ -41,9 +43,27 @@ class UserController extends GetxController {
     isLoading(false);
   }
 
-  // Optional: refresh user data
+  // ! refresh user data
   Future<void> refreshUserData() async {
     userDataList.clear();
     await getUserData();
+  }
+
+  // ! Fetch home member data from API
+  Future<void> getHomeMemberData() async {
+    isLoading(true);
+    final Response response =
+        await ApiClient.getData(ApiConstants.fetchHomeMember);
+    if (response.statusCode == 200) {
+      var responseData = response.body['data'] as List;
+      if (responseData.isNotEmpty) {
+        homeMemberList.value = responseData
+            .map<HomeMemberModel>((e) => HomeMemberModel.fromJson(e))
+            .toList();
+      }
+    } else {
+      ApiChecker.checkApi(response);
+    }
+    isLoading(false);
   }
 }
