@@ -11,7 +11,7 @@ class HomeHealthModel {
 
   factory HomeHealthModel.fromJson(Map<String, dynamic> json) {
     return HomeHealthModel(
-      health: json['health'] ?? 0,
+      health: (json['health'] as num).toDouble() ?? 0,
       totalTasks: json['totalTasks'] ?? 0,
       completedTasks: json['completedTasks'] ?? 0,
     );

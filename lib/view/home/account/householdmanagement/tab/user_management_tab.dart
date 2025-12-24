@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
+import 'package:home_cache/controller/home_member_controller.dart';
+import 'package:home_cache/controller/user_controller.dart';
 import 'package:home_cache/view/home/account/productsupport/widgets/text_field_widget.dart';
 import 'package:home_cache/view/home/account/widgets/user_management_tile.dart';
+import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import 'package:home_cache/view/widget/text_button_widget.dart';
 
 class UserManagementTab extends StatefulWidget {
@@ -16,182 +20,271 @@ class UserManagementTab extends StatefulWidget {
 class _UserManagementTabState extends State<UserManagementTab> {
   bool isAddingUser = false;
 
-  final TextEditingController fnameController = TextEditingController();
-  final TextEditingController lnameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
+  final TextEditingController otpController = TextEditingController();
 
-  final List<Map<String, String>> users = [
-    {'name': 'Vanessa Alvarez', 'role': 'House Resident'},
-    {'name': 'Ahsan Bari', 'role': 'House Resident'},
-    {'name': 'Bob T. Builder', 'role': 'House Resident'},
-    {'name': 'Thomas T.T. Engine', 'role': 'House Resident'},
-  ];
+  late final UserController userController;
+  late final HomeMemberController homeMemberController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Get controllers safely
+    userController = Get.find<UserController>();
+    homeMemberController = Get.put(HomeMemberController());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      userController.getUserData();
+      userController.getHomeMemberData();
+    });
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    otpController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Header Row
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Column(
-            //   children: [
-            //     Text(
-            //       'Who Can See Your',
-            //       style: AppTypoGraphy.bold.copyWith(color: AppColors.secondary),
-            //       textAlign: TextAlign.center,
-            //     ),
-            //     Text(
-            //       'HomeCache',
-            //       style: AppTypoGraphy.bold.copyWith(color: AppColors.secondary),
-            //       textAlign: TextAlign.center,
-            //     ),
-            //   ],
-            // ),
-
-            SizedBox(
-              width: 200.w,
-              child: Text('Who can see your homeCache',
-                  style: AppTypoGraphy.bold.copyWith(color: AppColors.secondary)),
-            ),
-            SizedBox(width: 12.w),
-            IconButton(
-              icon: Icon(
-                isAddingUser ? Icons.close : Icons.add,
-                size: 32.sp,
-                color: AppColors.secondary,
-              ),
-              onPressed: () {
-                setState(() {
-                  isAddingUser = !isAddingUser;
-                });
-              },
-            ),
-          ],
-        ),
-        SizedBox(height: 12.h),
-        if (isAddingUser)
-          Column(
-            children: [
-              Container(
-                height: 218.h,
-                padding: EdgeInsets.all(16.w),
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 6.h),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextFieldWidget(
-                            hintText: 'First Name',
-                            controller: fnameController,
-                          ),
-                        ),
-                        SizedBox(width: 12.w),
-                        Expanded(
-                          child: TextFieldWidget(
-                            hintText: 'Last Name',
-                            controller: lnameController,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16.h),
-                    TextFieldWidget(
-                      hintText: 'Email',
-                      controller: emailController,
-                    ),
-                    SizedBox(height: 24.h),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 50.w),
-                      child: TextWidgetButton(
-                        text: 'Send Invite',
-                        onPressed: () {
-                          setState(() {
-                            isAddingUser = !isAddingUser;
-                          });
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                  '"${emailController.text}" send email Successfully'),
-                              duration: const Duration(seconds: 3),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          )
+        if (userController.userDataList.first.homeData?.homeRole == 'owner')
+          _buildOwnerCard()
         else
-          ListView.builder(
-            physics: const ClampingScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: users.length,
-            itemBuilder: (context, index) {
-              final user = users[index];
-          
-              return Dismissible(
-                key: ValueKey(user['name']), // unique key
-                direction: DismissDirection.endToStart,
-                background: Container(
-                  alignment: Alignment.centerRight,
-                  padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
+          _buildResidentCard(context),
+        SizedBox(height: 12.h),
+        if (isAddingUser) _buildAddUserForm(context) else _buildMemberList(),
+      ],
+    );
+  }
+
+  Widget _buildResidentCard(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        SizedBox(
+          width: 220.w,
+          child: Text(
+            'Join to get access  HomeCache',
+            style: AppTypoGraphy.bold.copyWith(color: AppColors.secondary),
+          ),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            elevation: 0,
+            padding: EdgeInsets.symmetric(horizontal: 12.w),
+            minimumSize: Size(100.w, 40.h),
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+          ),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return Dialog(
+                  insetPadding:
+                      EdgeInsets.symmetric(horizontal: 12.w, vertical: 18.h),
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.r),
                   ),
-                  child: const Icon(
-                    Icons.delete,
-                    color: Colors.white,
+                  child: SizedBox(
+                    height: 200.h,
+                    width: 300.w,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 12.w, vertical: 18.h),
+                      child: Column(
+                        children: [
+                          Text(
+                            "Join Home",
+                            style: AppTypoGraphy.bold
+                                .copyWith(color: AppColors.primary),
+                          ),
+                          SizedBox(height: 16.h),
+                          TextFieldWidget(
+                            hintText: 'Enter your OTP',
+                            controller: otpController,
+                          ),
+                          SizedBox(height: 24.h),
+                          Obx(
+                            () => Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 50.w),
+                              child: TextWidgetButton(
+                                text: homeMemberController.isLoading.value
+                                    ? 'Joining...'
+                                    : 'Submit',
+                                onPressed: () {
+                                  if (otpController.text.trim().isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Please enter OTP'),
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  homeMemberController.joinHome({
+                                    "home_id": otpController.text.trim(),
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-                onDismissed: (direction) {
-                  // Save removed user
-                  final removedUser = user;
-                  final removedIndex = index;
-          
-                  setState(() {
-                    users.removeAt(index);
+                );
+              },
+            );
+          },
+          child: const Text("Join Now"),
+        )
+      ],
+    );
+  }
+
+  Widget _buildOwnerCard() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        SizedBox(
+          width: 220.w,
+          child: Text(
+            'Who can see your HomeCache',
+            style: AppTypoGraphy.bold.copyWith(color: AppColors.secondary),
+          ),
+        ),
+        IconButton(
+          icon: Icon(
+            isAddingUser ? Icons.close : Icons.add,
+            size: 32.sp,
+            color: AppColors.secondary,
+          ),
+          onPressed: () => setState(() => isAddingUser = !isAddingUser),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAddUserForm(BuildContext context) {
+    return Container(
+      height: 180.h,
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Column(
+        children: [
+          SizedBox(height: 16.h),
+          TextFieldWidget(
+            hintText: 'Email',
+            controller: emailController,
+          ),
+          SizedBox(height: 24.h),
+          Obx(
+            () => Padding(
+              padding: EdgeInsets.symmetric(horizontal: 50.w),
+              child: TextWidgetButton(
+                text: homeMemberController.isLoading.value
+                    ? 'Sending...'
+                    : 'Send Invite',
+                onPressed: () async {
+                  if (emailController.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please enter an email'),
+                      ),
+                    );
+                    return;
+                  }
+
+                  await homeMemberController.inviteHomeMember({
+                    "email": emailController.text.trim(),
                   });
-          
-                  // Show snackbar with UNDO
+
+                  setState(() => isAddingUser = false);
+
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('${removedUser['name']} removed'),
-                      duration: const Duration(seconds: 3),
-                      action: SnackBarAction(
-                        label: 'Undo',
-                        textColor: Colors.yellow,
-                        onPressed: () {
-                          setState(() {
-                            users.insert(removedIndex, removedUser);
-                          });
-                        },
+                      content: Text(
+                        '"${emailController.text}" invite sent successfully',
                       ),
                     ),
                   );
                 },
-                child: UserManagementTile(
-                  onTap: () {},
-                  fullName: user['name']!,
-                  role: user['role']!,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMemberList() {
+    return Obx(() {
+      if (userController.isLoading.value) {
+        return const Center(child: CustomProgressIndicator());
+      }
+
+      if (userController.homeMemberList.isEmpty) {
+        return const Center(child: Text('No members found'));
+      }
+
+      return ListView.builder(
+        shrinkWrap: true,
+        physics: const ClampingScrollPhysics(),
+        itemCount: userController.homeMemberList.length,
+        itemBuilder: (context, index) {
+          final user = userController.homeMemberList[index];
+          final role = user.homeData.homeRole.isNotEmpty
+              ? 'House ${user.homeData.homeRole[0].toUpperCase()}${user.homeData.homeRole.substring(1)}'
+              : 'House Member';
+
+          return Dismissible(
+            key: ValueKey(user.id),
+            direction: DismissDirection.endToStart,
+            background: Container(
+              alignment: Alignment.centerRight,
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              color: Colors.red,
+              child: const Icon(Icons.delete, color: Colors.white),
+            ),
+            onDismissed: (_) {
+              final removedUser = user;
+              final removedIndex = index;
+              userController.homeMemberList.removeAt(index);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Colors.green,
+                  duration: const Duration(seconds: 3),
+                  content: Text('${removedUser.profile.firstName} removed'),
+                  action: SnackBarAction(
+                    label: 'Undo',
+                    onPressed: () {
+                      userController.homeMemberList
+                          .insert(removedIndex, removedUser);
+                    },
+                  ),
                 ),
               );
             },
-          ),
-      ],
-    );
+            child: UserManagementTile(
+              onTap: () {},
+              fullName: '${user.profile.firstName} ${user.profile.lastName}',
+              role: role,
+            ),
+          );
+        },
+      );
+    });
   }
 }

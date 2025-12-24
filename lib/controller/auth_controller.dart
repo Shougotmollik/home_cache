@@ -25,7 +25,7 @@ class AuthController extends GetxController {
       var responseData = response.body['data'];
       String token = responseData['access_token'];
       await PrefsHelper.setString(AppConstants.bearerToken, token);
-      Get.offAllNamed(RouteNames.selectHouse);
+      Get.offAllNamed(RouteNames.selectHouseRole);
     } else {
       ApiChecker.checkApi(response);
     }

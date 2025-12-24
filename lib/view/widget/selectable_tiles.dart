@@ -50,10 +50,12 @@ class SelectableTile extends StatelessWidget {
               height: 72.w,
               fit: BoxFit.contain,
             ),
-            Text(
-              title,
-              style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w500),
-              textAlign: TextAlign.center,
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w500),
+                textAlign: TextAlign.center,
+              ),
             ),
           ],
         ),

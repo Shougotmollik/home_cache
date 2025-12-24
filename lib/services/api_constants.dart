@@ -55,7 +55,9 @@ class ApiConstants {
   static String getAiResponse = "/ai/get-message";
   static String postAiResponse = "/ai/get-response";
 
-  // static String fetchHomeMember = "/home-share/my-home-member";
-
   static String addMaterial = "/view-by-type/add-new-user-material";
+
+  static String joinHome = "/home-share/join-home";
+  static String inviteHomeMember = "/home-share/send-invite";
+  static String removeMember = "/home-share/remove-me-from-home-member";
 }

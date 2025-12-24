@@ -33,35 +33,35 @@ class _SelectTypeOfHouseScreenState extends State<SelectTypeOfHouseScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(seconds: 0), () {
-        _showFirstDialog();
-      });
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   Future.delayed(const Duration(seconds: 0), () {
+    //     _showFirstDialog();
+    //   });
+    // });
   }
 
-  void _showFirstDialog() {
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) => const WelcomeDialog(),
-    ).then((_) => _showSecondDialog());
-  }
+  // void _showFirstDialog() {
+  //   showDialog(
+  //     barrierDismissible: false,
+  //     context: context,
+  //     builder: (context) => const WelcomeDialog(),
+  //   ).then((_) => _showSecondDialog());
+  // }
 
-  void _showSecondDialog() {
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) => const HomeSelectionDialog(),
-    ).then((_) => _showThirdDialog());
-  }
+  // void _showSecondDialog() {
+  //   showDialog(
+  //     barrierDismissible: false,
+  //     context: context,
+  //     builder: (context) => const HomeSelectionDialog(),
+  //   ).then((_) => _showThirdDialog());
+  // }
 
-  void _showThirdDialog() {
-    showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) => const HomeProgressDialog());
-  }
+  // void _showThirdDialog() {
+  //   showDialog(
+  //       barrierDismissible: false,
+  //       context: context,
+  //       builder: (context) => const HomeProgressDialog());
+  // }
 
   @override
   Widget build(BuildContext context) {

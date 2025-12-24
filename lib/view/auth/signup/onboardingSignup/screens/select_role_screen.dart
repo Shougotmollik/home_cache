@@ -5,6 +5,9 @@ import 'package:get/get.dart';
 import 'package:home_cache/constants/colors.dart' show AppColors;
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/controller/auth_controller.dart';
+import 'package:home_cache/view/auth/signup/onboardingSignup/dialogs/home_progress_dialog.dart';
+import 'package:home_cache/view/auth/signup/onboardingSignup/dialogs/home_selection_dialog.dart';
+import 'package:home_cache/view/auth/signup/onboardingSignup/dialogs/welcome_dialog.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
 import 'package:home_cache/view/widget/selectable_tiles.dart';
 import 'package:home_cache/view/widget/text_button_widget_light.dart';
@@ -25,6 +28,39 @@ class _SelectHouseRoleScreenState extends State<SelectHouseRoleScreen> {
   bool isOtherSelected = false;
   final TextEditingController otherController = TextEditingController();
   final AuthController authController = Get.put(AuthController());
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(seconds: 0), () {
+        _showFirstDialog();
+      });
+    });
+  }
+
+  void _showFirstDialog() {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => const WelcomeDialog(),
+    ).then((_) => _showSecondDialog());
+  }
+
+  void _showSecondDialog() {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => const HomeSelectionDialog(),
+    ).then((_) => _showThirdDialog());
+  }
+
+  void _showThirdDialog() {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) => const HomeProgressDialog());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,14 +138,14 @@ class _SelectHouseRoleScreenState extends State<SelectHouseRoleScreen> {
 
               /// Bottom Buttons
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButtonWidgetLight(
-                    text: 'Skip',
-                    onPressed: () {
-                      Get.toNamed(RouteNames.finishUtility);
-                    },
-                  ),
+                  // TextButtonWidgetLight(
+                  //   text: 'Skip',
+                  //   onPressed: () {
+                  //     Get.toNamed(RouteNames.finishUtility);
+                  //   },
+                  // ),
                   CustomElevatedButton(
                     onTap: () {
                       String? selectedRole;
@@ -118,8 +154,8 @@ class _SelectHouseRoleScreenState extends State<SelectHouseRoleScreen> {
                         selectedRole = otherController.text.trim();
                       } else if (selectedIndex != null) {
                         final options = [
-                          "Owner",
-                          "Resident",
+                          "owner",
+                          "resident",
                         ];
                         selectedRole = options[selectedIndex!];
                       } else {
@@ -128,7 +164,7 @@ class _SelectHouseRoleScreenState extends State<SelectHouseRoleScreen> {
 
                       if (selectedRole != null && selectedRole.isNotEmpty) {
                         authController.updateHouseRole(selectedRole);
-                        Get.toNamed(RouteNames.finishUtility);
+                        Get.toNamed(RouteNames.selectHouse);
                       } else {
                         Get.snackbar(
                             'Error', 'Please select or enter a house role');

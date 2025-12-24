@@ -79,7 +79,7 @@ class Season {
 }
 
 class HomeHealth {
-  final int health;
+  final double health;
   final int totalTasks;
   final int completedTasks;
 
@@ -91,7 +91,7 @@ class HomeHealth {
 
   factory HomeHealth.fromJson(Map<String, dynamic> json) {
     return HomeHealth(
-      health: json['health'] ?? 0,
+      health: (json['health'] as num).toDouble() ?? 0,
       totalTasks: json['totalTasks'] ?? 0,
       completedTasks: json['completedTasks'] ?? 0,
     );
