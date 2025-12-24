@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
+import 'package:home_cache/controller/task_controller.dart';
 import 'package:home_cache/controller/user_controller.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
 import 'package:home_cache/view/widget/custom_progress_indicator.dart';
@@ -17,16 +18,28 @@ class HomeMemberScreen extends StatefulWidget {
 
 class _HomeMemberScreenState extends State<HomeMemberScreen> {
   final UserController userController = Get.find<UserController>();
+  final TaskController taskController = Get.find<TaskController>();
+
+  late final String taskId;
+  late final String taskTitle;
   @override
   void initState() {
     super.initState();
-    userController.getHomeMemberData();
+    final args = Get.arguments as Map<String, dynamic>;
+    taskId = args['task_id'];
+    taskTitle = args['task_title'];
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      userController.getHomeMemberData();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarBack(),
+      appBar: AppBarBack(
+        title: taskTitle,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -53,21 +66,35 @@ class _HomeMemberScreenState extends State<HomeMemberScreen> {
                     itemBuilder: (context, index) {
                       final member = userController.homeMemberList[index];
                       return ListTile(
+                        onTap: () {
+                          var data = {
+                            "task_id": taskId,
+                            "assign_to": member.id,
+                          };
+                          taskController.assignNewMember(data);
+                          taskController.fetchTaskDetails(taskId);
+                          Get.back();
+                        },
                         leading: SvgPicture.asset(
                           'assets/icons/account.svg',
-                          width: 40.w,
-                          height: 40.h,
+                          width: 32.w,
+                          height: 32.h,
                           color: AppColors.black,
                         ),
                         title: Text(
                           "${member.profile.firstName} ${member.profile.lastName}",
                           style: TextStyle(
-                              fontSize: 14.sp,
+                              fontSize: 18.sp,
                               fontWeight: FontWeight.w600,
                               color: AppColors.black),
                         ),
-                        subtitle: Text(userController
-                            .homeMemberList[index].homeData.homeRole),
+                        subtitle: Text(
+                          "House ${userController.homeMemberList[index].homeData.homeRole}",
+                          style: TextStyle(
+                              fontSize: 14.sp,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400),
+                        ),
                       );
                     },
                   ),

@@ -190,7 +190,10 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                                 userController.userDataList.first.id)
                         ? IconButton(
                             onPressed: () {
-                              Get.toNamed(RouteNames.homeMember);
+                              Get.toNamed(RouteNames.homeMember, arguments: {
+                                'task_id': taskDetails.taskData.id,
+                                'task_title': taskDetails.taskData.title
+                              });
                             },
                             icon: Icon(
                               Icons.mode_edit_outlined,

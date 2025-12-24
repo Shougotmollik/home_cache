@@ -117,6 +117,7 @@ class TaskController extends GetxController {
     }
   }
 
+// ! change schedule date
   Future<void> changeScheduleDate(String id, var selectedDate) async {
     isLoading(true);
 
@@ -132,6 +133,19 @@ class TaskController extends GetxController {
     isLoading(false);
 
     if (response.statusCode == 200) {
+    } else {
+      ApiChecker.checkApi(response);
+    }
+  }
+
+  //! Assign new member to task
+  Future<void> assignNewMember(var data) async {
+    isLoading(true);
+    Response response =
+        await ApiClient.patchData(ApiConstants.assignNewMember, data);
+    if (response.statusCode == 200) {
+      // Get.back();
+      // fetchTaskDetails('id');
     } else {
       ApiChecker.checkApi(response);
     }
