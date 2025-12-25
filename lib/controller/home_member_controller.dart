@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:home_cache/services/api_checker.dart';
 import 'package:home_cache/services/api_clients.dart';
@@ -73,5 +74,36 @@ class HomeMemberController extends GetxController {
     } finally {
       isLoading(false);
     }
+  }
+
+  // ! Remove home member
+  Future<void> removeHomeMember() async {
+    isLoading(true);
+
+    final Response response =
+        await ApiClient.deleteData(ApiConstants.removeMember);
+
+    if (response.statusCode == 200) {
+      await Future.delayed(const Duration(seconds: 2));
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          content: Text('Member removed successfully'),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          content: Text('Home Owner Cannot be removed'),
+        ),
+      );
+    }
+
+    isLoading(false);
   }
 }

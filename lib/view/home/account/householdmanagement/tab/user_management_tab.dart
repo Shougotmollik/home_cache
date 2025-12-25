@@ -257,25 +257,27 @@ class _UserManagementTabState extends State<UserManagementTab> {
               color: Colors.red,
               child: const Icon(Icons.delete, color: Colors.white),
             ),
-            onDismissed: (_) {
-              final removedUser = user;
-              final removedIndex = index;
-              userController.homeMemberList.removeAt(index);
+            onDismissed: (_) async {
+              // final removedUser = user;
+              // final removedIndex = index;
+              // // userController.homeMemberList.removeAt(index);
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  backgroundColor: Colors.green,
-                  duration: const Duration(seconds: 3),
-                  content: Text('${removedUser.profile.firstName} removed'),
-                  action: SnackBarAction(
-                    label: 'Undo',
-                    onPressed: () {
-                      userController.homeMemberList
-                          .insert(removedIndex, removedUser);
-                    },
-                  ),
-                ),
-              );
+              // ScaffoldMessenger.of(context).showSnackBar(
+              //   SnackBar(
+              //     backgroundColor: Colors.green,
+              //     duration: const Duration(seconds: 3),
+              //     content: Text('${removedUser.profile.firstName} removed'),
+              //     action: SnackBarAction(
+              //       label: 'Undo',
+              //       onPressed: () {
+              //         userController.homeMemberList
+              //             .insert(removedIndex, removedUser);
+              //       },
+              //     ),
+              //   ),
+              // );
+              await homeMemberController.removeHomeMember();
+              await userController.getHomeMemberData();
             },
             child: UserManagementTile(
               onTap: () {},
