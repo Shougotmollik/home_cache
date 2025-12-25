@@ -54,7 +54,7 @@ class ProviderListTile extends StatelessWidget {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    provider.lastServiceDate ?? "N/A",
+                    provider.type,
                     style: TextStyle(
                       fontSize: 14.sp,
                       color: Colors.black54,

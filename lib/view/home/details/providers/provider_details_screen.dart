@@ -22,13 +22,31 @@ class _ProviderDetailsScreenState extends State<ProviderDetailsScreen>
     with SingleTickerProviderStateMixin {
   bool isPastExpanded = false;
   final ProviderController providerController = Get.put(ProviderController());
-  final providerId = Get.arguments;
+  late String providerId;
 
   @override
   void initState() {
     super.initState();
+    
+    // Handle both String and Map arguments
+    final args = Get.arguments;
+    if (args is Map<String, String>) {
+      providerId = args['id'] ?? '';
+    } else if (args is String) {
+      providerId = args;
+    } else {
+      providerId = '';
+      print("⚠️ Invalid arguments type: ${args.runtimeType}");
+    }
+    
+    print("Provider ID:=======Details Screen=======> $providerId");
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      providerController.fetchProviderDetails(providerId);
+      if (providerId.isNotEmpty) {
+        providerController.fetchProviderDetails(providerId);
+      } else {
+        print("❌ Provider ID is empty!");
+      }
     });
   }
 
@@ -81,12 +99,12 @@ class _ProviderDetailsScreenState extends State<ProviderDetailsScreen>
             return const Center(child: Text("No provider found"));
           }
 
-          // Documents
+          // Documents - Fixed to use proper Document model
           final docs = provider.documents.isNotEmpty
               ? provider.documents
                   .map((doc) => {
                         'iconPath': 'assets/images/document.png',
-                        'title': doc.toString().split('/').last,
+                        'title': doc.fileName,
                         'date': 'Uploaded',
                       })
                   .toList()
@@ -189,17 +207,40 @@ class _ProviderDetailsScreenState extends State<ProviderDetailsScreen>
                 ),
                 SizedBox(height: 20.h),
 
-                // Scheduled Appointments
+                // Scheduled Appointments - NOW SHOWS REAL DATA FROM API
                 _sectionTitle('Scheduled Appointments'),
-                const ScheduledAppointmentTile(
-                  title: "No data",
-                  subtitle: "No scheduled appointments",
-                ),
+                Obx(() {
+                  final nextAppts = providerController.nextAppointments;
+
+                  if (nextAppts.isEmpty) {
+                    return const ScheduledAppointmentTile(
+                      title: "No data",
+                      subtitle: "No scheduled appointments",
+                    );
+                  }
+
+                  // Show all next appointments from API
+                  return Column(
+                    children: nextAppts.map((appt) {
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: 8.h),
+                        child: ScheduledAppointmentTile(
+                          title: appt.title,
+                          subtitle: "${appt.formattedDate} at ${appt.formattedTime}",
+                        ),
+                      );
+                    }).toList(),
+                  );
+                }),
                 SizedBox(height: 20.h),
 
-                // Past Appointments with animation
+                // Past Appointments with animation - NOW SHOWS REAL DATA FROM API
                 GestureDetector(
-                  onTap: () => setState(() => isPastExpanded = !isPastExpanded),
+                  onTap: () => setState(() {
+                    isPastExpanded = !isPastExpanded;
+                    print("📂 Past appointments expanded: $isPastExpanded");
+                    print("📂 Last appointments count: ${providerController.lastAppointments.length}");
+                  }),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -219,8 +260,32 @@ class _ProviderDetailsScreenState extends State<ProviderDetailsScreen>
                 SizedBox(height: 8.h),
                 AnimatedCrossFade(
                   firstChild: const SizedBox.shrink(),
-                  secondChild: const PastAppointmentsTile(
-                      date: 'No data', status: 'No history available'),
+                  secondChild: Obx(() {
+                    final lastAppts = providerController.lastAppointments;
+                    
+                    print("🔍 UI: Rendering past appointments, count: ${lastAppts.length}");
+
+                    if (lastAppts.isEmpty) {
+                      return const PastAppointmentsTile(
+                        date: 'No data',
+                        status: 'No history available',
+                      );
+                    }
+
+                    // Show all past appointments from API
+                    return Column(
+                      children: lastAppts.map((appt) {
+                        print("🔍 UI: Rendering appointment - ${appt.title} on ${appt.formattedDate}");
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: 8.h),
+                          child: PastAppointmentsTile(
+                            date: appt.formattedDate,
+                            status: appt.title,
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  }),
                   crossFadeState: isPastExpanded
                       ? CrossFadeState.showSecond
                       : CrossFadeState.showFirst,

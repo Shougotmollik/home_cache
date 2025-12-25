@@ -120,8 +120,10 @@ class ProviderScreen extends StatelessWidget {
                       debugPrint("=============> Provider $provider");
                       return ProviderListTile(
                         provider: provider,
-                        onTap: () => Get.toNamed(RouteNames.providerDetails,
-                            arguments: provider.id),
+                        onTap: () =>
+                            Get.toNamed(RouteNames.providerDetails, arguments: {
+                          'id': provider.id,
+                        }),
                       );
                     },
                   );
