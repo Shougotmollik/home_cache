@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:home_cache/model/home_member_model.dart';
 import 'package:home_cache/model/user_model.dart';
@@ -63,6 +66,35 @@ class UserController extends GetxController {
       }
     } else {
       ApiChecker.checkApi(response);
+    }
+    isLoading(false);
+  }
+
+  // ! product support
+  Future<void> productSupport(var data) async {
+    isLoading(true);
+    final Response response =
+        await ApiClient.postData(ApiConstants.productSupport, jsonEncode(data));
+    if (response.statusCode == 200) {
+      Get.back();
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          content: Text('Product support sent successfully'),
+        ),
+      );
+    } else {
+      ApiChecker.checkApi(response);
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          content: Text('Failed to send product support'),
+        ),
+      );
     }
     isLoading(false);
   }

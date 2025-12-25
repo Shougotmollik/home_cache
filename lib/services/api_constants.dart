@@ -7,6 +7,7 @@ class ApiConstants {
   static String login = "/auth/login";
 
   static String fetchUserData = "/user/me";
+  static String productSupport = "/user/support";
 
   static String updateProfile = "/user/update_profile";
   static String updatePassword = "/auth/update-password";
