@@ -14,7 +14,7 @@ class EditContactInformationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ProfileController controller = Get.find<ProfileController>();
+    final ProfileController controller = Get.put(ProfileController());
     return Scaffold(
       appBar: AppBarBack(
         title: 'Contact Information',
@@ -50,16 +50,6 @@ class EditContactInformationScreen extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 20.h),
-              Text(
-                'Email',
-                style: AppTypoGraphy.semiBold.copyWith(color: AppColors.black),
-                textAlign: TextAlign.start,
-              ),
-              SizedBox(height: 6.h),
-              AuthTextFormField(
-                hintText: 'example@example.com',
-                controller: controller.emailController,
-              ),
               SizedBox(height: 20.h),
               Text(
                 'Address',
@@ -72,14 +62,21 @@ class EditContactInformationScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.all(24.sp),
-        child: CustomElevatedButton(
-          onTap: () {
-            Get.back();
-          },
-          btnText: 'Update',
-          height: 48.h,
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(24.sp),
+          child: CustomElevatedButton(
+            onTap: () async {
+              var data = {
+                'first_name': controller.firstNameController.text,
+                'last_name': controller.lastNameController.text,
+                'address': controller.addressController.text
+              };
+              await controller.updateProfile(data);
+            },
+            btnText: controller.isLoading.value ? 'Updating...' : 'Update',
+            height: 48.h,
+          ),
         ),
       ),
     );

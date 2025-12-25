@@ -8,6 +8,9 @@ class ApiConstants {
 
   static String fetchUserData = "/user/me";
 
+  static String updateProfile = "/user/update_profile";
+  static String updatePassword = "/auth/update-password";
+
   static String fetchHomeMember = "/home-share/my-home-member";
 
   static String updateHomeData = "/user/update_home_data";

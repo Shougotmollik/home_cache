@@ -54,23 +54,8 @@ class AccountScreen extends StatelessWidget {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Profile image
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(40.r),
-                        child: userData.profile?.image != null
-                            ? Image.network(
-                                userData.profile!.image!,
-                                width: 60.w,
-                                height: 60.w,
-                                fit: BoxFit.cover,
-                              )
-                            : Image.asset(
-                                'assets/images/dot.png',
-                                width: 20.w,
-                                height: 20.w,
-                                fit: BoxFit.cover,
-                              ),
-                      ),
+                      Image.asset('assets/images/dot.png',
+                          width: 20.w, height: 20.w, fit: BoxFit.cover),
                       SizedBox(width: 12.w),
                       Expanded(
                         child: Column(
@@ -85,23 +70,22 @@ class AccountScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 4.h),
                             Text(
-                              userData.homeData?.homeAddress ??
-                                  "No address provided",
+                              userData.email ?? "No email provided",
                               style: TextStyle(
-                                fontSize: 14.sp,
+                                fontSize: 16.sp,
                                 color: AppColors.black,
                               ),
                             ),
                             SizedBox(height: 4.h),
-                            // Text(
-                            //   userData.homeData?.home?.homeRoomId != null
-                            //       ? "Home Room ID: ${userData.homeData!.home!.homeRoomId!}"
-                            //       : "No home data",
-                            //   style: TextStyle(
-                            //     fontSize: 14.sp,
-                            //     color: AppColors.black,
-                            //   ),
-                            // ),
+                            Text(
+                              userData.homeData?.homeAddress ??
+                                  "No address provided",
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                color: AppColors.black,
+                              ),
+                            ),
+                            SizedBox(height: 4.h),
                           ],
                         ),
                       ),

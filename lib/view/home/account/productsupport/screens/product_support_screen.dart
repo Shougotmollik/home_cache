@@ -25,16 +25,6 @@ class ProductSupportScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Email',
-                style: AppTypoGraphy.semiBold.copyWith(color: AppColors.black),
-                textAlign: TextAlign.start,
-              ),
-              SizedBox(height: 6.h),
-              TextFieldWidget(
-                hintText: 'Enter Email',
-              ),
-              SizedBox(height: 16.h),
-              Text(
                 'Subject Line',
                 style: AppTypoGraphy.semiBold.copyWith(color: AppColors.black),
                 textAlign: TextAlign.start,
@@ -69,19 +59,20 @@ class ProductSupportScreen extends StatelessWidget {
                     borderSide: BorderSide(color: Colors.grey, width: 1.5.w),
                   ),
                 ),
-                // style: const TextStyle(color: Color.fromARGB(255, 243, 90, 90)),
               ),
               SizedBox(height: 56.h),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.all(20.sp),
-        child: CustomElevatedButton(
-          onTap: () {},
-          btnText: 'Send',
-          height: 48.h,
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(20.sp),
+          child: CustomElevatedButton(
+            onTap: () {},
+            btnText: 'Send',
+            height: 48.h,
+          ),
         ),
       ),
     );
