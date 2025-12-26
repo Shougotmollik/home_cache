@@ -2,12 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:home_cache/model/assigned_member_task_model';
 import 'package:home_cache/services/api_checker.dart';
 import 'package:home_cache/services/api_clients.dart';
 import 'package:home_cache/services/api_constants.dart';
 
 class HomeMemberController extends GetxController {
   var isLoading = false.obs;
+
+  var assignedHomeMemberList = <AssignedMemberTask>[].obs;
 
 // ! Join home
   Future<void> joinHome(Map<String, dynamic> data) async {
@@ -43,7 +46,6 @@ class HomeMemberController extends GetxController {
     try {
       isLoading(true);
 
-      // Encode data as JSON before sending
       String jsonData = jsonEncode(data);
 
       Response response =
@@ -104,6 +106,24 @@ class HomeMemberController extends GetxController {
       );
     }
 
+    isLoading(false);
+  }
+
+// ! Assigned task member list
+  Future<void> getAssignedHomeMemberList() async {
+    isLoading(true);
+    final Response response =
+        await ApiClient.getData(ApiConstants.fetchAssignedHomeMember);
+    if (response.statusCode == 200) {
+      var responseData = response.body['data'] as List;
+      if (responseData.isNotEmpty) {
+        assignedHomeMemberList.value = responseData
+            .map<AssignedMemberTask>((e) => AssignedMemberTask.fromJson(e))
+            .toList();
+      }
+    } else {
+      ApiChecker.checkApi(response);
+    }
     isLoading(false);
   }
 }

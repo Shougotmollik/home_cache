@@ -64,4 +64,6 @@ class ApiConstants {
   static String joinHome = "/home-share/join-home";
   static String inviteHomeMember = "/home-share/send-invite";
   static String removeMember = "/home-share/remove-me-from-home-member";
+  static String fetchAssignedHomeMember =
+      "/task/only-home-members-assigned-task";
 }

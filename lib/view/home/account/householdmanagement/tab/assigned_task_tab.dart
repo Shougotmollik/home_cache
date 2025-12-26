@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
+import 'package:home_cache/config/route/route_names.dart';
 import 'package:home_cache/constants/colors.dart';
+import 'package:home_cache/controller/home_member_controller.dart';
 
 class AssignedTaskTab extends StatefulWidget {
   const AssignedTaskTab({super.key});
@@ -11,14 +14,14 @@ class AssignedTaskTab extends StatefulWidget {
 }
 
 class _AssignedTaskTabState extends State<AssignedTaskTab> {
-  final List<Map<String, String>> tasks = [
-    {'title': 'Clean Kitchen', 'assignedTo': 'Vanessa'},
-    {'title': 'Take out Trash', 'assignedTo': 'Ahsan'},
-    {'title': 'Wash Dishes', 'assignedTo': 'Bob'},
-    {'title': 'Vacuum Living Room', 'assignedTo': 'Thomas'},
-  ];
-
+  final HomeMemberController homeMemberController =
+      Get.put(HomeMemberController());
   String? currentSelection;
+  @override
+  void initState() {
+    super.initState();
+    homeMemberController.getAssignedHomeMemberList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,90 +37,114 @@ class _AssignedTaskTabState extends State<AssignedTaskTab> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 8.h),
-          Text(
-            'Tap a task to mark or assign',
-            style: TextStyle(
-              fontSize: 14.sp,
-              color: Colors.grey[600],
-            ),
-          ),
+          // SizedBox(height: 8.h),
+          // Text(
+          //   'Tap a task to mark or assign',
+          //   style: TextStyle(
+          //     fontSize: 14.sp,
+          //     color: Colors.grey[600],
+          //   ),
+          // ),
           SizedBox(height: 16.h),
-          Expanded(
-            child: ListView.separated(
-              itemCount: tasks.length,
-              separatorBuilder: (_, __) => SizedBox(height: 12.h),
-              itemBuilder: (context, index) {
-                final task = tasks[index];
-                // final isSelected = task['title'] == currentSelection;
+          Obx(
+            () {
+              return Expanded(
+                child: ListView.separated(
+                  itemCount: homeMemberController.assignedHomeMemberList.length,
+                  separatorBuilder: (_, __) => SizedBox(height: 12.h),
+                  itemBuilder: (context, index) {
+                    final task =
+                        homeMemberController.assignedHomeMemberList[index];
 
-                return InkWell(
-                  onTap: () {
-                    setState(() {
-                      currentSelection = task['title'];
-                    });
-                    // You can handle task selection here
-                  },
-                  borderRadius: BorderRadius.circular(12.r),
-                  child: Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                    decoration: BoxDecoration(
-                      // color: isSelected ? AppColors.lightgrey : Colors.white,
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(
-                        color:
-                            // isSelected ? AppColors.primary : Colors.grey[300]!,
-                            Colors.grey[300]!,
+                    return GestureDetector(
+                      onTap: () {
+                        // Get.toNamed(RouteNames.taskDetails, arguments: {
+                        //   'task_id': task.id,
+                        //   'task_title': task.title
+                        // });
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 16.w, vertical: 12.h),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12.r),
+                          border: Border.all(
+                            color: Colors.grey[300]!,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(6.w),
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color: AppColors.primary, width: 3.w)),
+                              child: SvgPicture.asset(
+                                'assets/icons/user.svg',
+                                width: 24.w,
+                                height: 24.w,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            SizedBox(width: 12.w),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          task.title,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16.sp,
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 4.h,
+                                          horizontal: 8.w,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.lightgrey,
+                                          borderRadius:
+                                              BorderRadius.circular(12.r),
+                                        ),
+                                        child: Text(
+                                          task.status,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12.sp,
+                                              color: AppColors.primary),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  SizedBox(height: 2.h),
+                                  Text(
+                                    'Assigned to: ${task.memberName}',
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(6.w),
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                  color: AppColors.primary, width: 3.w)),
-                          child: SvgPicture.asset(
-                            'assets/icons/user.svg',
-                            width: 24.w,
-                            height: 24.w,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                        SizedBox(width: 12.w),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                task['title']!,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16.sp,
-                                ),
-                              ),
-                              SizedBox(height: 2.h),
-                              Text(
-                                'Assigned to: ${task['assignedTo']}',
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        // if (isSelected)
-                        //   Icon(Icons.check_circle, color: AppColors.primary),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+                    );
+                  },
+                ),
+              );
+            },
           ),
         ],
       ),

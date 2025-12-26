@@ -1,0 +1,45 @@
+
+
+class AssignedMemberTask {
+  final String id;
+  final String taskId;
+  final String title;
+  final DateTime initialDate;
+  final String status;
+  final DateTime assignmentDate;
+  final String memberName;
+
+  AssignedMemberTask({
+    required this.id,
+    required this.taskId,
+    required this.title,
+    required this.initialDate,
+    required this.status,
+    required this.assignmentDate,
+    required this.memberName,
+  });
+
+  factory AssignedMemberTask.fromJson(Map<String, dynamic> json) {
+    return AssignedMemberTask(
+      id: json['id'] as String,
+      taskId: json['task_id'] as String,
+      title: json['title'] as String,
+      initialDate: DateTime.parse(json['initial_date']),
+      status: json['status'] as String,
+      assignmentDate: DateTime.parse(json['assignment_date']),
+      memberName: json['member_name'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'task_id': taskId,
+      'title': title,
+      'initial_date': initialDate.toIso8601String(),
+      'status': status,
+      'assignment_date': assignmentDate.toIso8601String(),
+      'member_name': memberName,
+    };
+  }
+}
