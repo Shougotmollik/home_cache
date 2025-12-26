@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/controller/home_controller.dart';
+import 'package:home_cache/controller/notification_controller.dart';
 import 'package:home_cache/controller/task_controller.dart';
 import 'package:home_cache/controller/user_controller.dart';
 import 'package:home_cache/view/home/home/widgets/home_health_pie_chart.dart';
@@ -24,6 +25,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final TaskController _taskController = Get.find<TaskController>();
   final HomeController homeController = Get.put(HomeController());
   final UserController userController = Get.put(UserController());
+  final NotificationController notificationController =
+      Get.put(NotificationController());
 
   @override
   Widget build(BuildContext context) {
@@ -159,13 +162,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: _taskController.tasks
                                 .map((task) => TaskListTile(
                                       task: task,
-                                      // title: task.title,
-                                      // date: DateFormat('MMMM d, yyyy')
-                                      //     .format(task.initialDate),
-                                      // onTap: () => Get.toNamed(
-                                      //   RouteNames.notificationDetails,
-                                      //   arguments: task.id,
-                                      // ),
                                     ))
                                 .toList(),
                           );
@@ -249,19 +245,34 @@ class _HomeScreenState extends State<HomeScreen> {
         }),
       ),
       actions: [
-        GestureDetector(
-          onTap: () => Get.toNamed(RouteNames.notifications),
-          child: Container(
-            height: 32.h,
-            width: 48.w,
-            decoration: const BoxDecoration(
-              color: AppColors.primary,
-              shape: BoxShape.circle,
-            ),
-            padding: EdgeInsets.all(5.w),
-            child: SvgPicture.asset(
-              "assets/icons/bell.svg",
-              fit: BoxFit.contain,
+        Obx(
+          () => GestureDetector(
+            onTap: () => Get.toNamed(RouteNames.notifications),
+            child: Container(
+              height: 32.h,
+              width: 48.w,
+              decoration: const BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+              ),
+              padding: EdgeInsets.all(5.w),
+              child: notificationController.taskNotificationList.isNotEmpty
+                  ? Badge.count(
+                      alignment: Alignment(1.0, -1.0),
+                      count: notificationController.taskNotificationList.length,
+                      child: Center(
+                        child: SvgPicture.asset(
+                          "assets/icons/bell.svg",
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    )
+                  : Center(
+                      child: SvgPicture.asset(
+                        "assets/icons/bell.svg",
+                        fit: BoxFit.contain,
+                      ),
+                    ),
             ),
           ),
         ),

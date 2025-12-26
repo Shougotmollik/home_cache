@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/route_manager.dart';
+import 'package:get/get.dart';
+import 'package:home_cache/config/helper/app_snackbar.dart';
+import 'package:home_cache/config/route/route_names.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
+import 'package:home_cache/controller/notification_controller.dart';
 import 'package:home_cache/view/home/notification/widgets/notification_app_bar.dart';
 import 'package:home_cache/view/home/notification/widgets/notification_tile.dart';
+import 'package:home_cache/view/home/schedule/screens/schedule_screen.dart';
 import 'package:home_cache/view/widget/text_button_widget.dart';
-import '../../../../../config/route/route_names.dart';
 
 class NotificationScreen extends StatelessWidget {
   const NotificationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final NotificationController notificationController =
+        Get.put(NotificationController());
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: NotificationAppBar(),
@@ -25,25 +30,51 @@ class NotificationScreen extends StatelessWidget {
               decoration: BoxDecoration(
                   color: AppColors.lightgrey.withAlpha(122),
                   borderRadius: BorderRadius.circular(16.r)),
-              child: ListView.separated(
-                padding: EdgeInsets.only(bottom: 125.h),
-                itemBuilder: (context, index) => NotificationTile(
-                  title: "Due: Roof Inspection",
-                  description:
-                      "Your last roof inspection was in 2022. Regular inspections are recommended every year to catch potential issues early.",
-                  onMarkDone: () {},
-                  onDismiss: () {},
-                  onTap: () {
-                    Get.toNamed(RouteNames.notificationDetails);
+              child: Obx(
+                () => ListView.separated(
+                  padding: EdgeInsets.only(bottom: 125.h),
+                  itemBuilder: (context, index) {
+                    final notification =
+                        notificationController.taskNotificationList[index];
+                    return NotificationTile(
+                      title: notification.title,
+                      description: notification.description,
+                      onMarkDone: () async {
+                        var data = {
+                          "task_assign_id": notification.taskAssignId,
+                          "task_id": notification.taskId,
+                          "task_status": "completed"
+                        };
+                        await notificationController.markAsDone(data);
+                      },
+                      onDismiss: () async {
+                        var data = {
+                          "task_assign_id": notification.taskAssignId,
+                          "task_id": notification.taskId,
+                          "task_status": "ignored"
+                        };
+                        await notificationController.markAsDone(data);
+                      },
+                      onTap: () {
+                        Get.toNamed(
+                          RouteNames.taskDetails,
+                          arguments: {
+                            'task_id': notification.taskId,
+                            'task_title': notification.title
+                          },
+                        );
+                      },
+                    );
                   },
+                  separatorBuilder: (_, __) => SizedBox(height: 12.h),
+                  itemCount: notificationController.taskNotificationList.length,
                 ),
-                separatorBuilder: (_, __) => SizedBox(height: 12.h),
-                itemCount: 3,
               ),
             ),
           ),
+          SizedBox(height: 20.h),
           Positioned(
-            bottom: 0,
+            bottom: 28.h,
             left: 0,
             right: 0,
             child: _buildNotificationFooterSection(),

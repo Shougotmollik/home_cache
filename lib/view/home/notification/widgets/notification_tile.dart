@@ -55,7 +55,7 @@ class NotificationTile extends StatelessWidget {
             ),
             SizedBox(height: 12.h),
             SizedBox(
-              height: 110.h,
+              // height: 110.h,
               child: Align(
                 alignment: Alignment.topLeft,
                 child: Text(
