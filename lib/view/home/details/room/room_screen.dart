@@ -128,7 +128,11 @@ class _RoomScreenState extends State<RoomScreen> {
             }
 
             if (roomController.allRooms.isEmpty) {
-              return const Center(child: Text("No rooms found"));
+              return Center(
+                  child: Text(
+                "No rooms you added yet",
+                style: AppTypoGraphy.semiBold,
+              ));
             }
 
             return GridView.builder(

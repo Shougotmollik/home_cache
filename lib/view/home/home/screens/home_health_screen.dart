@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/controller/home_controller.dart';
+import 'package:home_cache/controller/user_controller.dart';
+import 'package:home_cache/model/task.dart';
 import 'package:home_cache/view/home/home/widgets/task_progress_bar.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
 import 'package:home_cache/view/widget/task_list_tile.dart' show TaskListTile;
@@ -19,12 +21,17 @@ class _HomeHealthScreenState extends State<HomeHealthScreen> {
   bool isOverdueExpanded = true;
   bool isTasksExpanded = true;
   bool isCompleteExpanded = true;
+  late String userName;
 
   final HomeController homeController = Get.put(HomeController());
 
   @override
   void initState() {
     super.initState();
+
+    final args = Get.arguments as Map<String, dynamic>;
+    userName = args['user_name'];
+
     homeController.getHomeHealth();
   }
 
@@ -46,7 +53,7 @@ class _HomeHealthScreenState extends State<HomeHealthScreen> {
             final homeData = homeController.homeTaskData.value;
 
             if (homeData == null) {
-              return const Center(child: Text("No data available"));
+              return const Center(child: Text("No Tasks available"));
             }
 
             final totalTasks = homeData.homeHealth.totalTasks;
@@ -62,7 +69,7 @@ class _HomeHealthScreenState extends State<HomeHealthScreen> {
                 children: [
                   SizedBox(height: 20.h),
                   Text(
-                    'Great Work,',
+                    'Great Work, $userName',
                     style:
                         AppTypoGraphy.medium.copyWith(color: AppColors.black),
                   ),
@@ -169,10 +176,27 @@ class _HomeHealthScreenState extends State<HomeHealthScreen> {
         Divider(color: AppColors.lightgrey, thickness: 1.h, height: 6.h),
         if (isExpanded)
           ...tasks.map((task) {
+            DateTime? _safeParseDate(dynamic value) {
+              if (value == null) return null;
+              if (value is String && value.isNotEmpty) {
+                try {
+                  return DateTime.parse(value);
+                } catch (_) {
+                  return null;
+                }
+              }
+              return null;
+            }
+
             final taskTitle = task['title'] ?? "No title";
-            final taskDate = task['date'] ?? defaultDate;
             return TaskListTile(
-              task: task,
+              task: Task(
+                id: task['id'],
+                title: taskTitle,
+                description: task['description'],
+                initialDate: DateTime.parse(task['initial_date']),
+                date: _safeParseDate(task['date']),
+              ),
               // onTap: () {},
             );
           }).toList(),

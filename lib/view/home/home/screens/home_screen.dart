@@ -53,7 +53,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   SizedBox(height: 10.h),
                   GestureDetector(
-                      onTap: () => Get.toNamed(RouteNames.homeHealth),
+                      onTap: () => Get.toNamed(RouteNames.homeHealth,
+                              arguments: {
+                                'user_name': userController
+                                    .userDataList.first.profile?.firstName
+                              }),
                       child: Obx(() {
                         final progressHealth =
                             homeController.homeHealth.value.health;

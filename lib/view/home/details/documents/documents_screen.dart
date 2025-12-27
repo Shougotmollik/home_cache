@@ -153,15 +153,15 @@ class DocumentsScreen extends StatelessWidget {
 
                     String subtitle = '';
                     if (doc.type == 'warranty') {
-                      subtitle = doc.details.brand ?? '';
+                      subtitle = doc.details.brand ?? 'Not Added';
                     } else if (doc.type == 'receipt' ||
                         doc.type == 'insurance') {
-                      subtitle = doc.details.vendorStoreName ?? '';
+                      subtitle = doc.details.dateOfPurchase ?? '';
                     }
 
                     String date = doc.details.warrantyStartDate ??
                         doc.details.dateOfPurchase ??
-                        '';
+                        'Not Added';
 
                     return DocumentTile(
                       title:
