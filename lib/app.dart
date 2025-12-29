@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/config/theme/app_theme.dart';
 import 'package:home_cache/controller_binder.dart';
 import 'package:home_cache/config/route/routes.dart';
@@ -8,8 +9,8 @@ import 'package:home_cache/config/route/routes.dart';
 import 'config/route/route_names.dart';
 
 GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
-    GlobalKey<ScaffoldMessengerState>();
+// final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
+//     GlobalKey<ScaffoldMessengerState>();
 
 class HomeCache extends StatelessWidget {
   const HomeCache({super.key});

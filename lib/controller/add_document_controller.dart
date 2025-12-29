@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/config/route/route_names.dart';
 import 'package:home_cache/services/api_checker.dart';
 import 'package:home_cache/services/api_clients.dart';
@@ -79,10 +80,18 @@ class AddDocumentController extends GetxController {
       );
 
       if (response.statusCode == 200) {
+        AppSnackbar.show(
+          message: 'Document added successfully',
+          type: SnackType.success,
+        );
         await Future.delayed(const Duration(seconds: 2));
         // Get.back();
         Get.offAllNamed(RouteNames.documents);
       } else {
+        AppSnackbar.show(
+          message: 'Failed to add document',
+          type: SnackType.error,
+        );
         ApiChecker.checkApi(response);
       }
     } catch (e) {
@@ -100,9 +109,17 @@ class AddDocumentController extends GetxController {
         await ApiClient.patchData("/document/details/$id", data);
     // print(" APi Url ======>>${ApiConstants.updateDocument}$id");
     if (response.statusCode == 200) {
+      AppSnackbar.show(
+        message: 'Document updated successfully',
+        type: SnackType.success,
+      );
       await Future.delayed(const Duration(seconds: 2));
     } else {
       ApiChecker.checkApi(response);
+      AppSnackbar.show(
+        message: 'Failed to update document',
+        type: SnackType.warning,
+      );
     }
     isLoading(false);
   }

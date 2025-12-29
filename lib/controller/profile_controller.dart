@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/controller/user_controller.dart';
 import 'package:home_cache/services/api_checker.dart';
 import 'package:home_cache/services/api_clients.dart';
@@ -55,7 +56,9 @@ class ProfileController extends GetxController {
 
       Get.toNamed('/selectPowerType');
     } else {
-      Get.snackbar('Error', 'Please select or enter an address');
+      AppSnackbar.show(
+          message: 'Please select or enter an address',
+          type: SnackType.warning);
     }
   }
 
@@ -72,23 +75,15 @@ class ProfileController extends GetxController {
       await Future.delayed(const Duration(seconds: 2));
       await userController.refreshUserData();
       Get.back();
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Profile updated successfully'),
-        ),
+      AppSnackbar.show(
+        message: 'Profile updated successfully',
+        type: SnackType.success,
       );
     } else {
       ApiChecker.checkApi(response);
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Failed to update profile'),
-        ),
+      AppSnackbar.show(
+        message: 'Failed to update profile',
+        type: SnackType.warning,
       );
     }
 
@@ -107,23 +102,15 @@ class ProfileController extends GetxController {
       await Future.delayed(const Duration(seconds: 2));
       await userController.refreshUserData();
       Get.back();
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Password updated successfully'),
-        ),
+      AppSnackbar.show(
+        message: 'Password updated successfully',
+        type: SnackType.success,
       );
     } else {
       ApiChecker.checkApi(response);
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Failed to update password'),
-        ),
+      AppSnackbar.show(
+        message: 'Failed to update password',
+        type: SnackType.warning,
       );
     }
     isLoading(false);

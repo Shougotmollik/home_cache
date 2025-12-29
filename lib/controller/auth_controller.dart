@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:get/get.dart';
+import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/config/route/route_names.dart';
 import 'package:home_cache/constants/data/app_constants.dart';
 import 'package:home_cache/model/sing_up_collected_data.dart';
@@ -22,11 +23,14 @@ class AuthController extends GetxController {
         headers: {'Content-Type': 'application/json'});
 
     if (response.statusCode == 200) {
+      AppSnackbar.show(
+          message: "Registered Successfully", type: SnackType.success);
       var responseData = response.body['data'];
       String token = responseData['access_token'];
       await PrefsHelper.setString(AppConstants.bearerToken, token);
       Get.offAllNamed(RouteNames.selectHouseRole);
     } else {
+      AppSnackbar.show(message: "Failed to register", type: SnackType.warning);
       ApiChecker.checkApi(response);
     }
 
@@ -45,8 +49,11 @@ class AuthController extends GetxController {
       var responseData = response.body['data'];
       String token = responseData['access_token'];
       await PrefsHelper.setString(AppConstants.bearerToken, token);
+      AppSnackbar.show(message: "Login Successfully", type: SnackType.success);
       Get.offAllNamed(RouteNames.bottomNav);
     } else {
+      AppSnackbar.show(
+          message: "Credentials doesn't match", type: SnackType.warning);
       ApiChecker.checkApi(response);
     }
 
@@ -56,6 +63,7 @@ class AuthController extends GetxController {
 // ! Log out method
   Future<void> logOut() async {
     await PrefsHelper.remove(AppConstants.bearerToken);
+    AppSnackbar.show(message: "Logout Successfully", type: SnackType.warning);
     Get.offAllNamed(RouteNames.login);
   }
 
@@ -144,7 +152,9 @@ class AuthController extends GetxController {
 
     if (response.statusCode == 200) {
       print("📤 Sending JSON to API==> ${collectedData.value}");
-      // Get.snackbar("Success", "Signup data submitted successfully");
+      AppSnackbar.show(
+          message: "Home data submitted successfully", type: SnackType.success);
+
       Get.offAllNamed(RouteNames.bottomNav);
     } else {
       Get.snackbar("Error", "Failed: ${response.body}");

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/config/route/route_names.dart';
 import 'package:home_cache/model/appliance.dart';
 import 'package:home_cache/model/appliance_category.dart';
@@ -188,24 +189,14 @@ class ApplianceController extends GetxController {
     );
 
     if (response.statusCode == 200) {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Appliance added successfully'),
-        ),
-      );
+      AppSnackbar.show(
+          message: "Appliance added successfully", type: SnackType.success);
       await Future.delayed(const Duration(seconds: 1));
       Get.offAllNamed(RouteNames.viewByType);
     } else {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Failed to add appliance'),
-        ),
+      AppSnackbar.show(
+        message: "Failed to add appliance",
+        type: SnackType.error,
       );
       ApiChecker.checkApi(response);
     }
@@ -272,9 +263,17 @@ class ApplianceController extends GetxController {
     );
 
     if (response.statusCode == 200) {
+      AppSnackbar.show(
+        message: "Appliance updated successfully",
+        type: SnackType.success,
+      );
       await Future.delayed(const Duration(seconds: 1));
       Get.back();
     } else {
+      AppSnackbar.show(
+        message: "Failed to update appliance",
+        type: SnackType.warning,
+      );
       ApiChecker.checkApi(response);
     }
 

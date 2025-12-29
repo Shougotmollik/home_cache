@@ -5,9 +5,10 @@ Future<bool> hasInternet({bool showError = false}) async {
       await (Connectivity().checkConnectivity());
   if (connectivityResult.contains(ConnectivityResult.none)) {
     if (showError) {
-      showCustomToast(
-        text:
+      AppSnackbar.show(
+        message:
             'Failed to stablish connection, please check your internet connection',
+        type: SnackType.error,
       );
     }
 

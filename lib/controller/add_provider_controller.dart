@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/controller/provider_controller.dart';
 import 'package:home_cache/services/api_checker.dart';
 import 'package:home_cache/services/api_clients.dart';
@@ -54,24 +54,16 @@ class AddProviderController extends GetxController {
     );
 
     if (response.statusCode == 200) {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Provider added successfully'),
-        ),
+      AppSnackbar.show(
+        message: 'Provider added successfully',
+        type: SnackType.success,
       );
       Get.back();
       _providerController.fetchAllProviders();
     } else {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Failed to add provider'),
-        ),
+      AppSnackbar.show(
+        message: 'Failed to add provider',
+        type: SnackType.error,
       );
       ApiChecker.checkApi(response);
     }
@@ -108,24 +100,16 @@ class AddProviderController extends GetxController {
     );
 
     if (response.statusCode == 200) {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Provider updated successfully'),
-        ),
+      AppSnackbar.show(
+        message: 'Provider updated successfully',
+        type: SnackType.success,
       );
       Get.back();
       _providerController.fetchProviderDetails(id);
     } else {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Failed to update provider'),
-        ),
+      AppSnackbar.show(
+        message: 'Failed to update provider',
+        type: SnackType.warning,
       );
       ApiChecker.checkApi(response);
     }

@@ -1,7 +1,8 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:home_cache/config/helper/app_snackbar.dart';
+import 'package:home_cache/model/activity.dart';
 import 'package:home_cache/model/assigned_member_task_model';
 import 'package:home_cache/services/api_checker.dart';
 import 'package:home_cache/services/api_clients.dart';
@@ -11,6 +12,7 @@ class HomeMemberController extends GetxController {
   var isLoading = false.obs;
 
   var assignedHomeMemberList = <AssignedMemberTask>[].obs;
+  var activitiesList = <Activity>[].obs;
 
 // ! Join home
   Future<void> joinHome(Map<String, dynamic> data) async {
@@ -87,22 +89,12 @@ class HomeMemberController extends GetxController {
 
     if (response.statusCode == 200) {
       await Future.delayed(const Duration(seconds: 2));
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Member removed successfully'),
-        ),
-      );
+      AppSnackbar.show(
+          message: 'Member removed successfully', type: SnackType.success);
     } else {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Home Owner Cannot be removed'),
-        ),
+      AppSnackbar.show(
+        message: 'Home owner cannot be removed',
+        type: SnackType.info,
       );
     }
 
@@ -120,6 +112,23 @@ class HomeMemberController extends GetxController {
         assignedHomeMemberList.value = responseData
             .map<AssignedMemberTask>((e) => AssignedMemberTask.fromJson(e))
             .toList();
+      }
+    } else {
+      ApiChecker.checkApi(response);
+    }
+    isLoading(false);
+  }
+
+  // ! home member Recent activity
+  Future<void> getHomeMemberRecentActivity() async {
+    isLoading(true);
+    final Response response =
+        await ApiClient.getData(ApiConstants.fetchHomeMemberRecentActivity);
+    if (response.statusCode == 200) {
+      var responseData = response.body['data'] as List;
+      if (responseData.isNotEmpty) {
+        activitiesList.value =
+            responseData.map<Activity>((e) => Activity.fromJson(e)).toList();
       }
     } else {
       ApiChecker.checkApi(response);

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
+import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/controller/schedule_controller.dart';
 import 'package:home_cache/model/task_details_model.dart';
 import 'package:home_cache/services/api_checker.dart';
@@ -50,13 +51,9 @@ class TaskController extends GetxController {
     );
 
     if (response.statusCode == 200) {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Task created successfully'),
-        ),
+      AppSnackbar.show(
+        message: 'Task created successfully',
+        type: SnackType.success,
       );
       Get.back();
       scheduleController.fetchAllSchedule();
@@ -65,12 +62,10 @@ class TaskController extends GetxController {
       //   "upcoming",
       // );
     } else {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(const SnackBar(
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        content: Text('Failed to create task'),
-      ));
+      AppSnackbar.show(
+        message: 'Failed to create task',
+        type: SnackType.warning,
+      );
       ApiChecker.checkApi(response);
     }
 
@@ -128,26 +123,18 @@ class TaskController extends GetxController {
     Response response =
         await ApiClient.patchData(ApiConstants.markTaskComplete, data);
     if (response.statusCode == 200) {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Task completed successfully'),
-        ),
+      AppSnackbar.show(
+        message: 'Task completed successfully',
+        type: SnackType.success,
       );
       Get.back();
       fetchAllTask(
         "upcoming",
       );
     } else {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Failed to complete task'),
-        ),
+      AppSnackbar.show(
+        message: 'Failed to complete task',
+        type: SnackType.warning,
       );
       ApiChecker.checkApi(response);
     }
@@ -169,22 +156,13 @@ class TaskController extends GetxController {
     isLoading(false);
 
     if (response.statusCode == 200) {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Schedule date changed successfully'),
-        ),
-      );
+      AppSnackbar.show(
+          message: 'Schedule date changed successfully',
+          type: SnackType.success);
     } else {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Failed to change schedule date'),
-        ),
+      AppSnackbar.show(
+        message: 'Failed to change schedule date',
+        type: SnackType.warning,
       );
       ApiChecker.checkApi(response);
     }
@@ -196,17 +174,17 @@ class TaskController extends GetxController {
     Response response =
         await ApiClient.patchData(ApiConstants.assignNewMember, data);
     if (response.statusCode == 200) {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Member assigned successfully'),
-        ),
+      AppSnackbar.show(
+        message: 'Member assigned successfully',
+        type: SnackType.success,
       );
       // Get.back();
       // fetchTaskDetails('id');
     } else {
+      AppSnackbar.show(
+        message: 'Something went wrong',
+        type: SnackType.warning,
+      );
       ApiChecker.checkApi(response);
     }
   }

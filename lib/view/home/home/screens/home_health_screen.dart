@@ -8,6 +8,7 @@ import 'package:home_cache/controller/user_controller.dart';
 import 'package:home_cache/model/task.dart';
 import 'package:home_cache/view/home/home/widgets/task_progress_bar.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
+import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import 'package:home_cache/view/widget/task_list_tile.dart' show TaskListTile;
 
 class HomeHealthScreen extends StatefulWidget {
@@ -47,7 +48,7 @@ class _HomeHealthScreenState extends State<HomeHealthScreen> {
         child: Obx(
           () {
             if (homeController.isLoading.value) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: CustomProgressIndicator());
             }
 
             final homeData = homeController.homeTaskData.value;

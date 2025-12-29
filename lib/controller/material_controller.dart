@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart' hide MaterialType;
 import 'package:get/get.dart';
+import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/config/route/route_names.dart';
 import 'package:home_cache/model/material_category.dart';
 import 'package:home_cache/model/material_details_model.dart';
@@ -222,9 +223,17 @@ class MaterialController extends GetxController {
     );
 
     if (response.statusCode == 200) {
+      AppSnackbar.show(
+        message: "Material added successfully",
+        type: SnackType.success,
+      );
       await Future.delayed(const Duration(seconds: 1));
       Get.offAllNamed(RouteNames.viewByType);
     } else {
+      AppSnackbar.show(
+        message: "Failed to add material",
+        type: SnackType.error,
+      );
       ApiChecker.checkApi(response);
     }
 
@@ -310,13 +319,17 @@ class MaterialController extends GetxController {
     );
 
     if (response.statusCode == 200) {
-      Get.snackbar(
-        "Success",
-        "Material details updated successfully",
+      AppSnackbar.show(
+        message: "Material details updated successfully",
+        type: SnackType.success,
       );
 
       await getMaterialDetails(id);
     } else {
+      AppSnackbar.show(
+        message: "Failed to update material details",
+        type: SnackType.warning,
+      );
       ApiChecker.checkApi(response);
     }
 

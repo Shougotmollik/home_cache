@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/model/home_member_model.dart';
 import 'package:home_cache/model/user_model.dart';
 import 'package:home_cache/services/api_checker.dart';
@@ -76,24 +76,16 @@ class UserController extends GetxController {
     final Response response =
         await ApiClient.postData(ApiConstants.productSupport, jsonEncode(data));
     if (response.statusCode == 200) {
-      Get.back();
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Product support sent successfully'),
-        ),
+      AppSnackbar.show(
+        message: 'Product support message sent successfully',
+        type: SnackType.success,
       );
+      Get.back();
     } else {
       ApiChecker.checkApi(response);
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          content: Text('Failed to send product support'),
-        ),
+      AppSnackbar.show(
+        message: 'Failed to send product support message',
+        type: SnackType.warning,
       );
     }
     isLoading(false);

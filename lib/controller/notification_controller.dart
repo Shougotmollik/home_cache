@@ -49,7 +49,7 @@ class NotificationController extends GetxController {
       ApiChecker.checkApi(response);
       AppSnackbar.show(
         message: 'Failed to mark notification as done',
-        type: SnackType.error,
+        type: SnackType.warning,
       );
     }
     isLoading(false);

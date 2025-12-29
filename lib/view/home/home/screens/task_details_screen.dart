@@ -375,19 +375,23 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
         _quickActionTile(
           title: "Schedule Now",
           asset: "assets/images/calender.png",
-          onTap: () async {
-            DateTime? pickedDate = await showDatePicker(
-              context: context,
-              firstDate: DateTime.now(),
-              lastDate: DateTime(DateTime.now().year + 5),
-            );
-            if (pickedDate != null) {
-              await taskController.changeScheduleDate(
-                  taskDetails.taskData.id, pickedDate.toIso8601String());
+          onTap: userController.userDataList.first.id ==
+                  taskController.taskDetails.value?.taskData.createdBy
+              ? () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime(DateTime.now().year + 5),
+                  );
+                  if (pickedDate != null) {
+                    await taskController.changeScheduleDate(
+                        taskDetails.taskData.id, pickedDate.toIso8601String());
 
-              await taskController.fetchTaskDetails(taskDetails.taskData.id);
-            }
-          },
+                    await taskController
+                        .fetchTaskDetails(taskDetails.taskData.id);
+                  }
+                }
+              : null,
         ),
       ],
     );
@@ -396,7 +400,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   Widget _quickActionTile({
     required String title,
     required String asset,
-    required VoidCallback onTap,
+    required VoidCallback? onTap,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -409,14 +413,21 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
         ),
         child: Column(
           children: [
-            Image.asset(asset, height: 48.h, fit: BoxFit.contain),
+            Image.asset(
+              asset,
+              height: 48.h,
+              fit: BoxFit.contain,
+              color: onTap == null ? Colors.grey : AppColors.black,
+            ),
             SizedBox(height: 12.h),
             Text(
               title,
               style: TextStyle(
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w500,
-                color: AppColors.black.withAlpha(200),
+                color: onTap == null
+                    ? Colors.grey
+                    : AppColors.black.withAlpha(200),
               ),
             ),
           ],

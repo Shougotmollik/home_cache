@@ -246,7 +246,7 @@ class CustomHttp {
       }
 
       if (showFloatingError) {
-        showCustomToast(text: message);
+        AppSnackbar.show(message: message, type: SnackType.error);
       }
 
       return CustomHttpResult(statusCode: response.statusCode, error: message);

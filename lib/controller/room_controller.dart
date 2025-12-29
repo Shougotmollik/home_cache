@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:get/get.dart';
+import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/model/room.dart';
 import 'package:home_cache/model/room_data.dart';
 import 'package:home_cache/model/room_item.dart';
@@ -48,9 +49,17 @@ class RoomController extends GetxController {
     );
 
     if (response.statusCode == 200) {
+      AppSnackbar.show(
+        message: 'Room added successfully',
+        type: SnackType.success,
+      );
       fetchAllRoom();
       Get.back();
     } else {
+      AppSnackbar.show(
+        message: 'Failed to add room',
+        type: SnackType.error,
+      );
       ApiChecker.checkApi(response);
     }
 
@@ -211,6 +220,10 @@ class RoomController extends GetxController {
       );
 
       if (response.statusCode == 200) {
+        AppSnackbar.show(
+          message: 'Item added successfully',
+          type: SnackType.success,
+        );
         Get.back();
 
         // Parse new item from response
@@ -220,6 +233,10 @@ class RoomController extends GetxController {
           userRoomItems.add(newItem);
         }
       } else {
+        AppSnackbar.show(
+          message: 'Failed to add item',
+          type: SnackType.error,
+        );
         ApiChecker.checkApi(response);
       }
     } catch (e) {
@@ -247,8 +264,16 @@ class RoomController extends GetxController {
     isLoading(false);
 
     if (response.statusCode == 200) {
+      AppSnackbar.show(
+        message: 'Item updated successfully',
+        type: SnackType.success,
+      );
       return true; // success
     } else {
+      AppSnackbar.show(
+        message: 'Failed to update item',
+        type: SnackType.warning,
+      );
       ApiChecker.checkApi(response);
       return false;
     }
@@ -262,9 +287,17 @@ class RoomController extends GetxController {
         await ApiClient.deleteData("${ApiConstants.deleteUserRoomItem}$id");
 
     if (response.statusCode == 200) {
+      AppSnackbar.show(
+        message: 'Item deleted successfully',
+        type: SnackType.success,
+      );
       Get.back();
       userRoomItems.removeWhere((item) => item.id == id);
     } else {
+      AppSnackbar.show(
+        message: 'Failed to delete item',
+        type: SnackType.warning,
+      );
       ApiChecker.checkApi(response);
     }
 
