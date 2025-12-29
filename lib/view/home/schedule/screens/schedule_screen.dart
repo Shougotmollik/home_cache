@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:home_cache/config/route/route_names.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/controller/schedule_controller.dart';
+import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import 'package:intl/intl.dart';
 
 import '../dialog/add_task_dialog.dart';
@@ -56,6 +58,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               SizedBox(height: 12.h),
               Obx(
                 () {
+                  if (_scheduleController.isLoading.value) {
+                    return const Center(child: CustomProgressIndicator());
+                  }
                   return ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -89,8 +94,13 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                               SizedBox(width: 8.w),
                               GestureDetector(
                                 onTap: () {
+                                  Get.toNamed(RouteNames.homeMember,
+                                      arguments: {
+                                        'task_id': task.id,
+                                        'task_title': task.title
+                                      });
                                   setState(() {
-                                    // task.isLinked = !task.isLinked;
+                                    task.isLinked = !task.isLinked;
                                   });
                                 },
                                 child: SvgPicture.asset(

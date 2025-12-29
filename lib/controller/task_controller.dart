@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
+import 'package:home_cache/controller/schedule_controller.dart';
 import 'package:home_cache/model/task_details_model.dart';
 import 'package:home_cache/services/api_checker.dart';
 import 'package:home_cache/services/api_clients.dart';
@@ -16,6 +18,8 @@ class TaskController extends GetxController {
 
   RxInt totalTasks = 10.obs;
   RxInt completedTasks = 3.obs;
+
+  final ScheduleController scheduleController = Get.put(ScheduleController());
 
   @override
   void onInit() {
@@ -46,11 +50,27 @@ class TaskController extends GetxController {
     );
 
     if (response.statusCode == 200) {
-      Get.back();
-      fetchAllTask(
-        "upcoming",
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          content: Text('Task created successfully'),
+        ),
       );
+      Get.back();
+      scheduleController.fetchAllSchedule();
+
+      // fetchAllTask(
+      //   "upcoming",
+      // );
     } else {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(const SnackBar(
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        content: Text('Failed to create task'),
+      ));
       ApiChecker.checkApi(response);
     }
 
@@ -108,11 +128,27 @@ class TaskController extends GetxController {
     Response response =
         await ApiClient.patchData(ApiConstants.markTaskComplete, data);
     if (response.statusCode == 200) {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          content: Text('Task completed successfully'),
+        ),
+      );
       Get.back();
       fetchAllTask(
         "upcoming",
       );
     } else {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          content: Text('Failed to complete task'),
+        ),
+      );
       ApiChecker.checkApi(response);
     }
   }
@@ -133,7 +169,23 @@ class TaskController extends GetxController {
     isLoading(false);
 
     if (response.statusCode == 200) {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          content: Text('Schedule date changed successfully'),
+        ),
+      );
     } else {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          content: Text('Failed to change schedule date'),
+        ),
+      );
       ApiChecker.checkApi(response);
     }
   }
@@ -144,6 +196,14 @@ class TaskController extends GetxController {
     Response response =
         await ApiClient.patchData(ApiConstants.assignNewMember, data);
     if (response.statusCode == 200) {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          content: Text('Member assigned successfully'),
+        ),
+      );
       // Get.back();
       // fetchTaskDetails('id');
     } else {

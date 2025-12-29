@@ -4,7 +4,7 @@ class ScheduleModel {
   final DateTime createdAt;
   final DateTime? initialDate;
   final dynamic assignments;
-  final bool isLinked;
+  bool isLinked;
 
   ScheduleModel({
     required this.id,
@@ -13,7 +13,6 @@ class ScheduleModel {
     this.assignments,
     required this.isLinked,
     this.initialDate,
-
   });
 
   factory ScheduleModel.fromJson(Map<String, dynamic> json) {

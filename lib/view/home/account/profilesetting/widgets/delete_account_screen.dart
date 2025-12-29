@@ -76,28 +76,34 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: CustomElevatedButton(
-          height: 48.h,
-          onTap: () {
-            if (selectedReason != null) {
-              showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (context) => AccountDeletionDialog());
-            } else {
-              Get.snackbar(
-                'Warning',
-                'Please select a reason before deleting.',
-                snackPosition: SnackPosition.BOTTOM,
-                barBlur: 85,
-                backgroundColor: Colors.redAccent.withAlpha(200),
-                colorText: Colors.white,
-              );
-            }
-          },
-          btnText: 'Delete',
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: CustomElevatedButton(
+            height: 48.h,
+            onTap: () {
+              if (selectedReason != null) {
+                showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) => AccountDeletionDialog());
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    backgroundColor: Colors.red,
+                    duration: Duration(seconds: 3),
+                    behavior: SnackBarBehavior.floating,
+                    margin: EdgeInsets.all(10),
+                    elevation: 0,
+                    dismissDirection: DismissDirection.horizontal,
+                    padding: EdgeInsets.all(10),
+                    content: Text('Please select a reason'),
+                  ),
+                );
+              }
+            },
+            btnText: 'Delete',
+          ),
         ),
       ),
     );

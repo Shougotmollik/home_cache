@@ -148,24 +148,76 @@ class DocumentsScreen extends StatelessWidget {
                       mainAxisSpacing: 16.h,
                       crossAxisSpacing: 16.w,
                       childAspectRatio: .95),
+                  // Replace the itemBuilder section in your DocumentsScreen with this:
+
                   itemBuilder: (context, index) {
                     final doc = filteredDocs[index];
 
+                    // Determine title, subtitle, and date based on document type
+                    String title = '';
                     String subtitle = '';
-                    if (doc.type == 'warranty') {
-                      subtitle = doc.details.brand ?? 'Not Added';
-                    } else if (doc.type == 'receipt' ||
-                        doc.type == 'insurance') {
-                      subtitle = doc.details.dateOfPurchase ?? '';
+                    String date = '';
+
+                    switch (doc.type) {
+                      case 'warranty':
+                        title = doc.details.name ?? 'Warranty Document';
+                        subtitle = doc.details.brand ?? 'Brand not specified';
+                        date = " Expires: ${doc.details.warrantyEndDate}" ??
+                            'No date';
+                        break;
+
+                      case 'insurance':
+                        title = doc.details.providerName ?? 'Insurance Policy';
+                        subtitle =
+                            doc.details.policyNumber ?? 'No policy number';
+                        date = doc.details.coverageEndDate ??
+                            // doc.details.coverageStartDate ??
+                            'No date';
+                        break;
+
+                      case 'receipt':
+                        title = doc.details.vendorStoreName ?? 'Receipt';
+                        subtitle = doc.details.totalAmountPaid != null
+                            ? '\$${doc.details.totalAmountPaid}'
+                            : 'Amount not specified';
+                        date = doc.details.dateOfPurchase ?? 'No date';
+                        break;
+
+                      case 'quote':
+                        title = doc.details.serviceItemQuoted ?? 'Quote';
+                        subtitle = doc.details.vendorCompanyName ??
+                            (doc.details.quoteAmount != null
+                                ? '\$${doc.details.quoteAmount}'
+                                : 'No vendor');
+                        date = doc.details.validUntilDate ??
+                            doc.details.quoteDate ??
+                            'No date';
+                        break;
+
+                      case 'manual':
+                        title = doc.details.title ?? 'Manual';
+                        subtitle = doc.details.brandCompany ??
+                            doc.details.modelNumber ??
+                            'No brand';
+                        date = doc.details.publicationDate ?? 'No date';
+                        break;
+
+                      case 'other':
+                        title = doc.details.otherTitle ?? 'Document';
+                        subtitle = doc.details.otherBrandCompany ??
+                            doc.details.notes ??
+                            'No description';
+                        date = doc.details.otherBrandCompany ?? 'No date';
+                        break;
+
+                      default:
+                        title = doc.type.capitalizeFirst ?? 'Document';
+                        subtitle = 'Unknown type';
+                        date = 'No date';
                     }
 
-                    String date = doc.details.warrantyStartDate ??
-                        doc.details.dateOfPurchase ??
-                        'Not Added';
-
                     return DocumentTile(
-                      title:
-                          (doc.details.name ?? doc.type).capitalizeFirst ?? '',
+                      title: title,
                       subtitle: subtitle,
                       date: date,
                       iconPath: 'assets/images/document.png',

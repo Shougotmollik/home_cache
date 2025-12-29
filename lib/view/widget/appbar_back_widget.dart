@@ -13,19 +13,31 @@ class AppBarBack extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios,
-          size: 18.sp,
-          color: AppColors.secondary,
-        ),
-        onPressed: () {
+      leading: GestureDetector(
+        onTap: () {
           if (Navigator.canPop(context)) {
             Navigator.pop(context);
           } else {
             Get.offAllNamed(RouteNames.bottomNav);
           }
         },
+        child: Container(
+          margin: EdgeInsets.only(left: 10.w),
+          decoration: BoxDecoration(
+            color: AppColors.lightgrey.withAlpha(150),
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: Padding(
+              padding: EdgeInsets.only(left: 8.0),
+              child: Icon(
+                Icons.arrow_back_ios,
+                size: 18.sp,
+                color: AppColors.secondary,
+              ),
+            ),
+          ),
+        ),
       ),
       title: Text(title ?? '',
           style: AppTypoGraphy.bold

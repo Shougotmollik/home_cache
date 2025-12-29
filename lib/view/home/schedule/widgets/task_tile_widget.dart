@@ -62,21 +62,25 @@ class _TaskTileWidgetState extends State<TaskTileWidget> {
               //   padding: EdgeInsets.zero,
               //   constraints: const BoxConstraints(),
               // ),
-            if (widget.onEdit != null) ...[
-              SizedBox(width: 8.w),
-              IconButton(
-                icon: Icon(Icons.edit, size: 18.h, color: AppColors.primary,),
-                // icon: SvgPicture.asset(
-                //   'assets/icons/edit.svg',
-                //   width: 18.w,
-                //   height: 18.h,
-                //   color: AppColors.primary,
-                // ),
-                onPressed: widget.onEdit,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-            ],
+              if (widget.onEdit != null) ...[
+                SizedBox(width: 8.w),
+                IconButton(
+                  icon: Icon(
+                    Icons.edit,
+                    size: 18.h,
+                    color: AppColors.primary,
+                  ),
+                  // icon: SvgPicture.asset(
+                  //   'assets/icons/edit.svg',
+                  //   width: 18.w,
+                  //   height: 18.h,
+                  //   color: AppColors.primary,
+                  // ),
+                  onPressed: widget.onEdit,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              ],
           ],
         ),
         SizedBox(height: 4.h),
@@ -103,7 +107,7 @@ class _TaskTileWidgetState extends State<TaskTileWidget> {
               onTap: () {
                 if (!_isLinked) {
                   setState(() {
-                    _isLinked = true; // only set true once
+                    _isLinked = true;
                   });
                 }
               },
@@ -114,7 +118,6 @@ class _TaskTileWidgetState extends State<TaskTileWidget> {
                 color: AppColors.primary,
               ),
             ),
-
           ],
         ),
         SizedBox(height: 4.h),

@@ -107,33 +107,6 @@ class AddDocumentController extends GetxController {
     isLoading(false);
   }
 
-  // // ! Update Document
-  // Future<void> updateDocument(var data, String id) async {
-  //   isLoading(true);
-
-  //   try {
-  //     Response response = await ApiClient.patchMultipartData(
-  //       "${ApiConstants.updateDocument}$id",
-  //       data,
-  //       multipartBody: selectedFile.value != null
-  //           ? [MultipartBody('files', selectedFile.value!)]
-  //           : [],
-  //     );
-
-  //     if (response.statusCode == 200) {
-  //       await Future.delayed(const Duration(seconds: 2));
-  //       // Get.back();
-  //       Get.offAllNamed(RouteNames.documents);
-  //     } else {
-  //       ApiChecker.checkApi(response);
-  //     }
-  //   } catch (e) {
-  //     debugPrint("Error in updateDocument: $e");
-  //   }
-
-  //   isLoading(false);
-  // }
-
   @override
   void onClose() {
     firstFieldFocus.dispose();

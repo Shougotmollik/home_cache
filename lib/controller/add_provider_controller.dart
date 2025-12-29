@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:home_cache/controller/provider_controller.dart';
 import 'package:home_cache/services/api_checker.dart';
@@ -53,9 +54,25 @@ class AddProviderController extends GetxController {
     );
 
     if (response.statusCode == 200) {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          content: Text('Provider added successfully'),
+        ),
+      );
       Get.back();
       _providerController.fetchAllProviders();
     } else {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          content: Text('Failed to add provider'),
+        ),
+      );
       ApiChecker.checkApi(response);
     }
 
@@ -91,9 +108,25 @@ class AddProviderController extends GetxController {
     );
 
     if (response.statusCode == 200) {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          content: Text('Provider updated successfully'),
+        ),
+      );
       Get.back();
       _providerController.fetchProviderDetails(id);
     } else {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          content: Text('Failed to update provider'),
+        ),
+      );
       ApiChecker.checkApi(response);
     }
 

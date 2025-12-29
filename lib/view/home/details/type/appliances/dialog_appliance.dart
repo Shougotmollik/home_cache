@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/controller/appliance_controller.dart';
@@ -103,8 +104,13 @@ class DialogAppliance extends StatelessWidget {
               ),
               SizedBox(height: 6.h),
               Obx(() {
+                if (roomController.isLoading.value) {
+                  return Center(
+                      child: SizedBox(
+                          height: 42.h, child: CustomProgressIndicator()));
+                }
                 if (roomController.allRooms.isEmpty) {
-                  return const Center(child: CustomProgressIndicator());
+                  return const Center(child: Text("There is no room"));
                 }
 
                 // Set default value if empty
@@ -159,8 +165,7 @@ class DialogAppliance extends StatelessWidget {
                         'appliance_id': selectedTypeId.value,
                         'view_type_id': applianceTypeId,
                         'room_id': selectedRoomId.value,
-                        'type_name': applianceController
-                            .applianceTypeList
+                        'type_name': applianceController.applianceTypeList
                             .firstWhere(
                                 (type) => type.id == selectedTypeId.value)
                             .name,

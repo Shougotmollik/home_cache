@@ -188,9 +188,25 @@ class ApplianceController extends GetxController {
     );
 
     if (response.statusCode == 200) {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          content: Text('Appliance added successfully'),
+        ),
+      );
       await Future.delayed(const Duration(seconds: 1));
       Get.offAllNamed(RouteNames.viewByType);
     } else {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          content: Text('Failed to add appliance'),
+        ),
+      );
       ApiChecker.checkApi(response);
     }
 

@@ -102,12 +102,16 @@ class DialogMaterial extends StatelessWidget {
               ),
               SizedBox(height: 6.h),
               Obx(() {
-                if (roomController.allRooms.isEmpty) {
+                if (roomController.isLoading.value) {
                   return const Center(
                       child: SizedBox(
                           height: 40,
                           width: 30,
                           child: CustomProgressIndicator()));
+                }
+
+                if (roomController.allRooms.isEmpty) {
+                  return const Center(child: Text('No rooms found'));
                 }
 
                 // Set default value if empty

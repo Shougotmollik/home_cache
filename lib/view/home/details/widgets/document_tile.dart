@@ -69,7 +69,7 @@ class DocumentTile extends StatelessWidget {
             ),
             Expanded(
               child: Text(
-                "Expires : $date",
+                date,
                 style: TextStyle(
                     fontSize: 12.sp,
                     color: AppColors.black.withValues(alpha: 0.7),

@@ -10,6 +10,7 @@ import 'package:home_cache/view/auth/signup/widgets/custom_elevated_button.dart'
 import 'package:home_cache/view/home/account/productsupport/widgets/text_field_widget.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
 import '../../../../config/route/route_names.dart';
+import 'package:intl/intl.dart'; // Add this to pubspec.yaml if not present
 
 class AddDocumentsDetailsScreen extends StatefulWidget {
   const AddDocumentsDetailsScreen({super.key});
@@ -36,9 +37,21 @@ class _AddDocumentsDetailsScreenState extends State<AddDocumentsDetailsScreen> {
     print("add doctype shown here ====> $docType");
   }
 
+  @override
+  void dispose() {
+    // Dispose all controllers to prevent memory leaks
+    for (var controller in controllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
   Widget field(String label) {
-    final controller = TextEditingController();
-    controllers[label] = controller;
+    // Create controller only if it doesn't exist
+    if (!controllers.containsKey(label)) {
+      controllers[label] = TextEditingController();
+    }
+    final controller = controllers[label]!;
 
     bool isDateField = label.toLowerCase().contains('date');
 
@@ -63,8 +76,12 @@ class _AddDocumentsDetailsScreenState extends State<AddDocumentsDetailsScreen> {
                     );
 
                     if (picked != null) {
-                      controller.text =
-                          "${picked.year}-${picked.month}-${picked.day}";
+                      // Format date as YYYY-MM-DD for backend
+                      final formattedDate =
+                          DateFormat('yyyy-MM-dd').format(picked);
+                      controller.text = formattedDate;
+
+                      // Force UI update
                       setState(() {});
                     }
                   }
@@ -74,6 +91,7 @@ class _AddDocumentsDetailsScreenState extends State<AddDocumentsDetailsScreen> {
               child: TextFieldWidget(
                 hintText: isDateField ? "Select $label" : "Enter $label",
                 controller: controller,
+                isReadable: isDateField, // Make date fields read-only
               ),
             ),
           ),
@@ -140,6 +158,21 @@ class _AddDocumentsDetailsScreenState extends State<AddDocumentsDetailsScreen> {
   }
 
   void _saveDocument() {
+    // Validate that at least one field is filled
+    bool hasData = controllers.values
+        .any((controller) => controller.text.trim().isNotEmpty);
+
+    if (!hasData) {
+      Get.snackbar(
+        'Error',
+        'Please fill at least one field',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
     final fieldData = {
       for (var entry in controllers.entries) entry.key: entry.value.text.trim(),
     };
@@ -218,18 +251,19 @@ class _AddDocumentsDetailsScreenState extends State<AddDocumentsDetailsScreen> {
         break;
     }
 
+    // Convert all values to strings for API
     final Map<String, String> finalData =
         data.map((key, value) => MapEntry(key, value.toString()));
 
     debugPrint('FINAL JSON TO SEND ====> $finalData');
 
+    // Set the file if available
     if (filePath != null) {
       _addDocumentController.selectedFile.value = File(filePath!);
     }
 
+    // Call the API
     _addDocumentController.addDocument(finalData);
-
-    Get.offAndToNamed(RouteNames.documents);
   }
 
   @override
@@ -252,6 +286,7 @@ class _AddDocumentsDetailsScreenState extends State<AddDocumentsDetailsScreen> {
                   margin: EdgeInsets.only(bottom: 16.h),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey, width: 2.w),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: filePath!.endsWith('.pdf')
                       ? PDFView(
@@ -279,10 +314,20 @@ class _AddDocumentsDetailsScreenState extends State<AddDocumentsDetailsScreen> {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.0.w, vertical: 8.h),
-          child: CustomElevatedButton(
-            onTap: _saveDocument,
-            btnText: 'Save',
-            height: 48.h,
+          child: Obx(
+            () => IgnorePointer(
+              ignoring: _addDocumentController.isLoading.value,
+              child: Opacity(
+                opacity: _addDocumentController.isLoading.value ? 0.5 : 1.0,
+                child: CustomElevatedButton(
+                  onTap: _saveDocument,
+                  btnText: _addDocumentController.isLoading.value
+                      ? 'Saving...'
+                      : 'Save',
+                  height: 48.h,
+                ),
+              ),
+            ),
           ),
         ),
       ),

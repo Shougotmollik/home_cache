@@ -31,6 +31,9 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     taskId = arg['task_id'];
     taskTitle = arg['task_title'];
 
+    print("Task ID:===========> $taskId");
+    print("Task Title:======> $taskTitle");
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       taskController.fetchTaskDetails(taskId);
     });

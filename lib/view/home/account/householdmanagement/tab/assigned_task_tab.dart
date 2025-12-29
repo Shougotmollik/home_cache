@@ -58,10 +58,10 @@ class _AssignedTaskTabState extends State<AssignedTaskTab> {
 
                     return GestureDetector(
                       onTap: () {
-                        // Get.toNamed(RouteNames.taskDetails, arguments: {
-                        //   'task_id': task.id,
-                        //   'task_title': task.title
-                        // });
+                        Get.toNamed(RouteNames.taskDetails, arguments: {
+                          'task_id': task.taskId,
+                          'task_title': task.title
+                        });
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(
