@@ -40,7 +40,7 @@ class UserController extends GetxController {
         }
       }
     } else {
-      ApiChecker.checkApi(response);
+      // ApiChecker.checkApi(response);
     }
 
     isLoading(false);

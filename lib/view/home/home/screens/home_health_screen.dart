@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/controller/home_controller.dart';
-import 'package:home_cache/controller/user_controller.dart';
 import 'package:home_cache/model/task.dart';
 import 'package:home_cache/view/home/home/widgets/task_progress_bar.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';

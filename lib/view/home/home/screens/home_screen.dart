@@ -29,6 +29,15 @@ class _HomeScreenState extends State<HomeScreen> {
       Get.put(NotificationController());
 
   @override
+  void initState() {
+    super.initState();
+    userController.getUserData();
+    homeController.getHomeHealth();
+    notificationController.fetchTaskNotification();
+    _taskController.fetchAllTask('upcoming');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
