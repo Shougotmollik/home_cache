@@ -20,7 +20,17 @@ class ScheduleScreen extends StatefulWidget {
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
   final List<Task> _tasks = [];
-  final ScheduleController _scheduleController = Get.put(ScheduleController());
+  final ScheduleController _scheduleController = Get.find<ScheduleController>();
+
+  String? assignToId;
+
+  @override
+  void initState() {
+    _scheduleController.fetchAllSchedule();
+    super.initState();
+    final args = Get.arguments as Map<String, dynamic>?;
+    assignToId = args?['assign_to_id'];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,14 +104,23 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                               SizedBox(width: 8.w),
                               GestureDetector(
                                 onTap: () {
-                                  Get.toNamed(RouteNames.homeMember,
-                                      arguments: {
-                                        'task_id': task.id,
-                                        'task_title': task.title
-                                      });
-                                  setState(() {
-                                    task.isLinked = !task.isLinked;
-                                  });
+                                  if (assignToId != null &&
+                                      assignToId!.isNotEmpty) {
+                                    var data = {
+                                      'task_id': task.id,
+                                      'assign_to': assignToId
+                                    };
+                                    _scheduleController.assignNewProvider(data);
+                                  } else {
+                                    Get.toNamed(RouteNames.homeMember,
+                                        arguments: {
+                                          'task_id': task.id,
+                                          'task_title': task.title
+                                        });
+                                    setState(() {
+                                      task.isLinked = !task.isLinked;
+                                    });
+                                  }
                                 },
                                 child: SvgPicture.asset(
                                   task.isLinked

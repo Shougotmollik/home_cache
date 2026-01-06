@@ -1,3 +1,5 @@
+import 'package:home_cache/view/home/schedule/screens/schedule_screen.dart';
+
 class RouteNames {
   static const splash = '/splash';
   static const onboard = '/onboard';
@@ -60,4 +62,5 @@ class RouteNames {
 
   static const taskDetails = '/task-details';
   static const homeMember = '/home-member';
+  static const scheduleScreen = '/schedule-screen';
 }

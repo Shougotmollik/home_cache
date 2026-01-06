@@ -28,4 +28,9 @@ class RoomTypeModel {
       'image_id': imageId,
     };
   }
+
+  @override
+  String toString() {
+    return 'RoomTypeModel{id: $id, type: $type, image: $image, imageId: $imageId}';
+  }
 }

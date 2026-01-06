@@ -4,6 +4,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:home_cache/config/route/route_names.dart';
+import 'package:home_cache/config/route/routes.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/controller/add_provider_controller.dart';
@@ -161,7 +163,10 @@ class _UpdateProviderScreenState extends State<UpdateProviderScreen> {
         TileButton(
           imagePath: 'assets/images/link.png',
           title: 'Link Meeting',
-          onTap: () {},
+          onTap: () {
+            Get.toNamed(RouteNames.scheduleScreen,
+                arguments: {'assign_to_id': providerId});
+          },
         ),
         Obx(
           () => TileButton(

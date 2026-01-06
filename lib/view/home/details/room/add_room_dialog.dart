@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/controller/room_controller.dart';
+import 'package:home_cache/model/room_type.dart';
 import 'package:home_cache/view/auth/signup/widgets/custom_elevated_button.dart';
 import '../../../../config/route/route_names.dart';
 
@@ -19,7 +20,7 @@ class _AddRoomDialogState extends State<AddRoomDialog> {
   final TextEditingController nameController = TextEditingController();
   final RoomController roomController = Get.put(RoomController());
 
-  dynamic selectedRoom;
+  RoomTypeModel? selectedRoom;
 
   @override
   void initState() {
@@ -87,6 +88,7 @@ class _AddRoomDialogState extends State<AddRoomDialog> {
                   onChanged: (newValue) {
                     setState(() {
                       selectedRoom = newValue;
+                      print('Selected room:============> ${newValue}');
                     });
                   },
                 ),
@@ -135,8 +137,8 @@ class _AddRoomDialogState extends State<AddRoomDialog> {
                       Get.toNamed(
                         RouteNames.addRoom,
                         arguments: {
-                          'id': selectedRoom.id,
-                          'type': selectedRoom.type,
+                          'id': selectedRoom!.id,
+                          'type': selectedRoom!.type,
                           'name': nameController.text.trim(),
                         },
                       );

@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/constants/colors.dart';
-import 'package:home_cache/constants/data/rooms.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/controller/room_controller.dart';
-import 'package:home_cache/model/room_model.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
 import 'package:home_cache/view/home/chat/widgets/faq_search_bar_widget.dart';
 import 'package:home_cache/view/widget/text_button_widget.dart';
@@ -46,18 +45,18 @@ class _AddRoomScreenState extends State<AddRoomScreen> {
         ? args['name']
         : 'Room Name';
 
-    final room = rooms.firstWhere(
-      (r) => r.name == type,
-      orElse: () => RoomModel(name: type, items: []),
-    );
-
-    items = room.items;
-    filteredItems = List.from(items);
-    _filterItems('');
-
     // Defer fetch to avoid setState during build
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.fetchRoomItem(typeId, _searchQuery);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await controller.fetchRoomItem(typeId, _searchQuery);
+
+      // final room = controller.roomItem.firstWhere(
+      //   (r) => r.name == type,
+      //   orElse: () => RoomItem(name: '', id: ''),
+      // );
+
+      items = controller.roomItem.map((e) => e.name).toList();
+      filteredItems = List.from(items);
+      _filterItems('');
     });
   }
 
@@ -77,6 +76,8 @@ class _AddRoomScreenState extends State<AddRoomScreen> {
   }
 
   void _filterItems(String query) {
+    print("Filtering items with query: $query");
+    print("Original items: $items");
     setState(() {
       _searchQuery = query;
       filteredItems = query.isEmpty
@@ -273,16 +274,23 @@ class _AddRoomScreenState extends State<AddRoomScreen> {
                   Expanded(
                     child: TextWidgetButton(
                       text: '✓ Complete',
-                      onPressed: () {
-                        Map<String, dynamic> body = {
-                          'type_id': typeId,
-                          'name': name,
-                          'item_id': selectedItemIds,
-                        };
+                      onPressed: () async {
+                        if (selectedItemIds.isEmpty) {
+                          AppSnackbar.show(
+                              message: 'Please select at least one item.',
+                              duration: 300,
+                              type: SnackType.warning);
+                          return;
+                        } else {
+                          Map<String, dynamic> body = {
+                            'type_id': typeId,
+                            'name': name,
+                            'item_id': selectedItemIds,
+                          };
+                          print("Body being sent: $body");
 
-                        print("Body being sent: $body");
-
-                        controller.addRoom(body);
+                          await controller.addRoom(body);
+                        }
                       },
                     ),
                   ),

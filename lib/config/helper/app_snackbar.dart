@@ -249,7 +249,7 @@ class AppSnackbar {
   static void show({
     required String message,
     SnackType type = SnackType.info,
-    int duration = 4000,
+    int duration = 2000,
   }) {
     final snackBar = SnackBar(
       behavior: SnackBarBehavior.floating,

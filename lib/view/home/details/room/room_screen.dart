@@ -68,9 +68,9 @@ class _RoomScreenState extends State<RoomScreen> {
             imageUrl.isNotEmpty
                 ? Image.network(
                     imageUrl,
-                    height: 52.h,
-                    width: 52.w,
-                    fit: BoxFit.cover,
+                    height: 50.h,
+                    width: 62.w,
+                    fit: BoxFit.contain,
                   )
                 : Icon(Icons.meeting_room, size: 52.h, color: AppColors.black),
             SizedBox(height: 12.h),

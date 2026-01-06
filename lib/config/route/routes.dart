@@ -60,6 +60,7 @@ import 'package:home_cache/view/home/home/screens/task_details_screen.dart';
 import 'package:home_cache/view/home/notification/notification_details_screen.dart';
 import 'package:home_cache/view/home/notification/screens/notification_screen.dart';
 import 'package:home_cache/view/home/notification/widgets/calendar_screen.dart';
+import 'package:home_cache/view/home/schedule/screens/schedule_screen.dart';
 
 class AppRoutes {
   static final pages = [
@@ -225,5 +226,9 @@ class AppRoutes {
       page: () => const TaskDetailsScreen(),
     ),
     GetPage(name: RouteNames.homeMember, page: () => const HomeMemberScreen()),
+    GetPage(
+        name: RouteNames.scheduleScreen,
+        page: () => const ScheduleScreen(),
+        binding: ControllerBinder()),
   ];
 }

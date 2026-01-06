@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/model/schedule_model.dart';
 import 'package:home_cache/services/api_checker.dart';
 import 'package:home_cache/services/api_clients.dart';
@@ -31,5 +32,26 @@ class ScheduleController extends GetxController {
       ApiChecker.checkApi(response);
     }
     isLoading(false);
+  }
+
+  //! Assign new member to task
+  Future<void> assignNewProvider(var data) async {
+    isLoading(true);
+    Response response =
+        await ApiClient.patchData(ApiConstants.assignNewMember, data);
+    if (response.statusCode == 200) {
+      AppSnackbar.show(
+        message: 'provider assigned successfully',
+        type: SnackType.success,
+      );
+      Get.back();
+      // fetchTaskDetails('id');
+    } else {
+      AppSnackbar.show(
+        message: 'Something went wrong',
+        type: SnackType.warning,
+      );
+      ApiChecker.checkApi(response);
+    }
   }
 }

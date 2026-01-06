@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/config/route/route_names.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/controller/notification_controller.dart';
 import 'package:home_cache/view/home/notification/widgets/notification_app_bar.dart';
 import 'package:home_cache/view/home/notification/widgets/notification_tile.dart';
-import 'package:home_cache/view/home/schedule/screens/schedule_screen.dart';
 import 'package:home_cache/view/widget/text_button_widget.dart';
 
 class NotificationScreen extends StatelessWidget {
