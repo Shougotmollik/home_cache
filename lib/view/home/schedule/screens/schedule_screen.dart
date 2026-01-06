@@ -218,12 +218,16 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           top: Radius.circular(20.r),
         ),
       ),
-      builder: (_) => AddTaskDialog(
-        onTaskAdded: (newTask) {
-          setState(() {
-            _tasks.add(newTask);
-          });
-        },
+      builder: (context) => Padding(
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: AddTaskDialog(
+          onTaskAdded: (newTask) {
+            setState(() {
+              _tasks.add(newTask);
+            });
+          },
+        ),
       ),
     );
   }
