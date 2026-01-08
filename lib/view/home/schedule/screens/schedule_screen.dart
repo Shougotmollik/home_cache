@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:home_cache/config/route/route_names.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
-import 'package:home_cache/controller/schedule_controller.dart';
+import 'package:home_cache/controller/schedule_controller.dart';  
 import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import 'package:intl/intl.dart';
 

@@ -70,4 +70,5 @@ class ApiConstants {
   static String markNotificationAsRead = "/task/mark_as_done_or_ignore";
 
   static String fetchHomeMemberRecentActivity = "/home-share/recent-activities";
+  static String fetchRoomWithPaint = "/view-by-type/get-all-room-with-paint";
 }

@@ -63,4 +63,5 @@ class RouteNames {
   static const taskDetails = '/task-details';
   static const homeMember = '/home-member';
   static const scheduleScreen = '/schedule-screen';
+  static const paintScreen = '/paint-screen';
 }

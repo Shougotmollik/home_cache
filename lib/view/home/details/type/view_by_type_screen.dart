@@ -42,9 +42,10 @@ class _ViewByTypeScreenState extends State<ViewByTypeScreen> {
         });
         break;
       case 2:
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Coming Soon")),
-        );
+        Get.toNamed(RouteNames.paintScreen, arguments: {
+          "id": controller.typeList[index].id,
+          "type": controller.typeList[index].type,
+        });
         break;
       case 3:
       default:
