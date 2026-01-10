@@ -5,7 +5,6 @@ import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/config/route/route_names.dart';
 import 'package:home_cache/constants/data/app_constants.dart';
 import 'package:home_cache/model/sing_up_collected_data.dart';
-import 'package:home_cache/services/api_checker.dart';
 import 'package:home_cache/services/api_clients.dart';
 import 'package:home_cache/services/api_constants.dart';
 import 'package:home_cache/services/prefs_helper.dart';

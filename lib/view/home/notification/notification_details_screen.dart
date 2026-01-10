@@ -5,7 +5,6 @@ import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/controller/provider_controller.dart';
 import 'package:home_cache/controller/task_controller.dart';
-import 'package:home_cache/view/home/details/widgets/provider_list_tile.dart';
 import 'package:home_cache/view/home/notification/screens/home_member_screen.dart';
 import 'package:home_cache/view/home/schedule/widgets/assigned_person_tile.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';

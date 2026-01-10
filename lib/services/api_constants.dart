@@ -71,4 +71,8 @@ class ApiConstants {
 
   static String fetchHomeMemberRecentActivity = "/home-share/recent-activities";
   static String fetchRoomWithPaint = "/view-by-type/get-all-room-with-paint";
+  static String fetchPaintItem = "/view-by-type/get-all-paint-of-room/";
+  static String addNewPaintItem = "/view-by-room/add-item";
+  static String updatePaintItemDetails =
+      "/view-by-room/update-user-item-details/";
 }

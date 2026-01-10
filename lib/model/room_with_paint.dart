@@ -1,26 +1,49 @@
-
 class RoomWithPaint {
-  final String id;
-  final String name;
+  final List<UserRoom> userRooms;
   final String itemId;
-  final String roomType;
-  final int number;
 
   RoomWithPaint({
-    required this.id,
-    required this.name,
+    required this.userRooms,
     required this.itemId,
-    required this.roomType,
-    required this.number,
   });
 
   factory RoomWithPaint.fromJson(Map<String, dynamic> json) {
     return RoomWithPaint(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      itemId: json['item_id'] as String,
-      roomType: json['room_type'] as String,
-      number: json['number'] as int,
+      userRooms: (json['user_rooms'] as List)
+          .map((e) => UserRoom.fromJson(e))
+          .toList(),
+      itemId: json['item_id'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'user_rooms': userRooms.map((e) => e.toJson()).toList(),
+      'item_id': itemId,
+    };
+  }
+}
+
+// User room model
+class UserRoom {
+  final String id;
+  final String name;
+  final String roomType;
+  final int number;
+
+  UserRoom({
+    required this.id,
+    required this.name,
+    required this.roomType,
+    required this.number,
+  });
+
+  factory UserRoom.fromJson(Map<String, dynamic> json) {
+    return UserRoom(
+      id: json['id'],
+      name: json['name'],
+      roomType: json['room_type'],
+      number: json['number'],
     );
   }
 
@@ -28,7 +51,6 @@ class RoomWithPaint {
     return {
       'id': id,
       'name': name,
-      'item_id': itemId,
       'room_type': roomType,
       'number': number,
     };

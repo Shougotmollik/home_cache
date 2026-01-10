@@ -10,7 +10,6 @@ import 'package:home_cache/view/auth/signup/onboardingSignup/dialogs/home_select
 import 'package:home_cache/view/auth/signup/onboardingSignup/dialogs/welcome_dialog.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
 import 'package:home_cache/view/widget/selectable_tiles.dart';
-import 'package:home_cache/view/widget/text_button_widget_light.dart';
 import 'package:home_cache/view/widget/rounded_search_bar.dart';
 
 import '../../../../../config/route/route_names.dart';
@@ -101,9 +100,9 @@ class _SelectHouseRoleScreenState extends State<SelectHouseRoleScreen> {
                 runSpacing: 16.h,
                 children: [
                   _buildTile(
-                      context, "House Owner", "assets/images/person_ic.png", 0),
+                      context, "House Owner", "assets/images/owner.png", 0),
                   _buildTile(context, "House Resident",
-                      "assets/images/person_ic.png", 1),
+                      "assets/images/resident.png", 1),
                 ],
               ),
 
