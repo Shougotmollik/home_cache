@@ -20,11 +20,11 @@ class _ViewByTypeScreenState extends State<ViewByTypeScreen> {
 
   final ViewByTypeController controller = Get.put(ViewByTypeController());
 
-  @override
-  void initState() {
-    super.initState();
-    controller.getViewByType();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   controller.getViewByType();
+  // }
 
   /// Handle tile taps with navigation
   void onTileTap(int index) {

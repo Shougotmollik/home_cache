@@ -8,6 +8,12 @@ class ViewByTypeController extends GetxController {
   var isLoading = false.obs;
   var typeList = <ViewByType>[].obs;
 
+  @override
+  void onInit() {
+    super.onInit();
+    getViewByType();
+  }
+
   //! Get view by type
   Future<void> getViewByType() async {
     isLoading(true);

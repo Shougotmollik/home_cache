@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:home_cache/config/route/route_names.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart' show AppColors;
-import 'package:home_cache/view/home/details/type/appliances/dialog_appliance.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
 
 class UtilityScreen extends StatefulWidget {
@@ -101,12 +102,7 @@ class _UtilityScreenState extends State<UtilityScreen> {
             padding: const EdgeInsets.only(right: 8.0),
             child: TextButton(
               onPressed: () {
-                // showDialog(
-                //   context: context,
-                //   builder: (context) => const DialogAppliance(
-
-                //   ),
-                // );
+                Get.toNamed(RouteNames.addUtilitiesScreen);
               },
               style: TextButton.styleFrom(
                 backgroundColor: AppColors.primary,

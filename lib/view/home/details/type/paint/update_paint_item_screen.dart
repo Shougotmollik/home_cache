@@ -32,7 +32,7 @@ class _UpdatePaintItemScreenState extends State<UpdatePaintItemScreen> {
   late final TextEditingController lastPaintController =
       TextEditingController();
 
-  final PaintController paintController = Get.put(PaintController());
+  final PaintController paintController = Get.find<PaintController>();
 
   // late String roomId;
   // late String itemId;

@@ -1,7 +1,7 @@
 import 'dart:core';
 
 class ApiConstants {
-  static String baseUrl = "https://k10swf0g-6000.inc1.devtunnels.ms/api/v1";
+  static String baseUrl = "https://rcw2z4rg-6000.inc1.devtunnels.ms/api/v1";
 
   static String signup = "/auth/create-user";
   static String login = "/auth/login";

@@ -16,6 +16,12 @@ class PaintController extends GetxController {
   final paintItemList = <PaintItem>[].obs;
   var selectedFile = Rx<File?>(null);
 
+  @override
+  void onReady() {
+    super.onReady();
+    fetchRoomWithPaint();
+  }
+
   // ! Fetch room with paint data
 
   Future<void> fetchRoomWithPaint() async {

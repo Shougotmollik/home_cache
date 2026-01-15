@@ -52,7 +52,9 @@ class RouteNames {
   static const householdManagement = '/household-management';
   static const notifications = '/notifications';
   static const notificationDetails = '/notification-details';
+
   static const utility = '/utility';
+  static const addUtilitiesScreen = '/add-utilities-screen';
 
   static const material = '/material';
   static const addMaterial = '/add-material';
