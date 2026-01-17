@@ -78,4 +78,5 @@ class ApiConstants {
   static String utilitiesComponents = "/view-by-type/get-all-utility-type";
   static String utilitiesComponentsType =
       "/view-by-type/get-available-utility-item/";
+  static String addUtility = "/view-by-type/add-user-utility";
 }

@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/controller/utilities_controller.dart';
@@ -14,6 +15,7 @@ import 'package:home_cache/view/home/account/productsupport/widgets/text_field_w
 import 'package:home_cache/view/home/details/widgets/doccument_slider.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 class AddUtilitiesScreen extends StatefulWidget {
   const AddUtilitiesScreen({super.key});
@@ -25,13 +27,14 @@ class AddUtilitiesScreen extends StatefulWidget {
 class _AddUtilitiesScreenState extends State<AddUtilitiesScreen> {
   final UtilitiesController utilitiesController =
       Get.put(UtilitiesController());
-  // Reactive selected IDs
-  final RxString selectedTypeId = ''.obs;
-  final RxString selectedRoomId = ''.obs;
+
   File? _documentFile;
 
-  UtilityComponent? selectedComponent;
-  UtilityComponentType? selectedComponentType;
+  final TextEditingController lastServiceController = TextEditingController();
+  final TextEditingController noteTextController = TextEditingController();
+  final Rx<UtilityComponent?> selectedComponent = Rx<UtilityComponent?>(null);
+  final Rx<UtilityComponentType?> selectedComponentType =
+      Rx<UtilityComponentType?>(null);
 
   @override
   Widget build(BuildContext context) {
@@ -54,8 +57,30 @@ class _AddUtilitiesScreenState extends State<AddUtilitiesScreen> {
                             .copyWith(color: AppColors.black)),
                     SizedBox(width: 6.w),
                     IconButton(
-                        onPressed: () {},
-                        icon: Image.asset("assets/icons/save_ic.png")),
+                      onPressed: () async {
+                        if (selectedComponent.value == null ||
+                            selectedComponentType.value == null) {
+                          AppSnackbar.show(
+                            message:
+                                "Please select component and component type",
+                            type: SnackType.error,
+                          );
+                          return;
+                        }
+
+                        var data = {
+                          "utility_type_id": selectedComponent.value!.id,
+                          "utility_item_id": selectedComponentType.value!.id,
+                          "details": {
+                            "last_service": lastServiceController.text,
+                            "notes": noteTextController.text
+                          }
+                        };
+
+                        await utilitiesController.addUtility(data);
+                      },
+                      icon: Image.asset("assets/icons/save_ic.png"),
+                    ),
                   ],
                 ),
               ),
@@ -67,8 +92,8 @@ class _AddUtilitiesScreenState extends State<AddUtilitiesScreen> {
                     final picked = await ImagePicker()
                         .pickImage(source: ImageSource.camera);
                     if (picked != null) {
-                      setState(() => utilitiesController
-                          .selectedImageFile.value = File(picked.path));
+                      utilitiesController.selectedImageFile.value =
+                          File(picked.path);
                     }
                   },
                   child: Obx(() {
@@ -153,12 +178,11 @@ class _AddUtilitiesScreenState extends State<AddUtilitiesScreen> {
 
               SizedBox(height: 16.h),
 
-              // ----- Type Field -----
-
+              // ----- Component Dropdown -----
               Obx(() {
                 final list = utilitiesController.utilityComponents;
 
-                if (utilitiesController.isLoading.value) {
+                if (utilitiesController.isLoading.value && list.isEmpty) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
@@ -172,7 +196,7 @@ class _AddUtilitiesScreenState extends State<AddUtilitiesScreen> {
                     Text('Component', style: AppTypoGraphy.semiBold),
                     SizedBox(height: 6.h),
                     DropdownButtonFormField<UtilityComponent>(
-                      value: selectedComponent,
+                      value: selectedComponent.value,
                       items: list
                           .map(
                             (e) => DropdownMenuItem<UtilityComponent>(
@@ -184,12 +208,9 @@ class _AddUtilitiesScreenState extends State<AddUtilitiesScreen> {
                       onChanged: (value) {
                         if (value == null) return;
 
-                        setState(() {
-                          selectedComponent = value;
-                          selectedComponentType = null; // reset type
-                        });
+                        selectedComponent.value = value;
+                        selectedComponentType.value = null; // reset type
 
-                        // 🚀 API CALL HERE
                         utilitiesController.getUtilityComponentTypes(value.id!);
                       },
                       decoration: _dec('Select Component'),
@@ -198,24 +219,84 @@ class _AddUtilitiesScreenState extends State<AddUtilitiesScreen> {
                   ],
                 );
               }),
+
+              // ----- Component Type Dropdown -----
               Obx(() {
                 final list = utilitiesController.utilityComponentType;
 
-                if (utilitiesController.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
+                // Only show message if no component is selected
+                if (selectedComponent.value == null) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Component Type', style: AppTypoGraphy.semiBold),
+                      SizedBox(height: 6.h),
+                      Container(
+                        padding: EdgeInsets.all(12.w),
+                        decoration: BoxDecoration(
+                          color: AppColors.lightgrey.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Text(
+                          'Select component first',
+                          style: AppTypoGraphy.regular.copyWith(
+                            color: AppColors.grey,
+                            fontSize: 14.sp,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16.h),
+                    ],
+                  );
                 }
 
+                // Show loading only when fetching component types
+                if (utilitiesController.isLoading.value && list.isEmpty) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Component Type', style: AppTypoGraphy.semiBold),
+                      SizedBox(height: 6.h),
+                      const Center(child: CircularProgressIndicator()),
+                      SizedBox(height: 16.h),
+                    ],
+                  );
+                }
+
+                // Show message if no types found for selected component
                 if (list.isEmpty) {
-                  return const Text('Select component first');
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Component Type', style: AppTypoGraphy.semiBold),
+                      SizedBox(height: 6.h),
+                      Container(
+                        padding: EdgeInsets.all(12.w),
+                        decoration: BoxDecoration(
+                          color: AppColors.lightgrey.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Text(
+                          'No types available for selected component',
+                          style: AppTypoGraphy.regular.copyWith(
+                            color: AppColors.grey,
+                            fontSize: 14.sp,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16.h),
+                    ],
+                  );
                 }
 
+                // Show dropdown with component types
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Component Type', style: AppTypoGraphy.semiBold),
                     SizedBox(height: 6.h),
                     DropdownButtonFormField<UtilityComponentType>(
-                      value: selectedComponentType,
+                      value: selectedComponentType.value,
                       items: list
                           .map(
                             (e) => DropdownMenuItem<UtilityComponentType>(
@@ -225,9 +306,7 @@ class _AddUtilitiesScreenState extends State<AddUtilitiesScreen> {
                           )
                           .toList(),
                       onChanged: (value) {
-                        setState(() {
-                          selectedComponentType = value;
-                        });
+                        selectedComponentType.value = value;
                       },
                       decoration: _dec('Select Component Type'),
                     ),
@@ -236,40 +315,43 @@ class _AddUtilitiesScreenState extends State<AddUtilitiesScreen> {
                 );
               }),
 
-              // TextFieldWidget(
-              //   hintText: 'e.g., Refrigerator, Washing Machine',
-              //   controller: TextEditingController(),
-              // ),
+              // Last Service date
+              Text('Last Service Date',
+                  style:
+                      AppTypoGraphy.semiBold.copyWith(color: AppColors.black)),
+              SizedBox(height: 8.h),
+              GestureDetector(
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime.now(),
+                  );
 
-              SizedBox(height: 16.h),
-
-              // ----- Location Field -----
-              Text(
-                'Location',
-                style: AppTypoGraphy.semiBold.copyWith(color: AppColors.black),
+                  if (pickedDate != null) {
+                    lastServiceController.text =
+                        DateFormat('MM/dd/yyyy').format(pickedDate);
+                  }
+                },
+                child: AbsorbPointer(
+                  child: TextFieldWidget(
+                    controller: lastServiceController,
+                    hintText: 'Enter Last Service Date',
+                  ),
+                ),
               ),
-              SizedBox(height: 6.h),
-              TextFieldWidget(
-                  hintText: 'e.g., Kitchen, Laundry Room',
-                  controller: TextEditingController()),
-
               SizedBox(height: 16.h),
-
               // ----- Notes Field -----
               Text(
                 'Notes',
                 style: AppTypoGraphy.semiBold.copyWith(color: AppColors.black),
               ),
               TextFieldWidget(
-                  hintText: 'Additional details about the appliance',
-                  controller: TextEditingController()),
+                  hintText: 'Additional details about the utility',
+                  controller: noteTextController),
               SizedBox(height: 16.h),
 
-              // // ----- Past Appointments -----
-              // if (isPastExpanded) ...[
-              //   PastAppointmentsTile(date: "June 18, 2025", status: "AC Check"),
-              //   PastAppointmentsTile(date: "May 05, 2025", status: "AC Check"),
-              // ],
               SizedBox(height: 20.h),
 
               // ----- Documents Section -----
@@ -314,7 +396,7 @@ class _AddUtilitiesScreenState extends State<AddUtilitiesScreen> {
                 ],
               ),
 
-              SizedBox(height: 16.h),
+              SizedBox(height: 56.h),
             ],
           ),
         ),

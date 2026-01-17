@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:get/get.dart';
+import 'package:home_cache/config/helper/app_snackbar.dart';
+import 'package:home_cache/config/route/route_names.dart';
 import 'package:home_cache/model/utility_component_type.dart';
 import 'package:home_cache/model/utility_model.dart';
 import 'package:home_cache/services/api_checker.dart';
@@ -54,21 +56,74 @@ class UtilitiesController extends GetxController {
 
   // get utility component types
   Future<void> getUtilityComponentTypes(String id) async {
-    isLoading.value = true;
+    try {
+      isLoading.value = true;
 
-    Response response =
-        await ApiClient.getData("${ApiConstants.utilitiesComponentsType}$id");
-    if (response.statusCode == 200) {
-      final responseData = response.body;
-      utilityComponentType.clear();
-      if (responseData['data'] != null) {
-        final List list = responseData['data'];
-        utilityComponentType.addAll(
-          list.map((e) => UtilityComponentType.fromJson(e)).toList(),
-        );
+      Response response =
+          await ApiClient.getData("${ApiConstants.utilitiesComponentsType}$id");
+
+      if (response.statusCode == 200) {
+        final responseData = response.body;
+        utilityComponentType.clear();
+
+        if (responseData['data'] != null) {
+          final List list = responseData['data'];
+          utilityComponentType.addAll(
+            list.map((e) => UtilityComponentType.fromJson(e)).toList(),
+          );
+        }
+      } else {
+        ApiChecker.checkApi(response);
       }
-    } else {
-      ApiChecker.checkApi(response);
+    } catch (e) {
+      print('Error fetching utility component types: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // add utility
+  Future<void> addUtility(var data) async {
+    isLoading(true);
+
+    // Ensure 'data' is a Map<String, dynamic>
+    final Map<String, dynamic> safeData = Map<String, dynamic>.from(data);
+
+    // Convert all values to strings
+    final Map<String, String> stringData = safeData.map(
+      (key, value) => MapEntry(key.toString(), value?.toString() ?? ''),
+    );
+
+    try {
+      Response response = await ApiClient.postMultipartData(
+        ApiConstants.addUtility,
+        stringData,
+        multipartBody: selectedFile.value != null
+            ? [MultipartBody('files', selectedFile.value!)]
+            : [MultipartBody('image', selectedImageFile.value!)],
+      );
+
+      if (response.statusCode == 200) {
+        AppSnackbar.show(
+          message: "Utility added successfully",
+          type: SnackType.success,
+        );
+        await Future.delayed(const Duration(seconds: 2));
+        Get.offAllNamed(RouteNames.viewByType);
+      } else {
+        AppSnackbar.show(
+          message: "Failed to add utility",
+          type: SnackType.error,
+        );
+        ApiChecker.checkApi(response);
+      }
+    } catch (e) {
+      AppSnackbar.show(
+        message: "Error: $e",
+        type: SnackType.error,
+      );
+    } finally {
+      isLoading(false);
     }
   }
 }
