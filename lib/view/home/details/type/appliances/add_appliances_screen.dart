@@ -10,7 +10,6 @@ import 'package:home_cache/controller/appliance_controller.dart';
 import 'package:home_cache/utils.dart' as utils;
 import 'package:home_cache/view/home/account/productsupport/widgets/text_field_widget.dart';
 import 'package:home_cache/view/home/details/widgets/doccument_slider.dart';
-import 'package:home_cache/view/home/details/widgets/past_appoinment_tile.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
 import 'package:image_picker/image_picker.dart';
 

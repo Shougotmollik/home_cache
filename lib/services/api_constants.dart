@@ -75,4 +75,7 @@ class ApiConstants {
   static String addNewPaintItem = "/view-by-room/add-item";
   static String updatePaintItemDetails =
       "/view-by-room/update-user-item-details/";
+  static String utilitiesComponents = "/view-by-type/get-all-utility-type";
+  static String utilitiesComponentsType =
+      "/view-by-type/get-available-utility-item/";
 }
