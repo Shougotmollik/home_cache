@@ -5,6 +5,7 @@ import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart' show AppColors;
 import 'package:home_cache/controller/appliance_controller.dart';
 import 'package:home_cache/view/home/details/type/appliances/dialog_appliance.dart';
+import 'package:home_cache/view/widget/appbar_back_widget.dart';
 import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import '../../../../../config/route/route_names.dart';
 import 'package:home_cache/model/appliance.dart';
@@ -53,10 +54,9 @@ class _AppliancesScreenState extends State<AppliancesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Appliances', style: AppTypoGraphy.medium),
-        backgroundColor: AppColors.surface,
-        elevation: 0,
+      appBar: AppBarBack(
+        title: 'Appliances',
+        titleColor: AppColors.secondary,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
@@ -84,6 +84,38 @@ class _AppliancesScreenState extends State<AppliancesScreen> {
           ),
         ],
       ),
+
+      // appBar: AppBar(
+      //   title: Text('Appliances', style: AppTypoGraphy.medium),
+      //   backgroundColor: AppColors.surface,
+      //   elevation: 0,
+      //   actions: [
+      //     Padding(
+      //       padding: const EdgeInsets.only(right: 8.0),
+      //       child: TextButton(
+      //         onPressed: () {
+      //           showDialog(
+      //             context: context,
+      //             builder: (_) => DialogAppliance(
+      //               applianceTypeId: applianceTypeId,
+      //             ),
+      //           );
+      //         },
+      //         style: TextButton.styleFrom(
+      //           backgroundColor: AppColors.primary,
+      //           padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+      //           shape: RoundedRectangleBorder(
+      //             borderRadius: BorderRadius.circular(12.r),
+      //           ),
+      //         ),
+      //         child: Text(
+      //           '+ Add',
+      //           style: TextStyle(color: Colors.white, fontSize: 14.sp),
+      //         ),
+      //       ),
+      //     ),
+      //   ],
+      // ),
       backgroundColor: AppColors.surface,
       body: Obx(() {
         if (controller.isLoading.value) {

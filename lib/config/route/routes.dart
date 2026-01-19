@@ -56,6 +56,7 @@ import 'package:home_cache/view/home/details/type/paint/add_paint_item_screen.da
 import 'package:home_cache/view/home/details/type/paint/paint_screen.dart';
 import 'package:home_cache/view/home/details/type/paint/update_paint_item_screen.dart';
 import 'package:home_cache/view/home/details/type/utility/add_utilities_screen.dart';
+import 'package:home_cache/view/home/details/type/utility/update_utilities_screen.dart';
 import 'package:home_cache/view/home/details/type/utility/utility_screen.dart';
 import 'package:home_cache/view/home/details/type/view_by_type_screen.dart';
 import 'package:home_cache/view/home/home/screens/home_health_screen.dart';
@@ -249,6 +250,10 @@ class AppRoutes {
     GetPage(
       name: RouteNames.addUtilitiesScreen,
       page: () => const AddUtilitiesScreen(),
+    ),
+    GetPage(
+      name: RouteNames.updateUtilitiesScreen,
+      page: () => const UpdateUtilitiesScreen(),
     ),
   ];
 }

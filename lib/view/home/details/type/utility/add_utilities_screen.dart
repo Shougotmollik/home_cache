@@ -28,6 +28,7 @@ class _AddUtilitiesScreenState extends State<AddUtilitiesScreen> {
       Get.put(UtilitiesController());
 
   File? _documentFile;
+  DateTime? selectedLastServiceDate;
 
   final TextEditingController lastServiceController = TextEditingController();
   final TextEditingController noteTextController = TextEditingController();
@@ -71,7 +72,8 @@ class _AddUtilitiesScreenState extends State<AddUtilitiesScreen> {
                           "utility_type_id": selectedComponent.value!.id,
                           "utility_item_id": selectedComponentType.value!.id,
                           "details": {
-                            "last_service": lastServiceController.text,
+                            "last_service":
+                                selectedLastServiceDate?.toIso8601String(),
                             "notes": noteTextController.text
                           }
                         };
@@ -328,6 +330,7 @@ class _AddUtilitiesScreenState extends State<AddUtilitiesScreen> {
                   );
 
                   if (pickedDate != null) {
+                    selectedLastServiceDate = pickedDate;
                     lastServiceController.text =
                         DateFormat('MM/dd/yyyy').format(pickedDate);
                   }

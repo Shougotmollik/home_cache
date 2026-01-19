@@ -72,15 +72,14 @@ class _PaintScreenState extends State<PaintScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Obx(
           () {
-
-            final roomData=controller.roomWithPaint.value;
+            final roomData = controller.roomWithPaint.value;
             if (controller.isLoading.value) {
               return const Center(
                 child: CustomProgressIndicator(),
               );
             }
 
-            if(roomData==null){
+            if (roomData == null) {
               return const Center(
                 child: Text('No paint data available.'),
               );

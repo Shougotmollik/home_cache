@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:get/get.dart';
 import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/config/route/route_names.dart';
+import 'package:home_cache/model/utilities_details.dart';
 import 'package:home_cache/model/utilities_type.dart';
 import 'package:home_cache/model/utilities_type_details.dart';
 import 'package:home_cache/model/utility_component_type.dart';
@@ -21,6 +22,7 @@ class UtilitiesController extends GetxController {
   var utilityComponentType = <UtilityComponentType>[].obs;
   var utilityTypeList = <UtilityTypeData>[].obs;
   var utilityTypeDetailList = <UtilityTypeDetails>[].obs;
+  var utilitiesDetails = Rxn<UtilitySingleDataDetails>();
 
   @override
   void onInit() {
@@ -153,20 +155,52 @@ class UtilitiesController extends GetxController {
   // get utility type details
   Future<void> getUtilityTypeDetails(String id) async {
     isLoading(true);
+
     Response response =
         await ApiClient.getData("${ApiConstants.getUtilityTypeDetails}$id");
+
     if (response.statusCode == 200) {
       final responseData = response.body;
-      utilityTypeDetailList.clear();
+
       if (responseData['data'] != null) {
         final List list = responseData['data'];
-        utilityTypeDetailList.addAll(
-          list.map((e) => UtilityTypeDetails.fromJson(e)).toList(),
-        );
+        utilityTypeDetailList.value =
+            list.map((e) => UtilityTypeDetails.fromJson(e)).toList();
+      } else {
+        utilityTypeDetailList.clear();
       }
     } else {
       ApiChecker.checkApi(response);
     }
+
     isLoading(false);
+  }
+
+  // update utility get utilities details
+// Fetch single utility details by ID
+  Future<UtilitySingleDataDetails?> getUtilitySingleDetails(String id) async {
+    isLoading(true);
+
+    try {
+      Response response =
+          await ApiClient.getData("${ApiConstants.getUtilitySingleDetails}$id");
+
+      if (response.statusCode == 200) {
+        final responseData = response.body;
+
+        if (responseData['data'] != null && responseData['data'].isNotEmpty) {
+          utilitiesDetails.value =
+              UtilitySingleDataDetails.fromJson(responseData['data']);
+          return utilitiesDetails.value;
+        }
+      } else {
+        ApiChecker.checkApi(response);
+      }
+    } catch (e) {
+      print("Error fetching utility single details: $e");
+    } finally {
+      isLoading(false);
+    }
+    return null;
   }
 }

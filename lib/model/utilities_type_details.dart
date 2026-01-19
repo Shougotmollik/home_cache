@@ -11,13 +11,11 @@ class UtilityTypeDetails {
 
   factory UtilityTypeDetails.fromJson(Map<String, dynamic> json) {
     return UtilityTypeDetails(
-      id: json['id'] as String? ?? '', // fallback if null
-      utilityItem: json['utility_item'] != null
+      id: json['id'] as String? ?? '',
+      utilityItem: json['utility_item'] is Map<String, dynamic>
           ? UtilityItem.fromJson(json['utility_item'])
-          : UtilityItem(name: ''), // fallback empty
-      details: json['details'] != null
-          ? UtilityDetails.fromJson(json['details'])
-          : UtilityDetails(), // empty fallback
+          : UtilityItem(name: ''),
+      details: UtilityDetails.fromDynamic(json['details']),
     );
   }
 
@@ -25,7 +23,7 @@ class UtilityTypeDetails {
     return {
       'id': id,
       'utility_item': utilityItem.toJson(),
-      'details': details.toJson(),
+      // 'details': details.toJson(),
     };
   }
 }
@@ -42,9 +40,7 @@ class UtilityItem {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-    };
+    return {'name': name};
   }
 }
 
@@ -54,21 +50,37 @@ class UtilityDetails {
 
   UtilityDetails({this.lastServiceDate, this.notes});
 
-  factory UtilityDetails.fromJson(Map<String, dynamic>? json) {
-    if (json == null) return UtilityDetails(); // safe fallback
-
-    return UtilityDetails(
-      lastServiceDate: json['last_service'] != null
-          ? DateTime.tryParse(json['last_service'])
-          : null,
-      notes: json['notes'] as String?, // allow null
-    );
+  factory UtilityDetails.fromDynamic(dynamic value) {
+    if (value is Map<String, dynamic>) {
+      return UtilityDetails(
+        lastServiceDate: _parseApiDate(value['last_service']),
+        notes: value['notes'] as String?,
+      );
+    }
+    return UtilityDetails();
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'last_service': lastServiceDate?.toIso8601String(),
-      'notes': notes,
-    };
+  static DateTime? _parseApiDate(dynamic value) {
+    if (value == null) return null;
+
+    // MM/DD/YYYY
+    if (value is String && value.contains('/')) {
+      final parts = value.split('/');
+      if (parts.length == 3) {
+        final month = int.tryParse(parts[0]);
+        final day = int.tryParse(parts[1]);
+        final year = int.tryParse(parts[2]);
+        if (month != null && day != null && year != null) {
+          return DateTime(year, month, day);
+        }
+      }
+    }
+
+    // ISO string
+    if (value is String) {
+      return DateTime.tryParse(value);
+    }
+
+    return null;
   }
 }

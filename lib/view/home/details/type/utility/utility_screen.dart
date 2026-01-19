@@ -136,16 +136,34 @@ class _UtilityScreenState extends State<UtilityScreen> {
                         separatorBuilder: (_, __) => SizedBox(height: 12.h),
                         itemBuilder: (context, index) {
                           final item = details[index];
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.lightgrey,
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            child: ListTile(
-                              title: Text(
-                                item.utilityItem.name,
-                                style: AppTypoGraphy.medium
-                                    .copyWith(fontSize: 18.sp),
+                          return GestureDetector(
+                            onTap: () {
+                              Get.toNamed(RouteNames.updateUtilitiesScreen,
+                                  arguments: {'id': item.id});
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(12.w),
+                              decoration: BoxDecoration(
+                                color: AppColors.lightgrey,
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item.utilityItem.name,
+                                    style: AppTypoGraphy.medium
+                                        .copyWith(fontSize: 18.sp),
+                                  ),
+                                  Text(
+                                    item.details.lastServiceDate != null
+                                        ? _formatDate(
+                                            item.details.lastServiceDate!)
+                                        : 'N/A',
+                                    style: AppTypoGraphy.regular
+                                        .copyWith(fontSize: 14.sp),
+                                  ),
+                                ],
                               ),
                             ),
                           );
@@ -157,5 +175,11 @@ class _UtilityScreenState extends State<UtilityScreen> {
         }),
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.month.toString().padLeft(2, '0')}/'
+        '${date.day.toString().padLeft(2, '0')}/'
+        '${date.year}';
   }
 }

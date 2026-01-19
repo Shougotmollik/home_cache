@@ -68,4 +68,5 @@ class RouteNames {
   static const paintScreen = '/paint-screen';
   static const addPaintItemScreen = '/addPaintItemScreen';
   static const updatePaintItemScreen = '/updatePaintItemScreen';
+  static const updateUtilitiesScreen='/update-utilities-screen';
 }
