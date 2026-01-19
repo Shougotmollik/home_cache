@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:get/get.dart';
 import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/config/route/route_names.dart';
+import 'package:home_cache/model/utilities_type.dart';
+import 'package:home_cache/model/utilities_type_details.dart';
 import 'package:home_cache/model/utility_component_type.dart';
 import 'package:home_cache/model/utility_model.dart';
 import 'package:home_cache/services/api_checker.dart';
@@ -17,11 +19,13 @@ class UtilitiesController extends GetxController {
 
   var utilityComponents = <UtilityComponent>[].obs;
   var utilityComponentType = <UtilityComponentType>[].obs;
+  var utilityTypeList = <UtilityTypeData>[].obs;
+  var utilityTypeDetailList = <UtilityTypeDetails>[].obs;
 
   @override
   void onInit() {
+    // getUtilitiesTypes();
     getUtilityComponents();
-
     super.onInit();
   }
 
@@ -125,5 +129,44 @@ class UtilitiesController extends GetxController {
     } finally {
       isLoading(false);
     }
+  }
+
+  // get utilities types data
+  Future<void> getUtilitiesTypes() async {
+    isLoading(true);
+    Response response = await ApiClient.getData(ApiConstants.getUtilitiesTypes);
+    if (response.statusCode == 200) {
+      final responseData = response.body;
+      utilityTypeList.clear();
+      if (responseData['data'] != null) {
+        final List list = responseData['data'];
+        utilityTypeList.addAll(
+          list.map((e) => UtilityTypeData.fromJson(e)).toList(),
+        );
+      }
+    } else {
+      ApiChecker.checkApi(response);
+    }
+    isLoading(false);
+  }
+
+  // get utility type details
+  Future<void> getUtilityTypeDetails(String id) async {
+    isLoading(true);
+    Response response =
+        await ApiClient.getData("${ApiConstants.getUtilityTypeDetails}$id");
+    if (response.statusCode == 200) {
+      final responseData = response.body;
+      utilityTypeDetailList.clear();
+      if (responseData['data'] != null) {
+        final List list = responseData['data'];
+        utilityTypeDetailList.addAll(
+          list.map((e) => UtilityTypeDetails.fromJson(e)).toList(),
+        );
+      }
+    } else {
+      ApiChecker.checkApi(response);
+    }
+    isLoading(false);
   }
 }

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -223,7 +222,6 @@ class _AddUtilitiesScreenState extends State<AddUtilitiesScreen> {
               // ----- Component Type Dropdown -----
               Obx(() {
                 final list = utilitiesController.utilityComponentType;
-
                 // Only show message if no component is selected
                 if (selectedComponent.value == null) {
                   return Column(
