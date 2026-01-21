@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/config/route/route_names.dart';
+import 'package:home_cache/constants/data/app_constants.dart';
 import 'package:home_cache/model/utilities_details.dart';
 import 'package:home_cache/model/utilities_type.dart';
 import 'package:home_cache/model/utilities_type_details.dart';
@@ -11,6 +14,8 @@ import 'package:home_cache/model/utility_model.dart';
 import 'package:home_cache/services/api_checker.dart';
 import 'package:home_cache/services/api_clients.dart';
 import 'package:home_cache/services/api_constants.dart';
+import 'package:home_cache/services/prefs_helper.dart';
+import 'package:http/http.dart' as http;
 
 class UtilitiesController extends GetxController {
   var isLoading = false.obs;
@@ -88,28 +93,95 @@ class UtilitiesController extends GetxController {
     }
   }
 
-  // add utility
-  Future<void> addUtility(var data) async {
+  // // add utility
+  // Future<void> addUtility(var data) async {
+  //   isLoading(true);
+
+  //   // Ensure 'data' is a Map<String, dynamic>
+  //   final Map<String, dynamic> safeData = Map<String, dynamic>.from(data);
+
+  //   // Convert all values to strings
+  //   final Map<String, String> stringData = safeData.map(
+  //     (key, value) => MapEntry(key.toString(), value?.toString() ?? ''),
+  //   );
+
+  //   try {
+  //     Response response = await ApiClient.postMultipartData(
+  //       ApiConstants.addUtility,
+  //       stringData,
+  //       multipartBody: selectedFile.value != null
+  //           ? [MultipartBody('files', selectedFile.value!)]
+  //           : [MultipartBody('image', selectedImageFile.value!)],
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       AppSnackbar.show(
+  //         message: "Utility added successfully",
+  //         type: SnackType.success,
+  //       );
+  //       await Future.delayed(const Duration(seconds: 2));
+  //       Get.offAllNamed(RouteNames.viewByType);
+  //     } else {
+  //       AppSnackbar.show(
+  //         message: "Failed to add utility",
+  //         type: SnackType.error,
+  //       );
+  //       ApiChecker.checkApi(response);
+  //     }
+  //   } catch (e) {
+  //     AppSnackbar.show(
+  //       message: "Error: $e",
+  //       type: SnackType.error,
+  //     );
+  //   } finally {
+  //     isLoading(false);
+  //   }
+  // }
+  Future<void> addUtility(Map<String, dynamic> data) async {
     isLoading(true);
 
-    // Ensure 'data' is a Map<String, dynamic>
-    final Map<String, dynamic> safeData = Map<String, dynamic>.from(data);
-
-    // Convert all values to strings
-    final Map<String, String> stringData = safeData.map(
-      (key, value) => MapEntry(key.toString(), value?.toString() ?? ''),
-    );
-
     try {
-      Response response = await ApiClient.postMultipartData(
-        ApiConstants.addUtility,
-        stringData,
-        multipartBody: selectedFile.value != null
-            ? [MultipartBody('files', selectedFile.value!)]
-            : [MultipartBody('image', selectedImageFile.value!)],
-      );
+      debugPrint("REQUEST DATA => ${jsonEncode(data)}");
+      String? bearerToken =
+          await PrefsHelper.getString(AppConstants.bearerToken);
+      var uri = Uri.parse("${ApiConstants.baseUrl}${ApiConstants.addUtility}");
+      var request = http.MultipartRequest("POST", uri);
 
-      if (response.statusCode == 200) {
+      request.headers.addAll({
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $bearerToken',
+      });
+
+      data.forEach((key, value) {
+        if (value is Map || value is List) {
+          request.fields[key] = jsonEncode(value);
+        } else {
+          request.fields[key] = value.toString();
+        }
+      });
+
+      // Add files
+      if (selectedFile.value != null) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'files',
+          selectedFile.value!.path,
+        ));
+      } else if (selectedImageFile.value != null) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'image',
+          selectedImageFile.value!.path,
+        ));
+      }
+
+      // Send request
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      debugPrint("STATUS => ${response.statusCode}");
+      debugPrint("BODY => ${response.body}");
+
+      // Handle response
+      if (response.statusCode == 200 || response.statusCode == 201) {
         AppSnackbar.show(
           message: "Utility added successfully",
           type: SnackType.success,
@@ -121,13 +193,10 @@ class UtilitiesController extends GetxController {
           message: "Failed to add utility",
           type: SnackType.error,
         );
-        ApiChecker.checkApi(response);
       }
-    } catch (e) {
-      AppSnackbar.show(
-        message: "Error: $e",
-        type: SnackType.error,
-      );
+    } catch (e, stackTrace) {
+      debugPrint("❌ EXCEPTION => $e");
+      debugPrint("STACKTRACE => $stackTrace");
     } finally {
       isLoading(false);
     }
@@ -176,7 +245,6 @@ class UtilitiesController extends GetxController {
     isLoading(false);
   }
 
-  // update utility get utilities details
 // Fetch single utility details by ID
   Future<UtilitySingleDataDetails?> getUtilitySingleDetails(String id) async {
     isLoading(true);

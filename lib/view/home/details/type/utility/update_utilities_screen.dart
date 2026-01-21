@@ -36,7 +36,7 @@ class _UpdateUtilitiesScreenState extends State<UpdateUtilitiesScreen> {
   Rx<UtilityComponentType?> selectedComponentType =
       Rx<UtilityComponentType?>(null);
 
-  bool isLoadingUtility = true;
+  // bool isLoadingUtility = true;
   String? existingImageUrl;
   List<dynamic> existingFiles = [];
   late final String utilityId;
@@ -47,8 +47,35 @@ class _UpdateUtilitiesScreenState extends State<UpdateUtilitiesScreen> {
     final args = Get.arguments as Map<String, dynamic>;
     utilityId = args['id'];
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      utilitiesController.getUtilitySingleDetails(utilityId);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final data = await utilitiesController.getUtilitySingleDetails(utilityId);
+      if (data != null) {
+        existingImageUrl = data.image;
+        existingFiles = data.files ?? [];
+        noteTextController.text = data.details.notes ?? '';
+        final lastService = data.details.lastService;
+        if (lastService != null && lastService.isNotEmpty) {
+          selectedLastServiceDate = DateFormat('MM/dd/yyyy').parse(lastService);
+          lastServiceController.text = lastService;
+        }
+        final componentName = data.userUtility.utilityType.name;
+        final comp = utilitiesController.utilityComponents
+            .firstWhereOrNull((c) => c.name == componentName);
+        if (comp != null) {
+          selectedComponent.value = comp;
+
+          await utilitiesController.getUtilityComponentTypes(comp.id);
+
+          final typeId = data.utilityItemId;
+          final type = utilitiesController.utilityComponentType
+              .firstWhereOrNull((t) => t.id == typeId);
+          if (type != null) selectedComponentType.value = type;
+        }
+
+        // setState(() {
+        //   isLoadingUtility = false;
+        // });
+      }
     });
   }
 
@@ -298,14 +325,13 @@ class _UpdateUtilitiesScreenState extends State<UpdateUtilitiesScreen> {
           DropdownButtonFormField<UtilityComponent>(
             value: selectedComponent.value,
             items: list
-                .map((e) =>
-                    DropdownMenuItem(value: e, child: Text(e.name ?? '')))
+                .map((e) => DropdownMenuItem(value: e, child: Text(e.name)))
                 .toList(),
             onChanged: (value) {
               if (value == null) return;
               selectedComponent.value = value;
               selectedComponentType.value = null;
-              utilitiesController.getUtilityComponentTypes(value.id!);
+              utilitiesController.getUtilityComponentTypes(value.id);
             },
             decoration: _dec('Select Component'),
           ),
@@ -337,8 +363,7 @@ class _UpdateUtilitiesScreenState extends State<UpdateUtilitiesScreen> {
           DropdownButtonFormField<UtilityComponentType>(
             value: selectedComponentType.value,
             items: list
-                .map((e) =>
-                    DropdownMenuItem(value: e, child: Text(e.name ?? '')))
+                .map((e) => DropdownMenuItem(value: e, child: Text(e.name)))
                 .toList(),
             onChanged: (value) => selectedComponentType.value = value,
             decoration: _dec('Select Component Type'),

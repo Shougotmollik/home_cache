@@ -153,28 +153,28 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: 30.w,
-          height: 30.w,
-          padding: EdgeInsets.all(6.r),
-          decoration: BoxDecoration(
-            color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(8.r),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(122),
-                blurRadius: 2,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: SvgPicture.asset(
-            'assets/icons/download.svg',
-            width: 16,
-            height: 16,
-            color: AppColors.primary,
-          ),
-        ),
+        // Container(
+        //   width: 30.w,
+        //   height: 30.w,
+        //   padding: EdgeInsets.all(6.r),
+        //   decoration: BoxDecoration(
+        //     color: Colors.grey[200],
+        //     borderRadius: BorderRadius.circular(8.r),
+        //     boxShadow: [
+        //       BoxShadow(
+        //         color: Colors.black.withAlpha(122),
+        //         blurRadius: 2,
+        //         offset: const Offset(0, 2),
+        //       ),
+        //     ],
+        //   ),
+        //   child: SvgPicture.asset(
+        //     'assets/icons/download.svg',
+        //     width: 16,
+        //     height: 16,
+        //     color: AppColors.primary,
+        //   ),
+        // ),
         SizedBox(width: 8.w),
         GestureDetector(
           onTap: () => _showAddTaskDialog(context),
