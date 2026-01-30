@@ -1,19 +1,20 @@
 {
-    "cSpell.words": [
-        "appbar",
-        "Countertop",
-        "Dialong",
-        "Getx",
-        "graphy",
-        "Heatpump",
-        "householdmanagement",
-        "Hydronic",
-        "Iteam",
-        "lastservice",
-        "Mediaroom",
-        "Prefs",
-        "productsupport",
-        "subcription",
-        "webp"
-    ]
+  "cSpell.words": [
+    "appbar",
+    "Countertop",
+    "Dialong",
+    "Getx",
+    "graphy",
+    "Heatpump",
+    "householdmanagement",
+    "Hydronic",
+    "Iteam",
+    "lastservice",
+    "Mediaroom",
+    "Prefs",
+    "productsupport",
+    "subcription",
+    "webp"
+  ],
+  "dart.flutterSdkPath": ".fvm/versions/3.38.9"
 }
