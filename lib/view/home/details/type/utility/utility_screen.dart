@@ -6,6 +6,7 @@ import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart' show AppColors;
 import 'package:home_cache/controller/utilities_controller.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
+import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 
 class UtilityScreen extends StatefulWidget {
   const UtilityScreen({super.key});
@@ -79,7 +80,7 @@ class _UtilityScreenState extends State<UtilityScreen> {
           final details = utilitiesController.utilityTypeDetailList;
 
           if (categories.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CustomProgressIndicator());
           }
 
           return Column(

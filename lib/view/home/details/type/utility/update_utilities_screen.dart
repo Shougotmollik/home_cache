@@ -4,7 +4,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/controller/utilities_controller.dart';
@@ -130,10 +129,10 @@ class _UpdateUtilitiesScreenState extends State<UpdateUtilitiesScreen> {
             onPressed: () async {
               if (selectedComponent.value == null ||
                   selectedComponentType.value == null) {
-                AppSnackbar.show(
-                  message: "Please select component and component type",
-                  type: SnackType.error,
-                );
+                // AppSnackbar.show(
+                //   message: "Please select component and component type",
+                //   type: SnackType.error,
+                // );
                 return;
               }
 
