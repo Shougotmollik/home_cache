@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 40.h),
                 Text(
-                  'Email or Mobile Number',
+                  'Email',
                   style:
                       AppTypoGraphy.semiBold.copyWith(color: AppColors.black),
                   textAlign: TextAlign.start,

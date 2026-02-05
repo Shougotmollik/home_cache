@@ -7,10 +7,10 @@ import 'package:get/get.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/controller/material_controller.dart';
-import 'package:home_cache/utils/custom_snakbar.dart';
 import 'package:home_cache/view/home/account/productsupport/widgets/text_field_widget.dart';
 import 'package:home_cache/view/home/details/widgets/doccument_slider.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
+import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import 'package:home_cache/view/widget/time_text_field.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -355,7 +355,7 @@ class _EditMaterialScreenState extends State<EditMaterialScreen> {
         // Show loading indicator
         if (controller.isLoading.value && !isDataFetched) {
           return Center(
-            child: CircularProgressIndicator(),
+            child: CustomProgressIndicator(),
           );
         }
 

@@ -37,8 +37,12 @@ class TextWidgetButton extends StatelessWidget {
           ),
         ),
         child: isLoading
-            ? const CircularProgressIndicator(
-                color: Colors.white,
+            ? SizedBox(
+                height: 20.h,
+                width: 20.w,
+                child: const CircularProgressIndicator(
+                  color: Colors.white,
+                ),
               )
             : Text(
                 text,
