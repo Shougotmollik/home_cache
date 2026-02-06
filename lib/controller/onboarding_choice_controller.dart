@@ -20,9 +20,9 @@ class OnboardingChoiceController extends GetxController {
       selectedAddress.value = null;
     } else {
       addressSuggestions.value = [
-        '123 Home Ln example, Los Angeles, CA 123456',
-        '456 Maple St example, Los Angeles, CA 123456',
-        '789 Oak Rd example, Los Angeles, CA 123456',
+        // '123 Home Ln example, Los Angeles, CA 123456',
+        // '456 Maple St example, Los Angeles, CA 123456',
+        // '789 Oak Rd example, Los Angeles, CA 123456',
       ];
     }
   }

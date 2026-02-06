@@ -29,6 +29,7 @@ class HomeCache extends StatelessWidget {
           themeMode: ThemeMode.light,
           theme: AppTheme.lightTheme,
           initialRoute: RouteNames.splash,
+          // initialRoute: RouteNames.homeInfo,
           getPages: AppRoutes.pages,
           initialBinding: ControllerBinder(),
         );

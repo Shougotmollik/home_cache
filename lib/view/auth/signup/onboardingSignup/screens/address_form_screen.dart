@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/controller/auth_controller.dart';
 import 'package:home_cache/controller/onboarding_choice_controller.dart';
+import 'package:home_cache/env.dart';
 import 'package:home_cache/view/auth/signup/widgets/custom_elevated_button.dart';
+import 'package:home_cache/view/widget/google_map.dart';
 
 import '../../../../../config/route/route_names.dart';
 import '../../../../../constants/colors.dart';
@@ -57,69 +61,95 @@ class AddressFormScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 40.h),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(18.r),
-                  child: Container(
-                    width: double.infinity,
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
                     color: AppColors.lightgrey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        SizedBox(height: 8.h),
-                        Row(
-                          children: [
-                            SizedBox(width: 12.w),
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  borderRadius: BorderRadius.circular(10.r),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(6.0),
-                                  child: TextField(
-                                    controller: controller.addressController,
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 20.sp,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    decoration: InputDecoration(
-                                      hintText: 'Your Address',
-                                      hintStyle: TextStyle(fontSize: 20.sp),
-                                      border: InputBorder.none,
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(height: 8.h),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(width: 12.w),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) {
+                                    return GoogleMapScreen(
+                                      apiKey: EnvHandler.google_map_api_key,
+                                      onLocationSelect: (location) {
+                                        controller.addressController.text =
+                                            location.name;
+                                        controller.selectAddress(location.name);
+                                        controller.selectedAddress.value =
+                                            location.name;
+                                      },
+                                    );
+                                  },
+                                ));
+                              },
+                              child: AbsorbPointer(
+                                absorbing: true,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 12.w,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    borderRadius: BorderRadius.circular(10.r),
+                                  ),
+                                  child: Center(
+                                    child: TextField(
+                                      controller: controller.addressController,
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 20.sp,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      decoration: InputDecoration(
+                                        hintText: 'Your Address',
+                                        hintStyle: TextStyle(fontSize: 20.sp),
+                                        border: InputBorder.none,
+                                        isDense: true,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                            SizedBox(width: 10.w),
-                            InkWell(
-                              onTap: controller.clearAddress,
-                              child: SvgPicture.asset(
-                                'assets/icons/cross.svg',
-                                height: 48.h,
-                              ),
+                          ),
+                          // SizedBox(width: 10.w),
+                          InkWell(
+                            onTap: controller.clearAddress,
+                            child: SvgPicture.asset(
+                              'assets/icons/cross.svg',
+                              height: 48.h,
                             ),
-                          ],
-                        ),
-                        Obx(() => controller.addressSuggestions.isNotEmpty
-                            ? Column(
-                                children: [
-                                  Divider(
-                                    color: AppColors.black,
-                                    thickness: 1.h,
-                                    height: 6.h,
-                                  ),
-                                  ...controller.addressSuggestions
-                                      .map(_addressSuggestionItem)
-                                      .toList(),
-                                ],
-                              )
-                            : SizedBox()),
-                        SizedBox(height: 8.h),
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+                      Obx(() => controller.addressSuggestions.isNotEmpty
+                          ? Column(
+                              children: [
+                                Divider(
+                                  color: AppColors.black,
+                                  thickness: 1.h,
+                                  height: 6.h,
+                                ),
+                                ...controller.addressSuggestions
+                                    .map(_addressSuggestionItem)
+                                    .toList(),
+                              ],
+                            )
+                          : SizedBox()),
+                      SizedBox(height: 8.h),
+                    ],
                   ),
                 ),
                 // SizedBox(height: 148.h),
@@ -134,13 +164,14 @@ class AddressFormScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 32.h),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Expanded(
-                      child: TextButtonWidgetLight(
-                        text: 'Skip',
-                        onPressed: () => Get.toNamed('/finishUtility'),
-                      ),
-                    ),
+                    // Expanded(
+                    //   child: TextButtonWidgetLight(
+                    //     text: 'Skip',
+                    //     onPressed: () => Get.toNamed('/finishUtility'),
+                    //   ),
+                    // ),
                     SizedBox(width: 100.w),
                     CustomElevatedButton(
                       onTap: () {
@@ -153,8 +184,9 @@ class AddressFormScreen extends StatelessWidget {
                               'Selected Address: ${controller.selectedAddress.value}');
                           Get.toNamed(RouteNames.selectPowerType);
                         } else {
-                          Get.snackbar(
-                              'Error', 'Please select or enter an address');
+                          AppSnackbar.show(
+                              message: 'Please select an address',
+                              type: SnackType.warning);
                         }
                       },
                       btnText: 'Next',

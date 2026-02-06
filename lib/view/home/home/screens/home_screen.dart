@@ -11,6 +11,7 @@ import 'package:home_cache/controller/user_controller.dart';
 import 'package:home_cache/view/home/home/widgets/home_health_pie_chart.dart';
 import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import 'package:home_cache/view/widget/task_list_tile.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../config/route/route_names.dart';
 
@@ -226,34 +227,39 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.only(left: 8.0),
         child: Obx(() {
           if (userController.userDataList.isEmpty) {
-            return const SizedBox();
+            return const SizedBox(
+              child: Text('Loading...'),
+            );
           }
 
           final user = userController.userDataList.first;
           final firstName = user.profile?.firstName;
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (firstName == null) SizedBox(height: 10.h),
-              Text(
-                'Hi ${firstName ?? ''},',
-                style: AppTypoGraphy.medium.copyWith(
-                  color: AppColors.black,
-                  fontSize: 24.sp,
-                  fontWeight: FontWeight.w600,
+          return Skeletonizer(
+            enabled: userController.isLoading.value,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (firstName == null) SizedBox(height: 10.h),
+                Text(
+                  'Hi ${firstName ?? ''},',
+                  style: AppTypoGraphy.medium.copyWith(
+                    color: AppColors.black,
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              Text(
-                'Welcome Back',
-                style: AppTypoGraphy.regular.copyWith(
-                  color: AppColors.black.withAlpha(200),
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w300,
+                Text(
+                  'Welcome Back',
+                  style: AppTypoGraphy.regular.copyWith(
+                    color: AppColors.black.withAlpha(200),
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w300,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         }),
       ),
@@ -271,7 +277,7 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: EdgeInsets.all(5.w),
               child: notificationController.taskNotificationList.isNotEmpty
                   ? Badge.count(
-                      alignment: Alignment(1.0, -1.0),
+                      alignment: Alignment(0.6, -1.2),
                       count: notificationController.taskNotificationList.length,
                       child: Center(
                         child: SvgPicture.asset(

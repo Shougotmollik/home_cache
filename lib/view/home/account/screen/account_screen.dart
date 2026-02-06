@@ -46,46 +46,77 @@ class AccountScreen extends StatelessWidget {
                 final userData = userController.userDataList.first;
 
                 return Container(
-                  padding: EdgeInsets.all(12.w),
+                  padding: EdgeInsets.all(0.w),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12.r),
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Column(
                     children: [
-                      Image.asset('assets/images/dot.png',
-                          width: 20.w, height: 20.w, fit: BoxFit.cover),
-                      SizedBox(width: 12.w),
-                      Expanded(
-                        child: Column(
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Image.asset('assets/images/dot.png',
+                              width: 20.w, height: 20.w, fit: BoxFit.cover),
+                          SizedBox(width: 12.w),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "${userData.profile?.firstName ?? ""} ${userData.profile?.lastName ?? ""}",
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 4.h),
+                                Text(
+                                  userData.email ?? "No email provided",
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    color: AppColors.black,
+                                  ),
+                                ),
+                                SizedBox(height: 4.h),
+                                SizedBox(height: 4.h),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(
+                          right: 12.w,
+                          top: 12.w,
+                          bottom: 12.w,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          spacing: 4.w,
                           children: [
-                            Text(
-                              "${userData.profile?.firstName ?? ""} ${userData.profile?.lastName ?? ""}",
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.bold,
+                            Icon(
+                              Icons.location_on,
+                              color: AppColors.primary,
+                              size: 24.w,
+                            ),
+                            Expanded(
+                              child: Text(
+                                userData.homeData?.homeAddress != null
+                                    ? formatAddressMap(
+                                        userData.homeData!.homeAddress!)
+                                    : "No address provided",
+                                style: TextStyle(
+                                  fontSize: 16.sp,
+                                  color: AppColors.black,
+                                ),
                               ),
                             ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              userData.email ?? "No email provided",
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                color: AppColors.black,
-                              ),
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              userData.homeData?.homeAddress ??
-                                  "No address provided",
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                color: AppColors.black,
-                              ),
-                            ),
-                            SizedBox(height: 4.h),
                           ],
                         ),
                       ),
@@ -147,5 +178,29 @@ class AccountScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String formatAddressMap(String address) {
+    final parts = address.split(',').map((e) => e.trim()).toList();
+
+    if (parts.isEmpty) return "No address provided";
+
+    String zip = parts.length >= 1 ? parts.last : "";
+    String country = parts.length >= 2 ? parts[parts.length - 2] : "";
+    String state = parts.length >= 3 ? parts[parts.length - 3] : "";
+    String county = parts.length >= 4 ? parts[parts.length - 4] : "";
+    String city = parts.length >= 5 ? parts[parts.length - 5] : "";
+
+    // Everything before city is street address
+    String street =
+        parts.length > 5 ? parts.sublist(0, parts.length - 5).join(', ') : "";
+
+    // Option 1: With county (more detailed)
+    return '''
+$street
+$city, $county
+$state, $country $zip
+'''
+        .trim();
   }
 }
