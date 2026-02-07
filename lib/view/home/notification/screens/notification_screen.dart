@@ -72,7 +72,7 @@ class NotificationScreen extends StatelessWidget {
           ),
           SizedBox(height: 20.h),
           Positioned(
-            bottom: 28.h,
+            bottom: 12.h,
             left: 0,
             right: 0,
             child: _buildNotificationFooterSection(),
