@@ -5,9 +5,11 @@ import 'package:get/get.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart' show AppColors;
 import 'package:home_cache/controller/profile_controller.dart';
+import 'package:home_cache/env.dart';
 import 'package:home_cache/view/auth/signup/widgets/custom_elevated_button.dart';
 import 'package:home_cache/view/auth/widgets/auth_text_form_field.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
+import 'package:home_cache/view/widget/google_map.dart';
 
 class EditContactInformationScreen extends StatelessWidget {
   const EditContactInformationScreen({super.key});
@@ -57,7 +59,7 @@ class EditContactInformationScreen extends StatelessWidget {
                 textAlign: TextAlign.start,
               ),
               SizedBox(height: 6.h),
-              _buildAddressSelection(controller),
+              _buildAddressSelection(controller, context: context),
             ],
           ),
         ),
@@ -82,7 +84,8 @@ class EditContactInformationScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAddressSelection(ProfileController controller) {
+  Widget _buildAddressSelection(ProfileController controller,
+      {required BuildContext context}) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8.r),
       child: Container(
@@ -102,6 +105,16 @@ class EditContactInformationScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: TextFormField(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => GoogleMapScreen(
+                            apiKey: EnvHandler.google_map_api_key,
+                            onLocationSelect: (location) {
+                              controller.addressController.text = location.name;
+                            },
+                          ),
+                        ));
+                      },
                       controller: controller.addressController,
                       style: TextStyle(
                         color: Colors.black,
