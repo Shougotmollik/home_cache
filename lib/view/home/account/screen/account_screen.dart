@@ -185,7 +185,7 @@ class AccountScreen extends StatelessWidget {
 
     if (parts.isEmpty) return "No address provided";
 
-    String zip = parts.length >= 1 ? parts.last : "";
+    String zip = parts.isNotEmpty ? parts.last : "";
     String country = parts.length >= 2 ? parts[parts.length - 2] : "";
     String state = parts.length >= 3 ? parts[parts.length - 3] : "";
     String county = parts.length >= 4 ? parts[parts.length - 4] : "";
