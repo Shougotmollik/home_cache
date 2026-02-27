@@ -10,6 +10,7 @@ class CustomElevatedButton extends StatelessWidget {
   final double? width;
   final double? height;
   final bool? isLoading;
+  final bool? needIcon;
 
   const CustomElevatedButton({
     super.key,
@@ -19,6 +20,7 @@ class CustomElevatedButton extends StatelessWidget {
     this.width,
     this.height,
     this.isLoading = false,
+    this.needIcon = false,
   });
 
   @override
@@ -37,11 +39,12 @@ class CustomElevatedButton extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             alignment: WrapAlignment.center,
             children: [
-              Icon(
-                icon,
-                color: AppColors.white,
-                size: 18.sp,
-              ),
+              if (needIcon ?? false)
+                Icon(
+                  icon,
+                  color: AppColors.white,
+                  size: 18.sp,
+                ),
               isLoading!
                   ? SizedBox(
                       width: 16.w,

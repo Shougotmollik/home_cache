@@ -84,6 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Obx(
                         () => CustomElevatedButton(
                           onTap: _loginButton,
+                          needIcon: false,
                           width: 208.w,
                           btnText: 'Log In',
                           isLoading: _authController.isLoading.value,

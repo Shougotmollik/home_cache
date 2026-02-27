@@ -16,5 +16,6 @@
     "subcription",
     "webp"
   ],
-  "dart.flutterSdkPath": ".fvm/versions/"
+  "dart.flutterSdkPath": ".fvm/versions/",
+  "cmake.ignoreCMakeListsMissing": true
 }
