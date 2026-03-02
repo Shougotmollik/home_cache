@@ -9,6 +9,7 @@ import 'package:home_cache/constants/colors.dart' show AppColors;
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/controller/room_controller.dart';
 import 'package:home_cache/utils.dart' as utils;
+import 'package:home_cache/view/home/details/room/add_room_item_dialog.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
 import 'package:home_cache/view/widget/custom_progress_indicator.dart';
 import 'package:image_picker/image_picker.dart';
@@ -36,9 +37,9 @@ class _EditRoomDetailsScreenState extends State<EditRoomDetailsScreen> {
     print("Room: =====>>.$room");
 
     if (room != null && room.items.isNotEmpty) {
-      final itemId = room.items[index].id;
+      final itemId = room.items[index].userItemId;
 
-      if (itemId.isNotEmpty) {
+      if (itemId != null && itemId.isNotEmpty) {
         selectedItemId = itemId;
 
         print("Selected Item ID: $selectedItemId");
@@ -49,6 +50,7 @@ class _EditRoomDetailsScreenState extends State<EditRoomDetailsScreen> {
 
   late String roomId;
   late String roomName;
+  late String typeId;
 
   @override
   void initState() {
@@ -57,6 +59,11 @@ class _EditRoomDetailsScreenState extends State<EditRoomDetailsScreen> {
     final args = Get.arguments as Map<String, dynamic>?;
     roomId = args?['roomId'] ?? '';
     roomName = args?['roomName'] ?? 'Room';
+    typeId = args?['typeId'] ?? '';
+
+    print("Room ID:=========> $roomId");
+    print("Room Name: =========>$roomName");
+    print("Type ID:===========> $typeId");
 
     if (roomId.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -85,12 +92,19 @@ class _EditRoomDetailsScreenState extends State<EditRoomDetailsScreen> {
             padding: const EdgeInsets.only(right: 8.0),
             child: TextButton(
               onPressed: () {
-                Get.toNamed(RouteNames.addNewRoomIteam, arguments: {
-                  'id': roomController.roomDetails.value?.id,
-                  'roomName': roomName,
-                  'selectedItemId': roomController
-                      .roomDetails.value?.items[selectedCategoryIndex].id,
-                });
+                // Get.toNamed(RouteNames.addNewRoomIteam, arguments: {
+                //   'id': roomController.roomDetails.value?.id,
+                //   'roomName': roomName,
+                //   'selectedItemId': roomController
+                //       .roomDetails.value?.items[selectedCategoryIndex].id,
+                // });
+
+                showDialog(
+                    context: context,
+                    builder: (context) => AddRoomItemDialog(
+                          roomId: roomId,
+                          typeId: typeId,
+                        ));
               },
               style: TextButton.styleFrom(
                 backgroundColor: AppColors.primary,
@@ -140,11 +154,11 @@ class _EditRoomDetailsScreenState extends State<EditRoomDetailsScreen> {
                         });
                       },
                       child: Container(
-                          width: 112.w,
-                          height: 112.w,
+                          width: 320.w,
+                          height: 165.w,
                           decoration: BoxDecoration(
                             color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(10.r),
+                            borderRadius: BorderRadius.circular(28.r),
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(10.r),
@@ -255,27 +269,49 @@ class _EditRoomDetailsScreenState extends State<EditRoomDetailsScreen> {
 
                 Obx(
                   () => roomController.userRoomItems.isEmpty
-                      ? Center(child: Text('No room items found'))
+                      ? const Center(child: Text('No room items found'))
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 10.h,
-                          children: roomController.userRoomItems
-                              .map((item) => _buildRoomItemCard(
-                                    title: item.details.location,
-                                    subTitle: item.details.brand,
-                                    onTap: () {
-                                      Get.toNamed(
-                                        RouteNames.updateRoomItem,
-                                        arguments: item,
-                                      )?.then((result) {
-                                        if (result == true) {
-                                          roomController.fetchUserRoomItems(
-                                              selectedItemId);
-                                        }
-                                      });
+                          children: roomController.userRoomItems.map((item) {
+                            final String cardTitle =
+                                item.details['location']?.toString() ??
+                                    item.details['room']?.toString() ??
+                                    'N/A';
+
+                            final String cardSubTitle =
+                                item.details['brand']?.toString() ??
+                                    item.details['material']?.toString() ??
+                                    item.details['type']?.toString() ??
+                                    'N/A';
+
+                            return Padding(
+                              padding: EdgeInsets.only(bottom: 10.h),
+                              child: _buildRoomItemCard(
+                                title: cardTitle,
+                                subTitle: cardSubTitle,
+                                onTap: () {
+                                  final selectedIndexText = roomController
+                                      .roomDetails
+                                      .value!
+                                      .items[selectedCategoryIndex]
+                                      .item;
+
+                                  Get.toNamed(
+                                    RouteNames.updateRoomItem,
+                                    arguments: {
+                                      "name": selectedIndexText,
+                                      "item": item,
                                     },
-                                  ))
-                              .toList(),
+                                  )?.then((result) {
+                                    if (result == true) {
+                                      roomController
+                                          .fetchUserRoomItems(selectedItemId);
+                                    }
+                                  });
+                                },
+                              ),
+                            );
+                          }).toList(),
                         ),
                 )
               ],

@@ -45,6 +45,7 @@ class AppBarBack extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       backgroundColor: AppColors.surface,
       actions: actions ?? [],
+      centerTitle: true,
     );
   }
 

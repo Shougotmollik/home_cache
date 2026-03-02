@@ -11,6 +11,7 @@ class Provider {
   final String? deletedAt;
   final String rating;
   bool isFollowed;
+  DateTime? lastAppointmentDate;
 
   Provider({
     required this.id,
@@ -25,6 +26,7 @@ class Provider {
     this.deletedAt,
     required this.rating,
     required this.isFollowed,
+    this.lastAppointmentDate,
   });
 
   factory Provider.fromJson(Map<String, dynamic> json) {
@@ -49,6 +51,9 @@ class Provider {
       deletedAt: json["deleted_at"],
       rating: json["rating"] != null ? json["rating"].toString() : "0.00",
       isFollowed: json["is_followed"] ?? false,
+      lastAppointmentDate: json['last_appointment_date'] != null
+          ? DateTime.parse(json['last_appointment_date'])
+          : null,
     );
   }
 

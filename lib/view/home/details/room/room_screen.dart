@@ -24,16 +24,19 @@ class _RoomScreenState extends State<RoomScreen> {
   @override
   void initState() {
     super.initState();
-    roomController.fetchAllRoom();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      roomController.fetchAllRoom();
+    });
   }
 
-  Widget _buildTile(
-    BuildContext context,
-    String title,
-    String imageUrl,
-    int index,
-    VoidCallback onTap,
-  ) {
+  Widget _buildTile({
+    required BuildContext context,
+    required String title,
+    required String imageUrl,
+    required int index,
+    required VoidCallback onTap,
+    required String subTitle,
+  }) {
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -76,6 +79,14 @@ class _RoomScreenState extends State<RoomScreen> {
             SizedBox(height: 12.h),
             Text(
               title,
+              style: AppTypoGraphy.medium.copyWith(
+                color: AppColors.black,
+                fontSize: 16.sp,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              subTitle,
               style: AppTypoGraphy.medium.copyWith(
                 color: AppColors.black,
                 fontSize: 16.sp,
@@ -149,17 +160,19 @@ class _RoomScreenState extends State<RoomScreen> {
               itemBuilder: (context, index) {
                 final room = roomController.allRooms[index];
                 return _buildTile(
-                  context,
-                  room.roomName,
-                  room.type.image,
-                  index,
-                  () {
+                  context: context,
+                  title: room.name,
+                  imageUrl: room.type.image,
+                  index: index,
+                  subTitle: room.type.type,
+                  onTap: () {
                     Get.toNamed(
                       RouteNames.editRoomDetails,
                       arguments: {
-                        'roomName': room.roomName,
+                        'roomName': room.name,
                         'roomType': room.type.type,
                         'roomId': room.id,
+                        "typeId": room.typeId
                       },
                     );
                   },

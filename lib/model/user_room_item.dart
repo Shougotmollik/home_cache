@@ -21,13 +21,6 @@ class UserRoomItemResponse {
           .toList(),
     );
   }
-
-  Map<String, dynamic> toJson() => {
-        'success': success,
-        'message': message,
-        'status_code': statusCode,
-        'data': data.map((item) => item.toJson()).toList(),
-      };
 }
 
 class UserRoomItem {
@@ -35,7 +28,8 @@ class UserRoomItem {
   final String userRoomItemId;
   final String? image;
   final String? imageId;
-  final Details details;
+  // Dynamic Map handles all item types (Paint, Tile, Lighting, etc.)
+  final Map<String, dynamic> details;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? deletedAt;
@@ -53,29 +47,23 @@ class UserRoomItem {
 
   factory UserRoomItem.fromJson(Map<String, dynamic> json) {
     return UserRoomItem(
-      id: json['id'],
-      userRoomItemId: json['user_room_item_id'],
+      id: json['id']?.toString() ?? '',
+      userRoomItemId: json['user_room_item_id']?.toString() ?? '',
       image: json['image'],
       imageId: json['image_id'],
-      details: Details.fromJson(json['details']),
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      // Logic: If details exists, use it. If not, use empty map {}.
+      details: (json['details'] is Map)
+          ? Map<String, dynamic>.from(json['details'])
+          : {},
+      createdAt: DateTime.parse(
+          json['created_at'] ?? DateTime.now().toIso8601String()),
+      updatedAt: DateTime.parse(
+          json['updated_at'] ?? DateTime.now().toIso8601String()),
       deletedAt: json['deleted_at'] != null
           ? DateTime.parse(json['deleted_at'])
           : null,
     );
   }
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'user_room_item_id': userRoomItemId,
-        'image': image,
-        'image_id': imageId,
-        'details': details.toJson(),
-        'created_at': createdAt.toIso8601String(),
-        'updated_at': updatedAt.toIso8601String(),
-        'deleted_at': deletedAt?.toIso8601String(),
-      };
 }
 
 class Details {

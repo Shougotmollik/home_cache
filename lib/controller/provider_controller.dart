@@ -16,7 +16,7 @@ class ProviderController extends GetxController {
 
   // Single provider details
   var selectedProvider = Rxn<Provider>();
-  
+
   // Changed to lists to match API response
   var lastAppointments = <Appointment>[].obs;
   var nextAppointments = <Appointment>[].obs;
@@ -34,12 +34,38 @@ class ProviderController extends GetxController {
   //! Called from search bar
   void onSearchChanged(String query) {
     searchText.value = query;
+    applyAdvancedFilters(query: query);
   }
 
   //! Apply filter logic
-  void _applyFilter(String query) {
-    debugPrint("Filtering with query: $query");
-    if (query.isEmpty) {
+  // void _applyFilter(String query) {
+  //   debugPrint("Filtering with query: $query");
+  //   if (query.isEmpty) {
+  //     filteredAllProviders.value = allProviders;
+  //     return;
+  //   }
+
+  //   final lowerQuery = query.toLowerCase();
+
+  //   filteredAllProviders.value = allProviders.where((p) {
+  //     final name = p.name.toLowerCase();
+  //     final type = p.type.toLowerCase();
+  //     final company = p.company.toLowerCase();
+
+  //     final matches = name.contains(lowerQuery) ||
+  //         type.contains(lowerQuery) ||
+  //         company.contains(lowerQuery);
+
+  //     debugPrint("Checking ${p.name}: $matches");
+  //     return matches;
+  //   }).toList();
+  // }
+  //! Update _applyFilter to handle multiple criteria
+  void _applyFilter(String query,
+      {List<int>? ratings, List<String>? services}) {
+    if (query.isEmpty &&
+        (ratings == null || ratings.isEmpty) &&
+        (services == null || services.isEmpty)) {
       filteredAllProviders.value = allProviders;
       return;
     }
@@ -47,17 +73,72 @@ class ProviderController extends GetxController {
     final lowerQuery = query.toLowerCase();
 
     filteredAllProviders.value = allProviders.where((p) {
-      final name = p.name.toLowerCase();
-      final type = p.type.toLowerCase();
-      final company = p.company.toLowerCase();
+      // 1. Text Search Match
+      final matchesText = p.name.toLowerCase().contains(lowerQuery) ||
+          p.type.toLowerCase().contains(lowerQuery) ||
+          p.company.toLowerCase().contains(lowerQuery);
 
-      final matches = name.contains(lowerQuery) ||
-          type.contains(lowerQuery) ||
-          company.contains(lowerQuery);
+      // 2. Rating Match (Assuming Provider model has a 'rating' field)
+      final matchesRating = ratings == null ||
+          ratings.isEmpty ||
+          (p.rating != null && ratings.contains(int.parse(p.rating!)));
 
-      debugPrint("Checking ${p.name}: $matches");
-      return matches;
+      // 3. Service Type Match
+      final matchesService =
+          services == null || services.isEmpty || services.contains(p.type);
+
+      return matchesText && matchesRating && matchesService;
     }).toList();
+  }
+
+// Add a specific method for the Dialog to call
+  void applyAdvancedFilters({
+    String? query,
+    List<int>? ratings,
+    List<String>? services,
+    String? usageTimeframe,
+  }) {
+    // Use the passed query or the existing one in search bar
+    final searchKey = (query ?? searchText.value).toLowerCase();
+
+    filteredAllProviders.value = allProviders.where((p) {
+      // 1. Text Search
+      final matchesText = searchKey.isEmpty ||
+          p.name.toLowerCase().contains(searchKey) ||
+          p.type.toLowerCase().contains(searchKey) ||
+          p.company.toLowerCase().contains(searchKey);
+
+      // 2. Rating (Assuming p.rating is a String "4" or "4.5")
+      final matchesRating = ratings == null ||
+          ratings.isEmpty ||
+          (p.rating != null &&
+              ratings.contains(double.tryParse(p.rating!)?.toInt()));
+
+      // 3. Service Type
+      final matchesService =
+          services == null || services.isEmpty || services.contains(p.type);
+
+      // 4. Usage Timeframe
+      bool matchesUsage = true;
+      if (usageTimeframe != null && p.lastAppointmentDate != null) {
+        final daysDiff =
+            DateTime.now().difference(p.lastAppointmentDate!).inDays;
+        if (usageTimeframe == 'Past 30 Days')
+          matchesUsage = daysDiff <= 30;
+        else if (usageTimeframe == 'Past 90 Days')
+          matchesUsage = daysDiff <= 90;
+        else if (usageTimeframe == 'Past Year')
+          matchesUsage = daysDiff <= 365;
+        else if (usageTimeframe == '2+ Years') matchesUsage = daysDiff >= 730;
+      } else if (usageTimeframe != null && p.lastAppointmentDate == null) {
+        matchesUsage = false; // Filtered for time but no date available
+      }
+
+      return matchesText && matchesRating && matchesService && matchesUsage;
+    }).toList();
+
+    // Force GetX to update the UI
+    filteredAllProviders.refresh();
   }
 
   //! Fetch all providers
@@ -66,7 +147,7 @@ class ProviderController extends GetxController {
       debugPrint('Fetching all providers...');
       isLoading(true);
       errorMessage.value = '';
-      
+
       Response response = await ApiClient.getData(ApiConstants.fetchProviders);
 
       if (response.statusCode == 200) {
@@ -78,7 +159,7 @@ class ProviderController extends GetxController {
 
           // Initialize filtered list
           filteredAllProviders.value = allProviders;
-          
+
           debugPrint("✅ Loaded ${allProviders.length} providers");
         } else {
           errorMessage.value = "No providers found";
@@ -95,97 +176,68 @@ class ProviderController extends GetxController {
     }
   }
 
-  //! Fetch provider details by ID
   Future<void> fetchProviderDetails(String id) async {
     try {
       isLoading(true);
       errorMessage.value = '';
-      
+
       // Clear previous data
       selectedProvider.value = null;
       lastAppointments.clear();
       nextAppointments.clear();
-      
+
       debugPrint("🔍 Fetching provider details for ID: $id");
-      
-      // Add timestamp to prevent caching
+
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       Response response = await ApiClient.getData(
-        "${ApiConstants.fetchProviders}$id?t=$timestamp"
-      );
+          "${ApiConstants.fetchProviders}$id?t=$timestamp");
 
-      debugPrint("📡 Raw Response: ${response.body}");
-      
       if (response.statusCode == 200) {
         var responseData = response.body;
-        
-        debugPrint("📦 Response data: ${responseData.toString()}");
 
         if (responseData['data'] != null &&
             responseData['data']['provider'] != null) {
-          
-          // Parse provider
+          // 1. Parse Provider
           selectedProvider.value =
               Provider.fromJson(responseData['data']['provider']);
           debugPrint("✅ Provider loaded: ${selectedProvider.value?.name}");
 
-          // Parse lastAppointment (array)
-          if (responseData['data']['lastAppointment'] != null) {
-            var lastApptData = responseData['data']['lastAppointment'];
-            debugPrint("🔍 lastAppointment type: ${lastApptData.runtimeType}");
-            debugPrint("🔍 lastAppointment data: $lastApptData");
-            
-            if (lastApptData is List) {
-              lastAppointments.value = lastApptData
-                  .map<Appointment>((appt) {
-                    debugPrint("📅 Parsing appointment: $appt");
-                    return Appointment.fromJson(appt);
-                  })
-                  .toList();
-              debugPrint("✅ Last appointments loaded: ${lastAppointments.length}");
-              
-              // Log each appointment
-              for (var appt in lastAppointments) {
-                debugPrint("   📌 ${appt.title} - ${appt.date}");
-              }
-              
-              // Log if empty
-              if (lastAppointments.isEmpty) {
-                debugPrint("⚠️ lastAppointment array is empty - no appointments in API response");
-              }
-            } else {
-              debugPrint("⚠️ lastAppointment is not a List");
-            }
-          } else {
-            debugPrint("ℹ️ No lastAppointment data");
+          // 2. Parse lastAppointment (API returns an Array [])
+          var lastApptData = responseData['data']['lastAppointment'];
+          if (lastApptData != null && lastApptData is List) {
+            lastAppointments.value = lastApptData
+                .map<Appointment>((appt) => Appointment.fromJson(appt))
+                .toList();
+            debugPrint(
+                "✅ Last appointments loaded: ${lastAppointments.length}");
           }
 
-          // Parse nextAppointment (array)
-          if (responseData['data']['nextAppointment'] != null) {
-            var nextApptData = responseData['data']['nextAppointment'];
-            if (nextApptData is List) {
+          // 3. Parse nextAppointment (API returns a single Object {})
+          var nextApptData = responseData['data']['nextAppointment'];
+          if (nextApptData != null) {
+            if (nextApptData is Map<String, dynamic>) {
+              // Fix: Pass the data from the API (nextApptData), not the RxList
+              nextAppointments.value = [Appointment.fromJson(nextApptData)];
+              debugPrint("✅ Next appointment loaded (Object)");
+            } else if (nextApptData is List && nextApptData.isNotEmpty) {
+              // Fallback if API structure changes to List
               nextAppointments.value = nextApptData
                   .map<Appointment>((appt) => Appointment.fromJson(appt))
                   .toList();
-              debugPrint("✅ Next appointments loaded: ${nextAppointments.length}");
-            } else {
-              debugPrint("⚠️ nextAppointment is not a List");
+              debugPrint("✅ Next appointments loaded (List)");
             }
-          } else {
-            debugPrint("ℹ️ No nextAppointment data");
           }
-
         } else {
           errorMessage.value = "No provider found";
           debugPrint("❌ No provider data in response");
         }
       } else {
         ApiChecker.checkApi(response);
-        errorMessage.value = "Failed to load provider details (${response.statusCode})";
-        debugPrint("❌ API returned status code: ${response.statusCode}");
+        errorMessage.value =
+            "Failed to load provider details (${response.statusCode})";
       }
     } catch (e) {
-      errorMessage.value = e.toString();
+      errorMessage.value = "Error: ${e.toString()}";
       debugPrint("❌ Error fetching provider details: $e");
     } finally {
       isLoading(false);
@@ -196,7 +248,7 @@ class ProviderController extends GetxController {
   Future<bool> toggleFollowProvider(String providerId) async {
     try {
       debugPrint("🔄 Toggling follow for provider: $providerId");
-      
+
       var body = json.encode({
         "provider_id": providerId,
       });
@@ -213,7 +265,7 @@ class ProviderController extends GetxController {
         debugPrint("✅ Follow status updated to: $isFollowed");
 
         // Update the selected provider's follow status
-        if (selectedProvider.value != null && 
+        if (selectedProvider.value != null &&
             selectedProvider.value!.id == providerId) {
           selectedProvider.value!.isFollowed = isFollowed;
           selectedProvider.refresh();
@@ -224,9 +276,9 @@ class ProviderController extends GetxController {
         if (index != -1) {
           allProviders[index].isFollowed = isFollowed;
           allProviders.refresh();
-          
+
           // Also update filtered list
-          final filteredIndex = 
+          final filteredIndex =
               filteredAllProviders.indexWhere((p) => p.id == providerId);
           if (filteredIndex != -1) {
             filteredAllProviders[filteredIndex].isFollowed = isFollowed;
@@ -237,7 +289,8 @@ class ProviderController extends GetxController {
         return isFollowed;
       } else {
         debugPrint("❌ Follow API returned status: ${response.statusCode}");
-        throw Exception('Failed to toggle follow status: ${response.statusCode}');
+        throw Exception(
+            'Failed to toggle follow status: ${response.statusCode}');
       }
     } catch (e) {
       debugPrint("❌ Error in toggleFollowProvider: $e");

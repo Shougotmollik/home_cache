@@ -5,14 +5,14 @@ import 'package:home_cache/constants/app_typo_graphy.dart';
 
 class FaqSearchBarWidget extends StatelessWidget {
   final TextEditingController? controller;
-  final String hintText;
+  final String? hintText;
   final Function(String)? onChanged;
   final List<String> suggestions;
   final Function(String)? onSuggestionTap;
 
   const FaqSearchBarWidget({
     super.key,
-    this.hintText = 'Search topics',
+    this.hintText,
     this.onChanged,
     this.suggestions = const [],
     this.onSuggestionTap,
@@ -31,7 +31,7 @@ class FaqSearchBarWidget extends StatelessWidget {
           controller: controller,
           onChanged: onChanged,
           decoration: InputDecoration(
-            hintText: hintText,
+            hintText: hintText ?? "Search topics",
             border: InputBorder.none,
             filled: true,
             fillColor: AppColors.white,
@@ -70,7 +70,8 @@ class FaqSearchBarWidget extends StatelessWidget {
                 return ListTile(
                   title: Text(
                     suggestions[index],
-                    style: AppTypoGraphy.regular.copyWith(color: AppColors.black),
+                    style:
+                        AppTypoGraphy.regular.copyWith(color: AppColors.black),
                   ),
                   onTap: () => onSuggestionTap?.call(suggestions[index]),
                 );

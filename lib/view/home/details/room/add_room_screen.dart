@@ -7,6 +7,7 @@ import 'package:home_cache/config/helper/app_snackbar.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/controller/room_controller.dart';
+import 'package:home_cache/view/auth/signup/widgets/custom_elevated_button.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
 import 'package:home_cache/view/home/chat/widgets/faq_search_bar_widget.dart';
 import 'package:home_cache/view/widget/text_button_widget.dart';
@@ -146,6 +147,7 @@ class _AddRoomScreenState extends State<AddRoomScreen> {
               SizedBox(height: 6.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                spacing: 8.w,
                 children: [
                   Text(
                     name,
@@ -154,6 +156,63 @@ class _AddRoomScreenState extends State<AddRoomScreen> {
                       fontSize: 18.sp,
                     ),
                   ),
+                  GestureDetector(
+                      onTap: () {
+                        final TextEditingController nameEditController =
+                            TextEditingController(text: name);
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: AppColors.surface,
+                            title: const Text("Edit Room Name"),
+                            content: TextField(
+                              controller: nameEditController,
+                              decoration: const InputDecoration(
+                                hintText: "Enter room name",
+                                border: OutlineInputBorder(),
+                              ),
+                              autofocus: true,
+                            ),
+                            actions: [
+                              // CustomElevatedButton(
+                              //   onTap: () => Navigator.pop(context),
+                              //   btnText: "Cancel",
+                              //   width: 65.w,
+                              //   height: 32.h,
+                              //   bgColor: AppColors.cardColor,
+                              //   textColor: AppColors.primary,
+                              // ),
+                              OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.r),
+                                    ),
+                                    side: const BorderSide(
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text("Cancel")),
+                              CustomElevatedButton(
+                                  onTap: () {
+                                    if (nameEditController.text
+                                        .trim()
+                                        .isNotEmpty) {
+                                      setState(() {
+                                        name = nameEditController.text.trim();
+                                      });
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                  btnText: 'Save',
+                                  width: 65.w,
+                                  height: 32.h)
+                            ],
+                          ),
+                        );
+                      },
+                      child: SvgPicture.asset("assets/icons/edit.svg",
+                          width: 18.w, height: 18.h)),
                 ],
               ),
               SizedBox(height: 32.h),
@@ -214,7 +273,10 @@ class _AddRoomScreenState extends State<AddRoomScreen> {
                 ),
               ),
               SizedBox(height: 32.h),
-              FaqSearchBarWidget(onChanged: _filterItems),
+              FaqSearchBarWidget(
+                onChanged: _filterItems,
+                hintText: "Search ${type.toLowerCase()} items",
+              ),
               SizedBox(height: 16.h),
               if (_searchQuery.isNotEmpty && filteredItems.isNotEmpty)
                 Container(

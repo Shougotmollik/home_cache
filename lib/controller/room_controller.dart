@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:home_cache/config/helper/app_snackbar.dart';
+import 'package:home_cache/config/route/route_names.dart';
 import 'package:home_cache/model/room.dart';
 import 'package:home_cache/model/room_data.dart';
+import 'package:home_cache/model/room_field_model.dart';
 import 'package:home_cache/model/room_item.dart';
 import 'package:home_cache/model/room_type.dart';
 import 'package:home_cache/model/user_room_item.dart';
@@ -17,9 +19,12 @@ class RoomController extends GetxController {
   var allRooms = <RoomData>[].obs;
   var roomType = <RoomTypeModel>[].obs;
   var roomItem = <RoomItem>[].obs;
+  var availableRoomItem = <RoomItem>[].obs;
   var roomDetails = Rx<Room?>(null);
 
+  var roomFields = <RoomItem>[].obs;
   var userRoomItems = <UserRoomItem>[].obs;
+  var roomFieldsData = Rx<RoomField?>(null);
 
 // New reactive lists for UI
   var filteredRoomItems = <String>[].obs;
@@ -99,6 +104,26 @@ class RoomController extends GetxController {
         roomType.value = roomTypeData
             .map<RoomTypeModel>((e) => RoomTypeModel.fromJson(e))
             .toList();
+      }
+    } else {
+      ApiChecker.checkApi(response);
+    }
+
+    isLoading(false);
+  }
+
+  // ! get available room item
+  Future<void> fetchAvailableRoomItem({required String roomTypeId}) async {
+    isLoading(true);
+    final url = "/view-by-room/available-item/$roomTypeId";
+    Response response = await ApiClient.getData(url);
+
+    if (response.statusCode == 200) {
+      var responseData = response.body;
+      if (responseData['data'] != null) {
+        var roomItemData = responseData['data'] as List;
+        availableRoomItem.value =
+            roomItemData.map<RoomItem>((e) => RoomItem.fromJson(e)).toList();
       }
     } else {
       ApiChecker.checkApi(response);
@@ -203,13 +228,29 @@ class RoomController extends GetxController {
     isLoading(false);
   }
 
+  // !Add the filed fetch
+  Future<void> fetchRoomFields(String itemName) async {
+    isLoading(true);
+
+    final url = "/view-by-room/get-room-item-fields?item_name=$itemName";
+
+    Response response = await ApiClient.getData(url);
+
+    if (response.statusCode == 200) {
+      roomFieldsData.value = RoomField.fromJson(response.body);
+    } else {
+      ApiChecker.checkApi(response);
+    }
+
+    isLoading(false);
+  }
+
 // ! add user room item
   Future<void> addUserRoomItem(Map<String, dynamic> data) async {
     isLoading(true);
-
     try {
-      final Map<String, String> stringData = data.map(
-          (key, value) => MapEntry(key, value == null ? '' : value.toString()));
+      final Map<String, String> stringData =
+          data.map((k, v) => MapEntry(k, v?.toString() ?? ''));
 
       Response response = await ApiClient.postMultipartData(
         ApiConstants.addUserRoomItem,
@@ -220,27 +261,25 @@ class RoomController extends GetxController {
       );
 
       if (response.statusCode == 200) {
-        AppSnackbar.show(
-          message: 'Item added successfully',
-          type: SnackType.success,
-        );
-        Get.back();
-
-        // Parse new item from response
-        final responseData = response.body;
-        if (responseData['data'] != null && responseData['data'].isNotEmpty) {
-          final newItem = UserRoomItem.fromJson(responseData['data'][0]);
-          userRoomItems.add(newItem);
+        var rawData = response.body['data'];
+        UserRoomItem? newItem;
+        if (rawData is List && rawData.isNotEmpty) {
+          newItem = UserRoomItem.fromJson(rawData[0]);
+        } else if (rawData is Map<String, dynamic>) {
+          newItem = UserRoomItem.fromJson(rawData);
         }
-      } else {
+
+        if (newItem != null) {
+          userRoomItems.add(newItem);
+          userRoomItems.refresh(); // Important for GetX UI update
+        }
+
+        Get.offAndToNamed(RouteNames.room);
         AppSnackbar.show(
-          message: 'Failed to add item',
-          type: SnackType.error,
-        );
-        ApiChecker.checkApi(response);
+            message: 'Item added successfully', type: SnackType.success);
       }
     } catch (e) {
-      print("Error adding user room item: $e");
+      print("Add Item Error: $e");
     } finally {
       isLoading(false);
     }

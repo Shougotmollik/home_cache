@@ -76,7 +76,9 @@ class DocumentsScreen extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(10.r)),
                               elevation: 0.0,
                             ),
-                            child: Text(categories[index],
+                            child: Text(
+                                categories[index].capitalizeFirst ??
+                                    categories[index],
                                 style: TextStyle(
                                     color: isSelected
                                         ? Colors.white
@@ -108,7 +110,9 @@ class DocumentsScreen extends StatelessWidget {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10.r)),
                             ),
-                            child: Text(categories[actualIndex],
+                            child: Text(
+                                categories[actualIndex].capitalizeFirst ??
+                                    categories[actualIndex],
                                 style: TextStyle(
                                     color: isSelected
                                         ? Colors.white

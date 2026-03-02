@@ -11,6 +11,8 @@ class CustomElevatedButton extends StatelessWidget {
   final double? height;
   final bool? isLoading;
   final bool? needIcon;
+  final Color? bgColor;
+  final Color? textColor;
 
   const CustomElevatedButton({
     super.key,
@@ -21,6 +23,8 @@ class CustomElevatedButton extends StatelessWidget {
     this.height,
     this.isLoading = false,
     this.needIcon = false,
+    this.bgColor,
+    this.textColor,
   });
 
   @override
@@ -31,7 +35,7 @@ class CustomElevatedButton extends StatelessWidget {
         height: height ?? 40.h,
         width: width ?? 96.w,
         decoration: BoxDecoration(
-            color: AppColors.primary,
+            color: bgColor ?? AppColors.primary,
             borderRadius: BorderRadius.circular(10.r)),
         child: Center(
           child: Wrap(
@@ -59,7 +63,7 @@ class CustomElevatedButton extends StatelessWidget {
                   : Text(
                       btnText,
                       style: TextStyle(
-                          color: AppColors.white,
+                          color: textColor ?? AppColors.white,
                           fontWeight: FontWeight.w500,
                           fontSize: 16.sp),
                     )

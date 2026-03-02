@@ -8,6 +8,7 @@ import 'package:home_cache/constants/app_typo_graphy.dart';
 import 'package:home_cache/constants/colors.dart' show AppColors;
 import 'package:home_cache/controller/room_controller.dart';
 import 'package:home_cache/model/user_room_item.dart';
+import 'package:home_cache/model/room_field_model.dart'; // Ensure this is imported
 import 'package:home_cache/view/auth/signup/widgets/custom_elevated_button.dart';
 import 'package:home_cache/view/home/account/productsupport/widgets/text_field_widget.dart';
 import 'package:home_cache/view/widget/appbar_back_widget.dart';
@@ -20,45 +21,55 @@ class UpdateRoomItemScreen extends StatefulWidget {
 }
 
 class _UpdateRoomItemScreenState extends State<UpdateRoomItemScreen> {
-  final TextEditingController brandController = TextEditingController();
-  final TextEditingController brandLineController = TextEditingController();
-  final TextEditingController typeController = TextEditingController();
-  final TextEditingController colorController = TextEditingController();
-  final TextEditingController finishController = TextEditingController();
-  final TextEditingController roomTEController = TextEditingController();
-  final TextEditingController locationController = TextEditingController();
-  final TextEditingController lastPaintController = TextEditingController();
+  final RoomController roomController = Get.find<RoomController>();
+  final Map<String, TextEditingController> _dynamicControllers = {};
 
-  final RoomController roomController = Get.put(RoomController());
-  late String itemId;
+  // late String itemId;
+  late UserRoomItem itemData;
+  late String selectedTypeName;
 
   @override
   void initState() {
     super.initState();
+    final args = Get.arguments as Map<String, dynamic>;
+    selectedTypeName = args['name'] ?? '';
+    itemData = args['item'];
 
-    final UserRoomItem args = Get.arguments;
+    itemData.details.forEach((key, value) {
+      _dynamicControllers[key] = TextEditingController(text: value);
+    });
 
-    // Prefill fields
-    brandController.text = args.details.brand;
-    brandLineController.text = args.details.brandLine;
-    typeController.text = args.details.type;
-    colorController.text = args.details.color;
-    finishController.text = args.details.finish;
-    locationController.text = args.details.location;
-    lastPaintController.text = args.details.lastPainted;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      roomController.fetchRoomFields(selectedTypeName);
+    });
+  }
 
-    itemId = args.id;
-
-    // Debugging
-    print("Editing Item ID: $itemId");
+  @override
+  void dispose() {
+    _dynamicControllers.forEach((_, controller) => controller.dispose());
+    super.dispose();
   }
 
   Future<void> pickImage(ImageSource source) async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(source: source, imageQuality: 80);
-
     if (picked != null) {
       roomController.selectedFile.value = File(picked.path);
+    }
+  }
+
+  Future<void> _selectDate(BuildContext context, String fieldKey) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1950),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      setState(() {
+        _dynamicControllers[fieldKey]?.text =
+            picked.toIso8601String().split('T')[0];
+      });
     }
   }
 
@@ -66,151 +77,184 @@ class _UpdateRoomItemScreenState extends State<UpdateRoomItemScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
-      appBar: AppBarBack(title: "Update Item"),
+      appBar: AppBarBack(
+          title: "Update $selectedTypeName", titleColor: AppColors.secondary),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ---------------- IMAGE PICKER ----------------
-              Center(
-                child: GestureDetector(
-                  onTap: () {
-                    Get.bottomSheet(
-                      SafeArea(
-                        child: Container(
-                          color: Colors.white,
-                          child: Wrap(
-                            children: [
-                              ListTile(
-                                leading: Icon(Icons.photo_library),
-                                title: Text("Gallery"),
-                                onTap: () {
-                                  pickImage(ImageSource.gallery);
-                                  Get.back();
-                                },
-                              ),
-                              ListTile(
-                                leading: Icon(Icons.camera_alt),
-                                title: Text("Camera"),
-                                onTap: () {
-                                  pickImage(ImageSource.camera);
-                                  Get.back();
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  child: Obx(
-                    () => roomController.selectedFile.value == null
-                        ? Container(
-                            height: 120.h,
-                            width: 120.w,
-                            padding: EdgeInsets.all(12.w),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16.r),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withAlpha(35),
-                                  blurRadius: 10,
-                                  offset: Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  'assets/images/camera.png',
-                                  height: 32.h,
-                                  width: 32.w,
-                                ),
-                                SizedBox(height: 6.h),
-                                Text(
-                                  'Pick Image',
-                                  style: AppTypoGraphy.regular.copyWith(
-                                    fontSize: 12.sp,
-                                    color: AppColors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : ClipRRect(
-                            borderRadius: BorderRadius.circular(16.r),
-                            child: Image.file(
-                              roomController.selectedFile.value!,
-                              height: 120.h,
-                              width: 120.w,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                  ),
-                ),
-              ),
+        child: Obx(() {
+          if (roomController.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-              SizedBox(height: 20.h),
+          final roomFieldData = roomController.roomFieldsData.value;
+          if (roomFieldData == null) {
+            return const Center(child: Text("No Field Definitions Found"));
+          }
 
-              // ---------------- INPUT FIELDS ----------------
-              buildField("Brand", brandController),
-              buildField("Brand Line", brandLineController),
-              buildField("Type", typeController),
-              buildField("Color", colorController),
-              buildField("Finish", finishController),
-              buildField("Location", locationController),
-              buildField("Last Painted", lastPaintController),
-            ],
-          ),
-        ),
+          return SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildImageSection(),
+                SizedBox(height: 24.h),
+
+                // Dynamically build fields based on API definition
+                ...roomFieldData.fields
+                    .map((field) => _buildDynamicField(field))
+                    .toList(),
+              ],
+            ),
+          );
+        }),
       ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-          child: CustomElevatedButton(
-            btnText: "Update",
-            height: 48.h,
-            onTap: () async {
-              Map<String, dynamic> payload = {
-                "type": typeController.text,
-                "location": locationController.text,
-                "brand": brandController.text,
-                "brand_line": brandLineController.text,
-                "color": colorController.text,
-                "finish": finishController.text,
-                "last_painted": lastPaintController.text,
-              };
+      bottomNavigationBar: _buildBottomBar(),
+    );
+  }
 
-              print("Updating item: $payload");
+  Widget _buildDynamicField(Field field) {
+    // Ensure controller exists (if API returns a field not in the item details)
+    if (!_dynamicControllers.containsKey(field.field)) {
+      _dynamicControllers[field.field] = TextEditingController();
+    }
 
-              final success =
-                  await roomController.updateUserRoomItem(payload, itemId);
-
-              if (success) {
-                Get.back(result: true);
-              }
-            },
+    return Padding(
+      padding: EdgeInsets.only(bottom: 16.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            field.field.replaceAll('_', ' ').capitalizeFirst!,
+            style: AppTypoGraphy.semiBold.copyWith(color: AppColors.black),
           ),
+          SizedBox(height: 6.h),
+          if (field.type == 'select')
+            _buildDropdown(field)
+          else if (field.type == 'date')
+            _buildDateField(field)
+          else
+            TextFieldWidget(
+              controller: _dynamicControllers[field.field]!,
+              hintText: 'Enter ${field.field.replaceAll('_', ' ')}',
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDropdown(Field field) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          isExpanded: true,
+          value: field.values!.contains(_dynamicControllers[field.field]!.text)
+              ? _dynamicControllers[field.field]!.text
+              : null,
+          hint: Text("Select ${field.field}"),
+          items: field.values
+              ?.map((val) => DropdownMenuItem(value: val, child: Text(val)))
+              .toList(),
+          onChanged: (val) =>
+              setState(() => _dynamicControllers[field.field]!.text = val!),
         ),
       ),
     );
   }
 
-  // ---------------- FIELD WIDGET ----------------
-  Widget buildField(String title, TextEditingController controller) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title,
-            style: AppTypoGraphy.semiBold.copyWith(color: AppColors.black)),
-        SizedBox(height: 6.h),
-        TextFieldWidget(controller: controller, hintText: "Enter $title"),
-        SizedBox(height: 16.h),
-      ],
+  Widget _buildDateField(Field field) {
+    return GestureDetector(
+      onTap: () => _selectDate(context, field.field),
+      child: AbsorbPointer(
+        child: TextFieldWidget(
+          controller: _dynamicControllers[field.field]!,
+          hintText: 'Select Date',
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImageSection() {
+    return Center(
+      child: GestureDetector(
+        onTap: _showPickerOptions,
+        child: Obx(() {
+          bool hasNewFile = roomController.selectedFile.value != null;
+
+          return Container(
+            height: 120.h,
+            width: 120.w,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16.r),
+              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16.r),
+              child: hasNewFile
+                  ? Image.file(roomController.selectedFile.value!,
+                      fit: BoxFit.cover)
+                  : (itemData.image != null && itemData.image!.isNotEmpty)
+                      ? Image.network(itemData.image!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => _imagePlaceholder())
+                      : _imagePlaceholder(),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _imagePlaceholder() {
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      Icon(Icons.camera_alt, size: 32.h),
+      Text('Update Image',
+          style: AppTypoGraphy.regular.copyWith(fontSize: 12.sp))
+    ]);
+  }
+
+  void _showPickerOptions() {
+    Get.bottomSheet(Container(
+      color: Colors.white,
+      child: Wrap(children: [
+        ListTile(
+            leading: Icon(Icons.photo),
+            title: Text('Gallery'),
+            onTap: () => {pickImage(ImageSource.gallery), Get.back()}),
+        ListTile(
+            leading: Icon(Icons.camera),
+            title: Text('Camera'),
+            onTap: () => {pickImage(ImageSource.camera), Get.back()}),
+      ]),
+    ));
+  }
+
+  Widget _buildBottomBar() {
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.all(16.sp),
+        child: CustomElevatedButton(
+          onTap: () async {
+            Map<String, dynamic> payload = {};
+            _dynamicControllers.forEach((key, controller) {
+              payload[key] = controller.text;
+            });
+
+            bool success =
+                await roomController.updateUserRoomItem(payload, itemData.id);
+            if (success) {
+              Get.back(result: true);
+            }
+          },
+          btnText: 'Update Item',
+          height: 48.h,
+        ),
+      ),
     );
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:home_cache/constants/colors.dart';
 import 'package:home_cache/constants/app_typo_graphy.dart';
+import 'package:home_cache/controller/provider_controller.dart';
 
 class FilterDialog extends StatefulWidget {
   const FilterDialog({super.key});
@@ -11,6 +13,7 @@ class FilterDialog extends StatefulWidget {
 }
 
 class _FilterDialogState extends State<FilterDialog> {
+  final ProviderController providerController = Get.find<ProviderController>();
   String? selectedUsageFilter;
 
   Map<int, bool> selectedRatings = {};
@@ -59,10 +62,9 @@ class _FilterDialogState extends State<FilterDialog> {
                 Text(
                   'Sort & Filter Your Providers',
                   style: AppTypoGraphy.bold.copyWith(
-                    color: AppColors.black,
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w700
-                  ),
+                      color: AppColors.black,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w700),
                 ),
                 SizedBox(height: 12.h),
                 _sectionTitle('Last Used'),
@@ -104,6 +106,56 @@ class _FilterDialogState extends State<FilterDialog> {
                       .map((type) => _buildServiceCheckbox(type))
                       .toList(),
                 ),
+                SizedBox(height: 16.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  spacing: 18.w,
+                  children: [
+                    OutlinedButton(
+                        style: ButtonStyle(
+                            side: MaterialStateProperty.all(
+                          BorderSide(
+                            color: AppColors.border,
+                            width: 2.w,
+                          ),
+                        )),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text('Cancel')),
+                    ElevatedButton(
+                      onPressed: () {
+                        // 1. Prepare Rating List
+                        List<int> selectedRatingList = selectedRatings.entries
+                            .where((e) => e.value == true)
+                            .map((e) => e.key)
+                            .toList();
+
+                        // 2. Prepare Service List
+                        List<String> selectedServiceList = selectedServices
+                            .entries
+                            .where((e) => e.value == true)
+                            .map((e) => e.key)
+                            .toList();
+
+                        // 3. Call the ADVANCED filter method with ALL parameters
+                        providerController.applyAdvancedFilters(
+                          ratings: selectedRatingList,
+                          services: selectedServiceList,
+                          usageTimeframe:
+                              selectedUsageFilter, // Pass the 'Past 30 Days' etc.
+                        );
+
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white),
+                      child: Text('Apply'),
+                    )
+                  ],
+                )
               ],
             ),
           ),
@@ -148,7 +200,6 @@ class _FilterDialogState extends State<FilterDialog> {
   }
 
   bool? favoriteFilter;
-
 
   Widget _buildStarRatingCheckbox(int rating) {
     return GestureDetector(

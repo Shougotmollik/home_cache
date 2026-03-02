@@ -52,7 +52,7 @@ class DialogAppliance extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(height: 18.h),
+              SizedBox(height: 14.h),
               Text(
                 'Type',
                 style: AppTypoGraphy.regular.copyWith(color: AppColors.black),
@@ -96,7 +96,7 @@ class DialogAppliance extends StatelessWidget {
                   ),
                 );
               }),
-              SizedBox(height: 16.h),
+              SizedBox(height: 12.h),
               Text(
                 'Location',
                 style: AppTypoGraphy.regular.copyWith(color: AppColors.black),
