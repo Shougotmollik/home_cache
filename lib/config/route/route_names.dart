@@ -1,11 +1,10 @@
-import 'package:home_cache/view/home/schedule/screens/schedule_screen.dart';
-
 class RouteNames {
   static const splash = '/splash';
   static const onboard = '/onboard';
   static const login = '/login';
   static const signup = '/signup';
   static const selectHouse = '/select-house';
+  static const forgotPassword = "/forgot-password";
   static const homeInfo = '/home-info';
   static const selectPowerType = '/select-power-type';
   static const selectWaterSupply = '/select-water-supply';
@@ -68,5 +67,5 @@ class RouteNames {
   static const paintScreen = '/paint-screen';
   static const addPaintItemScreen = '/addPaintItemScreen';
   static const updatePaintItemScreen = '/updatePaintItemScreen';
-  static const updateUtilitiesScreen='/update-utilities-screen';
+  static const updateUtilitiesScreen = '/update-utilities-screen';
 }

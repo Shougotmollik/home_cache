@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:home_cache/config/route/route_names.dart';
 import 'package:home_cache/controller_binder.dart';
+import 'package:home_cache/view/auth/login/forgot_password_screen.dart';
 import 'package:home_cache/view/auth/login/login_screen.dart';
 import 'package:home_cache/view/auth/onboarding/onboarding_screen.dart';
 import 'package:home_cache/view/auth/signup/onboardingSignup/screens/address_form_screen.dart';
@@ -75,6 +76,11 @@ class AppRoutes {
         name: RouteNames.login,
         page: () => const LoginScreen(),
         binding: ControllerBinder()),
+    GetPage(
+      name: RouteNames.forgotPassword,
+      page: () => ForgotPasswordScreen(),
+      binding: ControllerBinder(),
+    ),
     GetPage(
         name: RouteNames.signup,
         page: () => const SignupScreen(),

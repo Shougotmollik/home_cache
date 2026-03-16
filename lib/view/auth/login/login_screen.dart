@@ -124,7 +124,9 @@ class _LoginScreenState extends State<LoginScreen> {
     return Align(
       alignment: Alignment.centerLeft,
       child: TextButton(
-        onPressed: () {},
+        onPressed: () {
+          Get.toNamed(RouteNames.forgotPassword);
+        },
         child: Text(
           'Forgot Password',
           style: AppTypoGraphy.semiBold.copyWith(

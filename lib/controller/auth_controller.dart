@@ -58,6 +58,21 @@ class AuthController extends GetxController {
     isLoading(false);
   }
 
+  Future<bool> forgotPassword(var data) async {
+    isLoading(true);
+    Response response = await ApiClient.postData(
+        ApiConstants.forgotPassword, jsonEncode(data),
+        headers: {'Content-Type': 'application/json'});
+    isLoading(false);
+    if (response.statusCode == 200) {
+      final responseData = response.body['data'];
+      var userId = responseData['user_id'];
+      return userId != null ? true : false;
+    } else {
+      return false;
+    }
+  }
+
 // ! Log out method
   Future<void> logOut() async {
     await PrefsHelper.remove(AppConstants.bearerToken);

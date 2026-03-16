@@ -5,6 +5,7 @@ class ApiConstants {
 
   static String signup = "/auth/create-user";
   static String login = "/auth/login";
+  static String forgotPassword = "/auth/verify-forgot-password-req";
 
   static String fetchUserData = "/user/me";
   static String productSupport = "/user/support";
