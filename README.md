@@ -115,11 +115,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-## 📧 Contact
-
-Your Name - [@yourlink](https://twitter.com/yourlink) - email@example.com
-
-Project Link: [https://github.com/your-username/home_cache](https://github.com/your-username/home_cache)
+Project Link: [https://github.com/your-username/home_cache](https://github.com/Shougotmollik/home_cache)
 
 <p align="center">
   Built with ❤️ for better home management.
